@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37012.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreanLearningApp", "KoreanLearningApp\KoreanLearningApp.csproj", "{367E342B-B479-2C93-878D-2E39D4E3D010}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{367E342B-B479-2C93-878D-2E39D4E3D010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{367E342B-B479-2C93-878D-2E39D4E3D010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{367E342B-B479-2C93-878D-2E39D4E3D010}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{367E342B-B479-2C93-878D-2E39D4E3D010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{367E342B-B479-2C93-878D-2E39D4E3D010}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC4A1801-43EF-42C8-8B10-F3B272760ADA}
+	EndGlobalSection
+EndGlobal
