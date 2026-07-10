@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="KoreanLearningApp.Views.AddWordPage"
+             Title="Новое слово"
+             BackgroundColor="#FBF7F0">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <Label Text="Корейское слово" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Entry x:Name="KoreanEntry" Placeholder="예: 안녕하세요" />
+
+            <Label Text="Транскрипция (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Entry x:Name="TranscriptionRuEntry" Placeholder="аннёнхасэё" />
+
+            <Label Text="Транскрипция (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Entry x:Name="TranscriptionEnEntry" Placeholder="annyeonghaseyo" />
+
+            <Label Text="Перевод (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Entry x:Name="TranslationRuEntry" Placeholder="Здравствуйте" />
+
+            <Label Text="Перевод (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Entry x:Name="TranslationEnEntry" Placeholder="Hello" />
+
+            <Button Text="Сохранить"
+                    Clicked="OnSaveClicked"
+                    BackgroundColor="#2E6F65"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="48"
+                    Margin="0,16,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
