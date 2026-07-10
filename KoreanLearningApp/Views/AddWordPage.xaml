@@ -23,13 +23,19 @@
             <Label Text="Перевод (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
             <Entry x:Name="TranslationEnEntry" Placeholder="Hello" />
 
+            <Label Text="Правило (почему так пишется/произносится)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Editor x:Name="RuleExplanationEditor"
+        Placeholder="Например: 안 + 녕 читается слитно из-за озвончения ㄴ..."
+        AutoSize="TextChanges"
+        MinimumHeightRequest="80" />
+
             <Button Text="Сохранить"
-                    Clicked="OnSaveClicked"
-                    BackgroundColor="#2E6F65"
-                    TextColor="White"
-                    CornerRadius="12"
-                    HeightRequest="48"
-                    Margin="0,16,0,0" />
+        Clicked="OnSaveClicked"
+        BackgroundColor="#2E6F65"
+        TextColor="White"
+        CornerRadius="12"
+        HeightRequest="48"
+        Margin="0,16,0,0" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

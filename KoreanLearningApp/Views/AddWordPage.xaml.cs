@@ -27,7 +27,8 @@ public partial class AddWordPage : ContentPage
             TranscriptionRu = TranscriptionRuEntry.Text ?? string.Empty,
             TranscriptionEn = TranscriptionEnEntry.Text ?? string.Empty,
             TranslationRu = TranslationRuEntry.Text ?? string.Empty,
-            TranslationEn = TranslationEnEntry.Text ?? string.Empty
+            TranslationEn = TranslationEnEntry.Text ?? string.Empty,
+            RuleExplanation = RuleExplanationEditor.Text ?? string.Empty
         };
 
         await _db.SaveWordAsync(word);
