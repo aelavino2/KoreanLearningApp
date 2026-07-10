@@ -1,0 +1,16 @@
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+*.suo
+*.userosscache
+*.sln.docstates
+
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+.DS_Store
