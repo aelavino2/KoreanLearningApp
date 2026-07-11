@@ -1,0 +1,112 @@
+[
+  {
+    "korean": "안녕하세요",
+    "transcriptionRu": "аннёнхасэё",
+    "transcriptionEn": "annyeonghaseyo",
+    "translationRu": "Здравствуйте",
+    "translationEn": "Hello",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "감사합니다",
+    "transcriptionRu": "камсахамнида",
+    "transcriptionEn": "gamsahamnida",
+    "translationRu": "Спасибо",
+    "translationEn": "Thank you",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "사랑해요",
+    "transcriptionRu": "саранхэё",
+    "transcriptionEn": "saranghaeyo",
+    "translationRu": "Я люблю тебя",
+    "translationEn": "I love you",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "미안해요",
+    "transcriptionRu": "мианхэё",
+    "transcriptionEn": "mianhaeyo",
+    "translationRu": "Извините",
+    "translationEn": "Sorry",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "친구",
+    "transcriptionRu": "чхингу",
+    "transcriptionEn": "chingu",
+    "translationRu": "Друг",
+    "translationEn": "Friend",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "가족",
+    "transcriptionRu": "каджок",
+    "transcriptionEn": "gajok",
+    "translationRu": "Семья",
+    "translationEn": "Family",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "물",
+    "transcriptionRu": "муль",
+    "transcriptionEn": "mul",
+    "translationRu": "Вода",
+    "translationEn": "Water",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "음식",
+    "transcriptionRu": "ымсик",
+    "transcriptionEn": "eumsik",
+    "translationRu": "Еда",
+    "translationEn": "Food",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "학교",
+    "transcriptionRu": "хаккё",
+    "transcriptionEn": "hakgyo",
+    "translationRu": "Школа",
+    "translationEn": "School",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  },
+  {
+    "korean": "사랑",
+    "transcriptionRu": "саран",
+    "transcriptionEn": "sarang",
+    "translationRu": "Любовь",
+    "translationEn": "Love",
+    "rule": "",
+    "category": "",
+    "type": "noun",
+    "pronunciationNote": ""
+  }
+]

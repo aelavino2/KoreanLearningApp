@@ -1,31 +1,29 @@
-﻿using KoreanLearningApp.Services;
+﻿using CommunityToolkit.Maui;
+using KoreanLearningApp.Services;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
-
 namespace KoreanLearningApp;
-
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
-
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
-
         builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddTransient<Views.WordsPage>();
         builder.Services.AddTransient<Views.AddWordPage>();
-
+        builder.Services.AddTransient<QuizPage>();
         return builder.Build();
-	}
+    }
 }

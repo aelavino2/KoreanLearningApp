@@ -120,6 +120,11 @@ public partial class WordsPage : ContentPage
         return _koreanLocale;
     }
 
+    private async void OnQuizClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(QuizPage));
+    }
+
     private async void OnPlayAudioClicked(object sender, EventArgs e)
     {
         if (sender is not Button { BindingContext: WordCardViewModel card })

@@ -25,6 +25,9 @@
             <Border Stroke="{StaticResource PersimmonColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
                 <Button Text="JSON" Clicked="OnImportExportClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
             </Border>
+            <Border Stroke="{StaticResource JadeColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource JadeColor}" Padding="4">
+                <Button Text="Проверка знаний" Clicked="OnQuizClicked" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+            </Border>
         </HorizontalStackLayout>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="Center">

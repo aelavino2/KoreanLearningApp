@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="KoreanLearningApp.Views.CustomAlertPage" BackgroundColor="#66000000">
+
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" Padding="30">
+        <Border BackgroundColor="#FBF7F0" StrokeShape="RoundRectangle 20" Stroke="#EAE3D6" StrokeThickness="1" Padding="26,24" MaximumWidthRequest="360">
+            <Border.Shadow>
+                <Shadow Brush="#000000" Opacity="0.25" Radius="20" Offset="0,8" />
+            </Border.Shadow>
+
+            <VerticalStackLayout Spacing="16">
+
+                <Label x:Name="TitleLabel" FontSize="19" FontAttributes="Bold" TextColor="#2B2B2B" />
+
+                <Label x:Name="MessageLabel" FontSize="15" TextColor="#5C5648" LineBreakMode="WordWrap" />
+
+                <HorizontalStackLayout x:Name="ButtonsLayout" Spacing="12" HorizontalOptions="End" Margin="0,8,0,0">
+                    <Button x:Name="SecondaryButton" Text="Отмена" Clicked="OnSecondaryClicked" BackgroundColor="Transparent" TextColor="#8A8378" FontSize="14" FontAttributes="Bold" IsVisible="False" />
+                    <Button x:Name="PrimaryButton" Text="ОК" Clicked="OnPrimaryClicked" BackgroundColor="#2E6F65" TextColor="White" FontSize="14" FontAttributes="Bold" CornerRadius="12" HeightRequest="42" Padding="20,0" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

@@ -1,5 +1,6 @@
 ﻿using KoreanLearningApp.Models;
 using SQLite;
+using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
@@ -8,6 +9,7 @@ namespace KoreanLearningApp.Services;
 public class DatabaseService
 {
     private SQLiteAsyncConnection? _connection;
+    private const string BackupFileName = "words_backup.json";
 
     private async Task Init()
     {
@@ -22,6 +24,7 @@ public class DatabaseService
         if (count == 0)
         {
             await _connection.InsertAllAsync(WordSeeder.GetSeedWords());
+            await AutoSaveBackupAsync();
         }
     }
 
@@ -36,6 +39,35 @@ public class DatabaseService
 #endif
     }
 
+    // Папка, куда автоматически пишется резервная JSON-копия при каждом изменении базы
+    public static string GetBackupFolder()
+    {
+#if WINDOWS
+        var folder = @"D:\c#\KoreanLearningApp\Database";
+#else
+        var folder = FileSystem.AppDataDirectory;
+#endif
+        Directory.CreateDirectory(folder);
+        return folder;
+    }
+
+    public static string GetBackupFilePath()
+        => Path.Combine(GetBackupFolder(), BackupFileName);
+
+    // Вызывается после каждого изменения базы — держит JSON-копию всегда актуальной
+    private async Task AutoSaveBackupAsync()
+    {
+        try
+        {
+            var json = await BuildExportJsonAsync();
+            await File.WriteAllTextAsync(GetBackupFilePath(), json);
+        }
+        catch
+        {
+            // Автосохранение резервной копии не критично для работы приложения — не прерываем поток
+        }
+    }
+
     public async Task<List<Word>> GetWordsAsync()
     {
         await Init();
@@ -45,10 +77,12 @@ public class DatabaseService
     public async Task<int> SaveWordAsync(Word word)
     {
         await Init();
-        if (word.Id != 0)
-            return await _connection!.UpdateAsync(word);
+        int result = word.Id != 0
+            ? await _connection!.UpdateAsync(word)
+            : await _connection!.InsertAsync(word);
 
-        return await _connection!.InsertAsync(word);
+        await AutoSaveBackupAsync();
+        return result;
     }
 
     public async Task<ImportResult> ImportWordsAsync(List<WordImportDto> incoming)
@@ -99,12 +133,24 @@ public class DatabaseService
         }
 
         if (toInsert.Count > 0)
+        {
             await _connection!.InsertAllAsync(toInsert);
+            await AutoSaveBackupAsync();
+        }
 
         return new ImportResult(toInsert.Count, skipped);
     }
 
-    public async Task<string> ExportWordsAsJsonAsync()
+    public async Task<int> DeleteWordAsync(Word word)
+    {
+        await Init();
+        var result = await _connection!.DeleteAsync(word);
+        await AutoSaveBackupAsync();
+        return result;
+    }
+
+    // Строит JSON текущего содержимого базы (используется и автосохранением, и ручным экспортом)
+    public async Task<string> BuildExportJsonAsync()
     {
         await Init();
         var words = await _connection!.Table<Word>().ToListAsync();
@@ -130,10 +176,4 @@ public class DatabaseService
 
     private static string MakeKey(string korean, string translationRu)
         => $"{korean.Trim().ToLowerInvariant()}|{translationRu.Trim().ToLowerInvariant()}";
-
-    public async Task<int> DeleteWordAsync(Word word)
-    {
-        await Init();
-        return await _connection!.DeleteAsync(word);
-    }
 }
