@@ -55,6 +55,12 @@ public partial class WordsPage : ContentPage
             await DisplayAlert("Правило", card.RuleText, "Понятно");
         }
     }
+
+    private async void OnImportExportClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(ImportExportPage));
+    }
+
     private void OnRevealClicked(object sender, EventArgs e)
     {
         if (sender is Button { BindingContext: WordCardViewModel card })

@@ -1,4 +1,5 @@
 ﻿using KoreanLearningApp.Services;
+using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 
 namespace KoreanLearningApp;
@@ -20,6 +21,7 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
+        builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddTransient<Views.WordsPage>();
         builder.Services.AddTransient<Views.AddWordPage>();

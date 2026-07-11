@@ -49,6 +49,20 @@
                     FontSize="16"
                     Padding="16,8" />
             </Border>
+
+            <Border Stroke="{StaticResource PersimmonColor}"
+        StrokeThickness="1.5"
+        StrokeShape="RoundRectangle 24"
+        BackgroundColor="{StaticResource CardColor}"
+        Padding="4">
+                <Button Text="🧩 JSON"
+            Clicked="OnImportExportClicked"
+            BackgroundColor="Transparent"
+            TextColor="{StaticResource PersimmonColor}"
+            FontAttributes="Bold"
+            FontSize="16"
+            Padding="16,8" />
+            </Border>
         </HorizontalStackLayout>
 
         <!-- Список карточек -->

@@ -8,5 +8,6 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute(nameof(AddWordPage), typeof(AddWordPage));
+        Routing.RegisterRoute(nameof(ImportExportPage), typeof(ImportExportPage));
     }
 }
