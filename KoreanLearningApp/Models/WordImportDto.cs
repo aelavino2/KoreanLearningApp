@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 namespace KoreanLearningApp.Models;
-
 public class WordImportDto
 {
     [JsonPropertyName("korean")]
@@ -20,4 +19,10 @@ public class WordImportDto
 
     [JsonPropertyName("rule")]
     public string Rule { get; set; } = string.Empty;
+
+    [JsonPropertyName("category")]
+    public string Category { get; set; } = string.Empty;
+
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = string.Empty;
 }

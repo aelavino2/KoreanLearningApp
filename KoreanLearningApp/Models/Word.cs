@@ -11,8 +11,11 @@ public class Word
     public string TranscriptionEn { get; set; } = string.Empty;
     public string TranslationRu { get; set; } = string.Empty;
     public string TranslationEn { get; set; } = string.Empty;
-
-    // Пояснение: почему слово так пишется или произносится
-    // (звуковые изменения, грамматическое правило и т.п.)
     public string RuleExplanation { get; set; } = string.Empty;
+
+    public string Category { get; set; } = string.Empty;
+
+    public WordType Type { get; set; } = WordType.Other;
+
+    public LearningStatus Status { get; set; } = LearningStatus.Learning;
 }

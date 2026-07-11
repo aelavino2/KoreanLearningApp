@@ -14,8 +14,8 @@ public class WordCardViewModel : INotifyPropertyChanged
         _word = word;
         _koreanToRussian = koreanToRussian;
     }
+    public Word UnderlyingWord => _word;
 
-    // Порядковый номер карточки в списке (обновляется при загрузке и перемешивании)
     public int Number
     {
         get => _number;
@@ -30,6 +30,22 @@ public class WordCardViewModel : INotifyPropertyChanged
 
     public string RuleText => _word.RuleExplanation;
     public bool HasRule => !string.IsNullOrWhiteSpace(_word.RuleExplanation);
+
+    public string CategoryText => _word.Category;
+    public bool HasCategory => !string.IsNullOrWhiteSpace(_word.Category);
+
+    public string TypeText => WordTypeHelper.ToLabel(_word.Type);
+
+    public bool IsLearned => _word.Status == LearningStatus.Learned;
+
+    public string StatusButtonText => IsLearned ? "✅ Выучено" : "📘 Учу";
+
+    public void ToggleStatus()
+    {
+        _word.Status = IsLearned ? LearningStatus.Learning : LearningStatus.Learned;
+        OnPropertyChanged(nameof(IsLearned));
+        OnPropertyChanged(nameof(StatusButtonText));
+    }
 
     public bool IsRevealed
     {

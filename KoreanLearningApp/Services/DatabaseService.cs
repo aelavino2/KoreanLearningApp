@@ -18,7 +18,6 @@ public class DatabaseService
         _connection = new SQLiteAsyncConnection(dbPath);
         await _connection.CreateTableAsync<Word>();
 
-        // Если база пустая — заполняем стартовым набором слов
         var count = await _connection.Table<Word>().CountAsync();
         if (count == 0)
         {
@@ -29,13 +28,10 @@ public class DatabaseService
     private static string GetDbPath()
     {
 #if WINDOWS
-        // Во время разработки на Windows храним базу прямо в папке проекта,
-        // чтобы можно было легко открыть её в DB Browser for SQLite
         var folder = @"D:\c#\KoreanLearningApp\Database";
         Directory.CreateDirectory(folder);
         return Path.Combine(folder, "korean_learning.db3");
 #else
-        // На мобильных платформах используем приватное хранилище приложения
         return Path.Combine(FileSystem.AppDataDirectory, "korean_learning.db3");
 #endif
     }
@@ -94,7 +90,10 @@ public class DatabaseService
                 TranscriptionEn = dto.TranscriptionEn.Trim(),
                 TranslationRu = dto.TranslationRu.Trim(),
                 TranslationEn = dto.TranslationEn.Trim(),
-                RuleExplanation = dto.Rule?.Trim() ?? string.Empty
+                RuleExplanation = dto.Rule?.Trim() ?? string.Empty,
+                Category = dto.Category?.Trim() ?? string.Empty,
+                Type = WordTypeHelper.FromStringKey(dto.Type),
+                Status = LearningStatus.Learning
             });
         }
 
@@ -108,7 +107,6 @@ public class DatabaseService
     {
         await Init();
         var words = await _connection!.Table<Word>().ToListAsync();
-
         var dtos = words.Select(w => new WordImportDto
         {
             Korean = w.Korean,
@@ -116,13 +114,15 @@ public class DatabaseService
             TranscriptionEn = w.TranscriptionEn,
             TranslationRu = w.TranslationRu,
             TranslationEn = w.TranslationEn,
-            Rule = w.RuleExplanation
+            Rule = w.RuleExplanation,
+            Category = w.Category,
+            Type = w.Type.ToString().ToLowerInvariant()
         }).ToList();
 
         return JsonSerializer.Serialize(dtos, new JsonSerializerOptions
         {
             WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping // чтобы корейские/русские символы не превращались в \uXXXX
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
     }
 
