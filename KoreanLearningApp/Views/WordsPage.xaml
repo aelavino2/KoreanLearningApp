@@ -63,6 +63,9 @@
                                 <Border BackgroundColor="{StaticResource BadgeColor}" StrokeShape="RoundRectangle 10" Padding="8,3">
                                     <Label Text="{Binding TypeText}" FontSize="12" TextColor="{StaticResource MutedColor}" />
                                 </Border>
+                                <Border BackgroundColor="{StaticResource BadgeColor}" StrokeShape="RoundRectangle 10" Padding="8,3">
+                                    <Label Text="{Binding BoxText}" FontSize="12" TextColor="{StaticResource MutedColor}" />
+                                </Border>
                             </HorizontalStackLayout>
 
                             <Grid Grid.Row="3">

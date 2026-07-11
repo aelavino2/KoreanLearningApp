@@ -27,6 +27,9 @@ public class WordCardViewModel : INotifyPropertyChanged
     public string TranscriptionText => (_koreanToRussian || IsRevealed) ? _word.TranscriptionRu : string.Empty;
     public string BackText => _koreanToRussian ? _word.TranslationRu : _word.Korean;
 
+    public string BoxText => SpacedRepetitionHelper.ProgressStars(_word.LeitnerBox);
+
+    public bool IsDueForReview => SpacedRepetitionHelper.IsDue(_word);
     public string RuleText => _word.RuleExplanation;
     public bool HasRule => !string.IsNullOrWhiteSpace(_word.RuleExplanation);
 

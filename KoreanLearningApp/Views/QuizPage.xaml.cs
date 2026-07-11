@@ -5,7 +5,8 @@ namespace KoreanLearningApp.Views;
 public partial class QuizPage : ContentPage
 {
     private const int QuestionSeconds = 15;
-    private const int MinLearnedWords = 4;
+    private const int MinWordsForQuiz = 4;
+    private const int SessionSize = 10;
 
     private readonly DatabaseService _db;
     private readonly Random _random = new();
@@ -40,20 +41,32 @@ public partial class QuizPage : ContentPage
     private async Task StartQuizAsync()
     {
         _allWords = await _db.GetWordsAsync();
-        var learned = _allWords.Where(w => w.Status == LearningStatus.Learned).ToList();
 
-        if (learned.Count < MinLearnedWords)
+        if (_allWords.Count < MinWordsForQuiz)
         {
             await CustomAlertPage.ShowAsync(
-                "Недостаточно выученных слов",
-                $"Для проверки знаний нужно минимум {MinLearnedWords} слов со статусом \"Выучено\". " +
-                $"Сейчас их: {learned.Count}. Отметьте больше слов как выученные и возвращайтесь.",
+                "Недостаточно слов",
+                $"Для проверки знаний нужно минимум {MinWordsForQuiz} слов в словаре. Сейчас их: {_allWords.Count}.",
                 "Понятно");
             await Shell.Current.GoToAsync("..");
             return;
         }
 
-        _quizQueue = learned.OrderBy(_ => _random.Next()).ToList();
+        // Берём слова, которые пора повторить (просроченные по алгоритму Лейтнера),
+        // ограничивая размер сессии, чтобы не перегружать одной проверкой
+        var due = await _db.GetDueWordsAsync(SessionSize);
+        _quizQueue = due.OrderBy(_ => _random.Next()).Take(SessionSize).ToList();
+
+        if (_quizQueue.Count < MinWordsForQuiz)
+        {
+            await CustomAlertPage.ShowAsync(
+                "Пока нечего повторять",
+                "Все слова уже повторены недавно и ждут своего срока. Возвращайтесь позже, либо добавьте новые слова.",
+                "Понятно");
+            await Shell.Current.GoToAsync("..");
+            return;
+        }
+
         _currentIndex = 0;
         _correctCount = 0;
         ScoreLabel.Text = "Правильно: 0";
@@ -73,6 +86,7 @@ public partial class QuizPage : ContentPage
         _currentWord = _quizQueue[_currentIndex];
         ProgressLabel.Text = $"Вопрос {_currentIndex + 1} из {_quizQueue.Count}";
         QuestionLabel.Text = _currentWord.Korean;
+        BoxLabel.Text = SpacedRepetitionHelper.ProgressStars(_currentWord.LeitnerBox);
 
         var wrongOptions = _allWords
             .Where(w => w.Id != _currentWord.Id && !string.IsNullOrWhiteSpace(w.TranslationRu))
@@ -132,6 +146,7 @@ public partial class QuizPage : ContentPage
         {
             _answerLocked = true;
             StopTimer();
+            await RecordAnswerAsync(wasCorrect: false);
             HighlightCorrectAnswer();
             await Task.Delay(900);
             MoveToNextQuestion();
@@ -147,6 +162,8 @@ public partial class QuizPage : ContentPage
         StopTimer();
 
         bool isCorrect = clicked.Text == _currentWord.TranslationRu;
+        await RecordAnswerAsync(isCorrect);
+
         if (isCorrect)
         {
             _correctCount++;
@@ -163,6 +180,16 @@ public partial class QuizPage : ContentPage
 
         await Task.Delay(700);
         MoveToNextQuestion();
+    }
+
+    // Применяет алгоритм Лейтнера к текущему слову и сохраняет результат в базу
+    private async Task RecordAnswerAsync(bool wasCorrect)
+    {
+        if (_currentWord is null)
+            return;
+
+        SpacedRepetitionHelper.ApplyAnswer(_currentWord, wasCorrect);
+        await _db.SaveWordAsync(_currentWord);
     }
 
     private void HighlightCorrectAnswer()
@@ -205,7 +232,7 @@ public partial class QuizPage : ContentPage
     {
         bool confirm = await CustomAlertPage.ShowConfirmAsync(
             "Завершить проверку?",
-            "Текущий результат не будет сохранён, если выйти сейчас.",
+            "Прогресс по уже отвеченным словам сохранён. Оставшиеся слова останутся в очереди на следующий раз.",
             "Завершить",
             "Продолжить");
 

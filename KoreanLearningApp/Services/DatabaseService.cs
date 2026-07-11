@@ -39,7 +39,6 @@ public class DatabaseService
 #endif
     }
 
-    // Папка, куда автоматически пишется резервная JSON-копия при каждом изменении базы
     public static string GetBackupFolder()
     {
 #if WINDOWS
@@ -51,10 +50,8 @@ public class DatabaseService
         return folder;
     }
 
-    public static string GetBackupFilePath()
-        => Path.Combine(GetBackupFolder(), BackupFileName);
+    public static string GetBackupFilePath() => Path.Combine(GetBackupFolder(), BackupFileName);
 
-    // Вызывается после каждого изменения базы — держит JSON-копию всегда актуальной
     private async Task AutoSaveBackupAsync()
     {
         try
@@ -64,7 +61,7 @@ public class DatabaseService
         }
         catch
         {
-            // Автосохранение резервной копии не критично для работы приложения — не прерываем поток
+            // Автосохранение не критично для работы приложения — не прерываем поток
         }
     }
 
@@ -72,6 +69,26 @@ public class DatabaseService
     {
         await Init();
         return await _connection!.Table<Word>().ToListAsync();
+    }
+
+    // Слова, которые пора повторить сейчас (просроченные), плюс — если их не хватает —
+    // добираем словами с самой ранней датой следующего повторения, чтобы сессия не была пустой.
+    public async Task<List<Word>> GetDueWordsAsync(int desiredCount)
+    {
+        await Init();
+        var all = await _connection!.Table<Word>().ToListAsync();
+
+        var due = all.Where(SpacedRepetitionHelper.IsDue).ToList();
+
+        if (due.Count < desiredCount)
+        {
+            var extra = all.Except(due)
+                .OrderBy(w => w.NextReviewAt)
+                .Take(desiredCount - due.Count);
+            due.AddRange(extra);
+        }
+
+        return due;
     }
 
     public async Task<int> SaveWordAsync(Word word)
@@ -128,7 +145,9 @@ public class DatabaseService
                 Category = dto.Category?.Trim() ?? string.Empty,
                 Type = WordTypeHelper.FromStringKey(dto.Type),
                 Status = LearningStatus.Learning,
-                PronunciationNote = dto.PronunciationNote?.Trim() ?? string.Empty
+                PronunciationNote = dto.PronunciationNote?.Trim() ?? string.Empty,
+                LeitnerBox = 1,
+                NextReviewAt = DateTime.UtcNow
             });
         }
 
@@ -149,7 +168,6 @@ public class DatabaseService
         return result;
     }
 
-    // Строит JSON текущего содержимого базы (используется и автосохранением, и ручным экспортом)
     public async Task<string> BuildExportJsonAsync()
     {
         await Init();
