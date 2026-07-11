@@ -3,29 +3,32 @@
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="16">
             <Label Text="Корейское слово" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="KoreanEntry" Placeholder="예: 안녕하세요" />
-            
+            <Entry x:Name="KoreanEntry" />
+
             <Label Text="Транскрипция (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranscriptionRuEntry" Placeholder="аннёнхасэё" />
-            
+            <Entry x:Name="TranscriptionRuEntry" />
+
             <Label Text="Транскрипция (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranscriptionEnEntry" Placeholder="annyeonghaseyo" />
-            
+            <Entry x:Name="TranscriptionEnEntry" />
+
             <Label Text="Перевод (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranslationRuEntry" Placeholder="Здравствуйте" />
-            
+            <Entry x:Name="TranslationRuEntry" />
+
             <Label Text="Перевод (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranslationEnEntry" Placeholder="Hello" />
-            
+            <Entry x:Name="TranslationEnEntry" />
+
             <Label Text="Категория" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="CategoryEntry" Placeholder="Например: Еда, Семья, Приветствия" />
-            
+            <Entry x:Name="CategoryEntry" />
+
             <Label Text="Тип слова" FontAttributes="Bold" TextColor="#2B2B2B" />
-            
-            <Picker x:Name="TypePicker" Title="Выберите тип" />
-            <Label Text="Правило (почему так пишется/произносится)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            
-            <Editor x:Name="RuleExplanationEditor" Placeholder="Например: 안 + 녕 читается слитно из-за озвончения ㄴ..." AutoSize="TextChanges" MinimumHeightRequest="80" />
+            <Picker x:Name="TypePicker" />
+
+            <Label Text="Правило (написание/грамматика)" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Editor x:Name="RuleExplanationEditor" AutoSize="TextChanges" MinimumHeightRequest="80" />
+
+            <Label Text="Заметка о произношении" FontAttributes="Bold" TextColor="#2B2B2B" />
+            <Editor x:Name="PronunciationNoteEditor" AutoSize="TextChanges" MinimumHeightRequest="80" />
+
             <Button Text="Сохранить" Clicked="OnSaveClicked" BackgroundColor="#2E6F65" TextColor="White" CornerRadius="12" HeightRequest="48" Margin="0,16,0,0" />
         </VerticalStackLayout>
     </ScrollView>

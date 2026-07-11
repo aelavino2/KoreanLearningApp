@@ -14,6 +14,7 @@ public class WordCardViewModel : INotifyPropertyChanged
         _word = word;
         _koreanToRussian = koreanToRussian;
     }
+
     public Word UnderlyingWord => _word;
 
     public int Number
@@ -23,13 +24,14 @@ public class WordCardViewModel : INotifyPropertyChanged
     }
 
     public string FrontText => _koreanToRussian ? _word.Korean : _word.TranslationRu;
-
     public string TranscriptionText => (_koreanToRussian || IsRevealed) ? _word.TranscriptionRu : string.Empty;
-
     public string BackText => _koreanToRussian ? _word.TranslationRu : _word.Korean;
 
     public string RuleText => _word.RuleExplanation;
     public bool HasRule => !string.IsNullOrWhiteSpace(_word.RuleExplanation);
+
+    public string PronunciationNoteText => _word.PronunciationNote;
+    public bool HasPronunciationNote => !string.IsNullOrWhiteSpace(_word.PronunciationNote);
 
     public string CategoryText => _word.Category;
     public bool HasCategory => !string.IsNullOrWhiteSpace(_word.Category);
@@ -37,8 +39,7 @@ public class WordCardViewModel : INotifyPropertyChanged
     public string TypeText => WordTypeHelper.ToLabel(_word.Type);
 
     public bool IsLearned => _word.Status == LearningStatus.Learned;
-
-    public string StatusButtonText => IsLearned ? "✅ Выучено" : "📘 Учу";
+    public string StatusButtonText => IsLearned ? "Выучено" : "Учу";
 
     public void ToggleStatus()
     {

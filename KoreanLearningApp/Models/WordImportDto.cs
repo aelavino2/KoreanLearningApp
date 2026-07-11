@@ -25,4 +25,7 @@ public class WordImportDto
 
     [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
+
+    [JsonPropertyName("pronunciationNote")]
+    public string PronunciationNote { get; set; } = string.Empty;
 }

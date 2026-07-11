@@ -93,7 +93,8 @@ public class DatabaseService
                 RuleExplanation = dto.Rule?.Trim() ?? string.Empty,
                 Category = dto.Category?.Trim() ?? string.Empty,
                 Type = WordTypeHelper.FromStringKey(dto.Type),
-                Status = LearningStatus.Learning
+                Status = LearningStatus.Learning,
+                PronunciationNote = dto.PronunciationNote?.Trim() ?? string.Empty
             });
         }
 
@@ -116,7 +117,8 @@ public class DatabaseService
             TranslationEn = w.TranslationEn,
             Rule = w.RuleExplanation,
             Category = w.Category,
-            Type = w.Type.ToString().ToLowerInvariant()
+            Type = w.Type.ToString().ToLowerInvariant(),
+            PronunciationNote = w.PronunciationNote
         }).ToList();
 
         return JsonSerializer.Serialize(dtos, new JsonSerializerOptions

@@ -8,7 +8,6 @@ public partial class AddWordPage : ContentPage
     {
         InitializeComponent();
         _db = db;
-
         TypePicker.ItemsSource = WordTypeHelper.AllTypes.Select(t => t.Label).ToList();
         TypePicker.SelectedIndex = WordTypeHelper.AllTypes.ToList().FindIndex(t => t.Type == WordType.Other);
     }
@@ -35,7 +34,8 @@ public partial class AddWordPage : ContentPage
             RuleExplanation = RuleExplanationEditor.Text ?? string.Empty,
             Category = CategoryEntry.Text ?? string.Empty,
             Type = selectedType,
-            Status = LearningStatus.Learning
+            Status = LearningStatus.Learning,
+            PronunciationNote = PronunciationNoteEditor.Text ?? string.Empty
         };
         await _db.SaveWordAsync(word);
         await Shell.Current.GoToAsync("..");
