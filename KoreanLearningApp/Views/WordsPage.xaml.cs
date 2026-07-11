@@ -122,7 +122,7 @@ public partial class WordsPage : ContentPage
 
     private async void OnQuizClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync(nameof(QuizPage));
+        await Shell.Current.GoToAsync(nameof(QuizSettingsPage));
     }
 
     private async void OnPlayAudioClicked(object sender, EventArgs e)

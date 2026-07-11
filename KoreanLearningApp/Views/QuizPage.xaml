@@ -8,31 +8,64 @@
             <Color x:Key="GoldColor">#C9A227</Color>
             <Color x:Key="CardColor">#FFFFFF</Color>
             <Color x:Key="MutedColor">#8A8378</Color>
+            <Color x:Key="BadgeColor">#F0EBE0</Color>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="20,16" RowSpacing="16">
-        <Label Grid.Row="0" x:Name="ProgressLabel" Text="Вопрос 1 из 10" FontSize="14" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center" />
-        <ProgressBar Grid.Row="1" x:Name="TimerBar" Progress="1" ProgressColor="{StaticResource JadeColor}" HeightRequest="10" />
 
-        <HorizontalStackLayout Grid.Row="2" Spacing="16" HorizontalOptions="Center">
-            <Label x:Name="ScoreLabel" Text="Правильно: 0" FontSize="14" TextColor="{StaticResource JadeColor}" FontAttributes="Bold" />
-            <Label x:Name="BoxLabel" Text="Коробка 1" FontSize="14" TextColor="{StaticResource MutedColor}" />
-        </HorizontalStackLayout>
+    <ScrollView>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Padding="20,16" RowSpacing="14">
 
-        <VerticalStackLayout Grid.Row="3" Spacing="20" VerticalOptions="Center">
-            <Border BackgroundColor="{StaticResource CardColor}" Stroke="#EAE3D6" StrokeThickness="1" StrokeShape="RoundRectangle 18" Padding="24,32">
+            <Label Grid.Row="0" x:Name="ProgressLabel" Text="Вопрос 1 из 10" FontSize="14" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center" />
+            <ProgressBar Grid.Row="1" x:Name="TimerBar" Progress="1" ProgressColor="{StaticResource JadeColor}" HeightRequest="10" />
+
+            <HorizontalStackLayout Grid.Row="2" Spacing="16" HorizontalOptions="Center">
+                <Label x:Name="ScoreLabel" Text="Правильно: 0" FontSize="14" TextColor="{StaticResource JadeColor}" FontAttributes="Bold" />
+                <Label x:Name="BoxLabel" Text="" FontSize="14" TextColor="{StaticResource MutedColor}" />
+            </HorizontalStackLayout>
+
+            <Border Grid.Row="3" BackgroundColor="{StaticResource CardColor}" Stroke="#EAE3D6" StrokeThickness="1" StrokeShape="RoundRectangle 18" Padding="24,32">
                 <Border.Shadow>
                     <Shadow Brush="#000000" Opacity="0.06" Radius="12" Offset="0,4" />
                 </Border.Shadow>
                 <Label x:Name="QuestionLabel" Text="안녕하세요" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource InkColor}" HorizontalOptions="Center" />
             </Border>
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+
+            <!-- Обычный режим: выбор варианта -->
+            <Grid x:Name="NormalModeGrid" Grid.Row="4" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
                 <Button x:Name="Option1Button" Grid.Row="0" Grid.Column="0" Clicked="OnOptionClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource InkColor}" FontSize="15" CornerRadius="12" HeightRequest="60" Padding="8" LineBreakMode="WordWrap" />
                 <Button x:Name="Option2Button" Grid.Row="0" Grid.Column="1" Clicked="OnOptionClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource InkColor}" FontSize="15" CornerRadius="12" HeightRequest="60" Padding="8" LineBreakMode="WordWrap" />
                 <Button x:Name="Option3Button" Grid.Row="1" Grid.Column="0" Clicked="OnOptionClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource InkColor}" FontSize="15" CornerRadius="12" HeightRequest="60" Padding="8" LineBreakMode="WordWrap" />
                 <Button x:Name="Option4Button" Grid.Row="1" Grid.Column="1" Clicked="OnOptionClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource InkColor}" FontSize="15" CornerRadius="12" HeightRequest="60" Padding="8" LineBreakMode="WordWrap" />
             </Grid>
-        </VerticalStackLayout>
-        <Button Grid.Row="4" Text="Завершить" Clicked="OnFinishClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontSize="14" HorizontalOptions="Center" />
-    </Grid>
+
+            <!-- Сложный режим: написание с клавиатурой хангыля -->
+            <VerticalStackLayout x:Name="HardModeLayout" Grid.Row="4" Spacing="12" IsVisible="False">
+
+                <Border BackgroundColor="{StaticResource BadgeColor}" StrokeShape="RoundRectangle 12" Padding="16,14">
+                    <Label x:Name="TypedAnswerLabel" Text=" " FontSize="26" FontAttributes="Bold" TextColor="{StaticResource InkColor}" HorizontalOptions="Center" />
+                </Border>
+
+                <Label Text="Начальная согласная" FontSize="12" TextColor="{StaticResource MutedColor}" />
+                <FlexLayout x:Name="ChoKeyboard" Wrap="Wrap" JustifyContent="Start" />
+
+                <Label Text="Гласная" FontSize="12" TextColor="{StaticResource MutedColor}" />
+                <FlexLayout x:Name="JungKeyboard" Wrap="Wrap" JustifyContent="Start" />
+
+                <Label Text="Конечная согласная (받침, необязательно)" FontSize="12" TextColor="{StaticResource MutedColor}" />
+                <FlexLayout x:Name="JongKeyboard" Wrap="Wrap" JustifyContent="Start" />
+
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                    <Button Grid.Column="0" Text="Слог" Clicked="OnCommitSyllableClicked" BackgroundColor="{StaticResource GoldColor}" TextColor="White" CornerRadius="10" HeightRequest="44" />
+                    <Button Grid.Column="1" Text="Пробел" Clicked="OnSpaceClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource InkColor}" CornerRadius="10" HeightRequest="44" />
+                    <Button Grid.Column="2" Text="⌫" Clicked="OnBackspaceClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource PersimmonColor}" CornerRadius="10" HeightRequest="44" />
+                </Grid>
+
+                <Button Text="Проверить" Clicked="OnSubmitAnswerClicked" BackgroundColor="{StaticResource JadeColor}" TextColor="White" CornerRadius="12" HeightRequest="50" Margin="0,8,0,0" />
+
+            </VerticalStackLayout>
+
+            <Button Grid.Row="5" Text="Завершить" Clicked="OnFinishClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontSize="14" HorizontalOptions="Center" Margin="0,8,0,0" />
+
+        </Grid>
+    </ScrollView>
 </ContentPage>

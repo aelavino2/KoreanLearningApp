@@ -21,8 +21,10 @@ public static class MauiProgram
 #endif
         builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddSingleton<QuizSessionSettings>();
         builder.Services.AddTransient<Views.WordsPage>();
         builder.Services.AddTransient<Views.AddWordPage>();
+        builder.Services.AddTransient<QuizSettingsPage>();
         builder.Services.AddTransient<QuizPage>();
         return builder.Build();
     }
