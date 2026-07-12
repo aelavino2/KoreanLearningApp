@@ -1,5 +1,4 @@
 ﻿using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Abstractions;
 using KoreanLearningApp.Infrastructure.Persistence.Abstractions.Repositories;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
@@ -9,7 +8,7 @@ using KoreanLearningApp.Services;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Repositories;
 
-public class WordRepository : Repository<WordEntity>, IWordRepository
+public class WordRepository : ImportExportRepository<WordEntity, WordImportDto>, IWordRepository
 {
     private readonly IBackupService _backupService;
 
@@ -55,58 +54,12 @@ public class WordRepository : Repository<WordEntity>, IWordRepository
 
     public async Task<ImportResult> ImportWordsAsync(List<WordImportDto> incoming)
     {
-        var existing = await GetAllEntitiesAsync();
+        var result = await ImportAsync(incoming);
 
-        var toInsert = new List<WordEntity>();
-        var skipped = new List<string>();
-        var seenInBatch = new HashSet<string>();
-
-        foreach (var dto in incoming)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Korean) || string.IsNullOrWhiteSpace(dto.TranslationRu))
-            {
-                skipped.Add($"{dto.Korean} — пропущено (нет корейского слова или перевода)");
-                continue;
-            }
-
-            var key = MakeKey(dto.Korean, dto.TranslationRu);
-
-            if (!seenInBatch.Add(key))
-            {
-                skipped.Add($"{dto.Korean} ({dto.TranslationRu}) — повтор внутри присланного списка");
-                continue;
-            }
-
-            if (existing.Any(w => MakeKey(w.Korean, w.TranslationRu) == key))
-            {
-                skipped.Add($"{dto.Korean} ({dto.TranslationRu}) — уже есть в базе");
-                continue;
-            }
-
-            toInsert.Add(new WordEntity
-            {
-                Korean = dto.Korean.Trim(),
-                TranscriptionRu = dto.TranscriptionRu.Trim(),
-                TranscriptionEn = dto.TranscriptionEn.Trim(),
-                TranslationRu = dto.TranslationRu.Trim(),
-                TranslationEn = dto.TranslationEn.Trim(),
-                RuleExplanation = dto.Rule?.Trim() ?? string.Empty,
-                Category = dto.Category?.Trim() ?? string.Empty,
-                Type = WordTypeHelper.FromStringKey(dto.Type),
-                Status = LearningStatus.Learning,
-                PronunciationNote = dto.PronunciationNote?.Trim() ?? string.Empty,
-                LeitnerBox = 1,
-                NextReviewAt = DateTime.UtcNow
-            });
-        }
-
-        if (toInsert.Count > 0)
-        {
-            await InsertAllAsync(toInsert);
+        if (result.AddedCount > 0)
             await SaveBackupAsync();
-        }
 
-        return new ImportResult(toInsert.Count, skipped);
+        return result;
     }
 
     public async Task<int> DeleteWordAsync(Word word)
@@ -130,4 +83,38 @@ public class WordRepository : Repository<WordEntity>, IWordRepository
 
     private static string MakeKey(string korean, string translationRu) =>
         $"{korean.Trim().ToLowerInvariant()}|{translationRu.Trim().ToLowerInvariant()}";
+
+    protected override bool IsValid(WordImportDto dto) =>
+        !string.IsNullOrWhiteSpace(dto.Korean) && !string.IsNullOrWhiteSpace(dto.TranslationRu);
+
+    protected override string GetKey(WordImportDto dto) =>
+        MakeKey(dto.Korean, dto.TranslationRu);
+
+    protected override string GetKey(WordEntity entity) =>
+        MakeKey(entity.Korean, entity.TranslationRu);
+
+    protected override WordEntity MapToEntity(WordImportDto dto) => new()
+    {
+        Korean = dto.Korean.Trim(),
+        TranscriptionRu = dto.TranscriptionRu.Trim(),
+        TranscriptionEn = dto.TranscriptionEn.Trim(),
+        TranslationRu = dto.TranslationRu.Trim(),
+        TranslationEn = dto.TranslationEn.Trim(),
+        RuleExplanation = dto.Rule?.Trim() ?? string.Empty,
+        Category = dto.Category?.Trim() ?? string.Empty,
+        Type = WordTypeHelper.FromStringKey(dto.Type),
+        Status = LearningStatus.Learning,
+        PronunciationNote = dto.PronunciationNote?.Trim() ?? string.Empty,
+        LeitnerBox = 1,
+        NextReviewAt = DateTime.UtcNow
+    };
+
+    protected override string InvalidMessage(WordImportDto dto) =>
+        $"{dto.Korean} — пропущено (нет корейского слова или перевода)";
+
+    protected override string DuplicateInBatchMessage(WordImportDto dto) =>
+        $"{dto.Korean} ({dto.TranslationRu}) — повтор внутри присланного списка";
+
+    protected override string AlreadyExistsMessage(WordImportDto dto) =>
+        $"{dto.Korean} ({dto.TranslationRu}) — уже есть в базе";
 }

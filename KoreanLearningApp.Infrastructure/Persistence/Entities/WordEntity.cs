@@ -7,7 +7,7 @@ using SQLite;
 namespace KoreanLearningApp.Infrastructure.Persistence.Entities;
 
 [Table(DbConstants.WordsTableName)]
-internal class WordEntity : IEntity
+public class WordEntity : IEntity
 {
     public string Korean { get; set; } = string.Empty;
     public string TranscriptionRu { get; set; } = string.Empty;

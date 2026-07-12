@@ -1,6 +1,6 @@
 ﻿using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Models;
-namespace KoreanLearningApp.Services;
+namespace KoreanLearningApp.Infrastructure.Persistence;
 public static class WordSeeder
 {
     public static List<Word> GetSeedWords() => new()
