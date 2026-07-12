@@ -3,33 +3,24 @@
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="16">
             <Label Text="Корейское слово" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="KoreanEntry" />
-
+            <Entry Text="{Binding KoreanText}" />
             <Label Text="Транскрипция (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranscriptionRuEntry" />
-
+            <Entry Text="{Binding TranscriptionRuText}" />
             <Label Text="Транскрипция (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranscriptionEnEntry" />
-
+            <Entry Text="{Binding TranscriptionEnText}" />
             <Label Text="Перевод (рус.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranslationRuEntry" />
-
+            <Entry Text="{Binding TranslationRuText}" />
             <Label Text="Перевод (англ.)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="TranslationEnEntry" />
-
+            <Entry Text="{Binding TranslationEnText}" />
             <Label Text="Категория" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Entry x:Name="CategoryEntry" />
-
+            <Entry Text="{Binding CategoryText}" />
             <Label Text="Тип слова" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Picker x:Name="TypePicker" />
-
+            <Picker ItemsSource="{Binding TypeLabels}" SelectedItem="{Binding SelectedTypeLabel}" />
             <Label Text="Правило (написание/грамматика)" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Editor x:Name="RuleExplanationEditor" AutoSize="TextChanges" MinimumHeightRequest="80" />
-
+            <Editor Text="{Binding RuleExplanationText}" AutoSize="TextChanges" MinimumHeightRequest="80" />
             <Label Text="Заметка о произношении" FontAttributes="Bold" TextColor="#2B2B2B" />
-            <Editor x:Name="PronunciationNoteEditor" AutoSize="TextChanges" MinimumHeightRequest="80" />
-
-            <Button Text="Сохранить" Clicked="OnSaveClicked" BackgroundColor="#2E6F65" TextColor="White" CornerRadius="12" HeightRequest="48" Margin="0,16,0,0" />
+            <Editor Text="{Binding PronunciationNoteText}" AutoSize="TextChanges" MinimumHeightRequest="80" />
+            <Button Text="Сохранить" Command="{Binding SaveCommand}" BackgroundColor="#2E6F65" TextColor="White" CornerRadius="12" HeightRequest="48" Margin="0,16,0,0" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

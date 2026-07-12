@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels" x:Class="KoreanLearningApp.Views.WordsPage" Title="Корейские слова" BackgroundColor="#FBF7F0">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels" x:Class="KoreanLearningApp.Views.WordsPage" x:Name="RootPage" Title="Корейские слова" BackgroundColor="#FBF7F0">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -17,23 +17,44 @@
 
         <HorizontalStackLayout Grid.Row="0" Spacing="12" HorizontalOptions="Center">
             <Border Stroke="{StaticResource JadeColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button x:Name="DirectionButton" Text="KR - RU" Clicked="OnToggleDirectionClicked" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+                <Button Text="{Binding DirectionButtonText}" Command="{Binding ToggleDirectionCommand}" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
             </Border>
             <Border Stroke="{StaticResource GoldColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button Text="Перемешать" Clicked="OnShuffleClicked" BackgroundColor="Transparent" TextColor="{StaticResource GoldColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+                <Button Text="Перемешать" Command="{Binding ShuffleCommand}" BackgroundColor="Transparent" TextColor="{StaticResource GoldColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
             </Border>
             <Border Stroke="{StaticResource PersimmonColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button Text="JSON" Clicked="OnImportExportClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+                <Button Text="JSON" Command="{Binding ImportExportCommand}" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
             </Border>
             <Border Stroke="{StaticResource JadeColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource JadeColor}" Padding="4">
-                <Button Text="Проверка знаний" Clicked="OnQuizClicked" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+                <Button Text="Проверка знаний" Command="{Binding QuizCommand}" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" FontSize="16" Padding="16,8" />
             </Border>
         </HorizontalStackLayout>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="Center">
-            <Button x:Name="FilterAllButton" Text="Все" Clicked="OnFilterAllClicked" BackgroundColor="{StaticResource JadeColor}" TextColor="White" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
-            <Button x:Name="FilterLearningButton" Text="Учу" Clicked="OnFilterLearningClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
-            <Button x:Name="FilterLearnedButton" Text="Выучено" Clicked="OnFilterLearnedClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
+            <Button Text="Все" Command="{Binding FilterAllCommand}" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsFilterAllActive}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource JadeColor}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Учу" Command="{Binding FilterLearningCommand}" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsFilterLearningActive}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource JadeColor}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Выучено" Command="{Binding FilterLearnedCommand}" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsFilterLearnedActive}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource JadeColor}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </HorizontalStackLayout>
 
         <CollectionView Grid.Row="2" ItemsSource="{Binding Cards}" SelectionMode="None">
@@ -51,7 +72,7 @@
                             <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                                 <Label Grid.Column="0" Text="{Binding Number}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource JadeColor}" VerticalOptions="Center" />
                                 <Label Grid.Column="1" Text="{Binding FrontText}" FontSize="26" FontAttributes="Bold" TextColor="{StaticResource InkColor}" />
-                                <Button Grid.Column="2" Text="Слушать" Clicked="OnPlayAudioClicked" BackgroundColor="{StaticResource JadeColor}" TextColor="White" FontSize="12" CornerRadius="10" HeightRequest="32" Padding="10,0" VerticalOptions="Center" />
+                                <Button Grid.Column="2" Text="Слушать" Command="{Binding BindingContext.PlayAudioCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}" BackgroundColor="{StaticResource JadeColor}" TextColor="White" FontSize="12" CornerRadius="10" HeightRequest="32" Padding="10,0" VerticalOptions="Center" />
                             </Grid>
 
                             <Label Grid.Row="1" Text="{Binding TranscriptionText}" FontSize="14" TextColor="{StaticResource MutedColor}" FontAttributes="Italic" />
@@ -69,15 +90,15 @@
                             </HorizontalStackLayout>
 
                             <Grid Grid.Row="3">
-                                <Button Text="Показать перевод" Clicked="OnRevealClicked" IsVisible="{Binding ShowButton}" BackgroundColor="{StaticResource GoldColor}" TextColor="White" FontSize="14" CornerRadius="12" HeightRequest="40" HorizontalOptions="Start" />
+                                <Button Text="Показать перевод" Command="{Binding BindingContext.RevealCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}" IsVisible="{Binding ShowButton}" BackgroundColor="{StaticResource GoldColor}" TextColor="White" FontSize="14" CornerRadius="12" HeightRequest="40" HorizontalOptions="Start" />
                                 <Label Text="{Binding BackText}" IsVisible="{Binding IsRevealed}" FontSize="20" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" />
                             </Grid>
 
                             <Label Grid.Row="4" Text="{Binding PronunciationNoteText}" IsVisible="{Binding HasPronunciationNote}" FontSize="13" TextColor="{StaticResource MutedColor}" />
 
                             <HorizontalStackLayout Grid.Row="5" Spacing="16">
-                                <Button Text="Правило" Clicked="OnRuleClicked" IsVisible="{Binding HasRule}" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
-                                <Button Text="{Binding StatusButtonText}" Clicked="OnStatusToggleClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
+                                <Button Text="Правило" Command="{Binding BindingContext.RuleCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}" IsVisible="{Binding HasRule}" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
+                                <Button Text="{Binding StatusButtonText}" Command="{Binding BindingContext.StatusToggleCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
                             </HorizontalStackLayout>
 
                         </Grid>
@@ -90,7 +111,7 @@
             <Border.Shadow>
                 <Shadow Brush="#000000" Opacity="0.2" Radius="10" Offset="0,4" />
             </Border.Shadow>
-            <Button Text="+" FontSize="30" TextColor="White" BackgroundColor="Transparent" Clicked="OnAddClicked" />
+            <Button Text="+" FontSize="30" TextColor="White" BackgroundColor="Transparent" Command="{Binding AddCommand}" />
         </Border>
 
     </Grid>
