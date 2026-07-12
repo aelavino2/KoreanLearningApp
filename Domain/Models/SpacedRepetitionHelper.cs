@@ -1,4 +1,6 @@
-﻿namespace KoreanLearningApp.Models;
+﻿using KoreanLearningApp.Domain.Models;
+
+namespace KoreanLearningApp.Models;
 
 public static class SpacedRepetitionHelper
 {

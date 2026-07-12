@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
 using KoreanLearningApp.Services;
+using KoreanLearningApp.Domain.Models;
 
 namespace KoreanLearningApp.ViewModels
 {

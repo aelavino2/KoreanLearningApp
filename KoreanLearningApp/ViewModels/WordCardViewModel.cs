@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Models;
 namespace KoreanLearningApp.ViewModels;
 public class WordCardViewModel : INotifyPropertyChanged

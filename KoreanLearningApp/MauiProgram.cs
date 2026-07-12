@@ -1,4 +1,7 @@
 ﻿using CommunityToolkit.Maui;
+using KoreanLearningApp.Infrastructure.Persistence;
+using KoreanLearningApp.Infrastructure.Persistence.Abstractions;
+using KoreanLearningApp.Infrastructure.Persistence.Backup;
 using KoreanLearningApp.Services;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
@@ -20,6 +23,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Services.AddTransient<ImportExportPage>();
+        builder.Services.AddSingleton<IBackupService, BackupJsonService>();
+        builder.Services.AddSingleton<DatabaseConstants>();
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddSingleton<QuizSessionSettings>();
         builder.Services.AddTransient<WordsPage>();

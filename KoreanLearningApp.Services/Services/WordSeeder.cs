@@ -1,4 +1,5 @@
-﻿using KoreanLearningApp.Models;
+﻿using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Models;
 namespace KoreanLearningApp.Services;
 public static class WordSeeder
 {

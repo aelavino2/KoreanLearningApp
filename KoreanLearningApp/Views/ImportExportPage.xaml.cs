@@ -1,3 +1,4 @@
+using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Services;
 using KoreanLearningApp.ViewModels;
 
@@ -7,7 +8,7 @@ public partial class ImportExportPage : ContentPage
 {
     private readonly ImportExportPageViewModel _viewModel;
 
-    public ImportExportPage(DatabaseService db)
+    public ImportExportPage(DatabaseConstants db)
     {
         InitializeComponent();
         _viewModel = new ImportExportPageViewModel(db);

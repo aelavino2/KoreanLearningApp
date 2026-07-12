@@ -1,4 +1,5 @@
-﻿using KoreanLearningApp.Events;
+﻿using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Events;
 using KoreanLearningApp.Models;
 using KoreanLearningApp.Services;
 using KoreanLearningApp.Views;
