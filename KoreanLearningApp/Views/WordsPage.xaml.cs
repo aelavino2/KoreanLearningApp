@@ -1,37 +1,42 @@
-пїњusing KoreanLearningApp.Events;
-using KoreanLearningApp.Services;
+// Views/WordsPage.xaml.cs
 using KoreanLearningApp.ViewModels;
 
 namespace KoreanLearningApp.Views;
 
 public partial class WordsPage : ContentPage
 {
-    private readonly WordsPageViewModel _viewModel;
+    private readonly WordsViewModel _viewModel;
 
-    public WordsPage(DatabaseService db)
+    // ViewModel приходит через DI (см. регистрацию ниже) Ч страница ничего сама не создаЄт
+    public WordsPage(WordsViewModel viewModel)
     {
         InitializeComponent();
-
-        _viewModel = new WordsPageViewModel(db);
+        _viewModel = viewModel;
         BindingContext = _viewModel;
-
-        _viewModel.AlertRequested += OnAlertRequested;
-        _viewModel.NavigationRequested += OnNavigationRequested;
     }
 
+    // OnAppearing вызываетс€ каждый раз при переходе на страницу Ч хорошее место дл€ загрузки данных
     protected override async void OnAppearing()
     {
         base.OnAppearing();
         await _viewModel.LoadWordsAsync();
     }
 
-    private async void OnAlertRequested(object? sender, AlertRequestEventArgs e)
+    // Ћовим изменение размера окна (актуально дл€ десктопа при ресайзе Ч на телефоне почти не сработает,
+    // ориентаци€ экрана мен€етс€ отдельным событием, если понадобитс€ Ч добавим)
+    protected override void OnSizeAllocated(double width, double height)
     {
-        await DisplayAlert(e.Title, e.Message, e.Cancel);
-    }
+        base.OnSizeAllocated(width, height);
 
-    private async void OnNavigationRequested(object? sender, string route)
-    {
-        await Shell.Current.GoToAsync(route);
+        // ”словна€ граница: уже Ч телефон (1 колонка), шире Ч десктоп/планшет (несколько колонок)
+        var span = width switch
+        {
+            < 600 => 1,
+            < 900 => 2,
+            _ => 3
+        };
+
+        if (WordsCollectionView.ItemsLayout is GridItemsLayout gridLayout && gridLayout.Span != span)
+            gridLayout.Span = span;
     }
 }

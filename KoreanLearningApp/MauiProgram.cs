@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Maui;
 using KoreanLearningApp.Infrastructure.Persistence;
-using KoreanLearningApp.Infrastructure.Persistence.Abstractions;
-using KoreanLearningApp.Infrastructure.Persistence.Backup;
+using KoreanLearningApp.Infrastructure.Persistence.Entities;
+using KoreanLearningApp.Infrastructure.Persistence.Repositories;
 using KoreanLearningApp.Services;
+using KoreanLearningApp.Services.Abstractions;
+using KoreanLearningApp.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 namespace KoreanLearningApp;
@@ -22,15 +24,21 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddTransient<ImportExportPage>();
-        builder.Services.AddSingleton<IBackupService, BackupJsonService>();
-        builder.Services.AddSingleton<DatabaseConstants>();
-        builder.Services.AddSingleton<DatabaseService>();
-        builder.Services.AddSingleton<QuizSessionSettings>();
+        var dbPath = Path.Combine(FileSystem.AppDataDirectory, DatabaseConstants.DatabaseFileName);
+        builder.Services.AddSingleton(new DbContext(dbPath));
+
+        builder.Services.AddSingleton(sp =>
+        {
+            var dbContext = sp.GetRequiredService<DbContext>();
+            return dbContext.GetConnectionAsync().GetAwaiter().GetResult();
+        });
+
+        builder.Services.AddSingleton<BaseRepository<WordEntity>>();
+        builder.Services.AddSingleton<IWordRepository, WordRepository>();
+        builder.Services.AddSingleton<IWordService, WordService>();
+        builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
-        builder.Services.AddTransient<AddWordPage>();
-        builder.Services.AddTransient<QuizSettingsPage>();
-        builder.Services.AddTransient<QuizPage>();
+
         return builder.Build();
     }
 }

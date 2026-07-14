@@ -77,24 +77,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\AddWordPage.xaml.cs">
-	    <DependentUpon>AddWordPage.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\WordsPage.xaml.cs">
-	    <DependentUpon>WordsPage.xaml</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="Views\AddWordPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\ImportExportPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\QuizSettingsPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\WordsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

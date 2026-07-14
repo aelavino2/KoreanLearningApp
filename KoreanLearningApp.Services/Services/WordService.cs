@@ -1,30 +1,20 @@
 ﻿using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Infrastructure.Persistence.Abstractions.Repositories;
-using KoreanLearningApp.Models;
 using KoreanLearningApp.Services.Abstractions;
 
 namespace KoreanLearningApp.Services;
 
 public class WordService : IWordService
 {
-    private readonly IWordRepository _wordRepository;
+    private readonly IWordRepository _repository;
 
-    public WordService(IWordRepository wordRepository)
+    public WordService(IWordRepository repository)
     {
-        _wordRepository = wordRepository;
+        _repository = repository;
     }
 
-    public Task<List<Word>> GetWordsAsync() => _wordRepository.GetWordsAsync();
+    public Task<List<Word>> GetWordsAsync() => _repository.GetWordsAsync();
 
-    public Task<List<Word>> GetDueWordsAsync(int desiredCount) =>
-        _wordRepository.GetDueWordsAsync(desiredCount);
+    public Task<int> SaveWordAsync(Word word) => _repository.SaveWordAsync(word);
 
-    public Task<int> SaveWordAsync(Word word) => _wordRepository.SaveWordAsync(word);
-
-    public Task<int> DeleteWordAsync(Word word) => _wordRepository.DeleteWordAsync(word);
-
-    public Task<ImportResult> ImportWordsAsync(List<WordImportDto> incoming) =>
-        _wordRepository.ImportWordsAsync(incoming);
-
-    public Task<string> BuildExportJsonAsync() => _wordRepository.BuildExportJsonAsync();
+    public Task<int> DeleteWordAsync(Word word) => _repository.DeleteWordAsync(word);
 }

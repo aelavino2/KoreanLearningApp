@@ -16,4 +16,8 @@
     <ProjectReference Include="..\KoreanLearningApp.Services\KoreanLearningApp.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\Services\" />
+  </ItemGroup>
+
 </Project>

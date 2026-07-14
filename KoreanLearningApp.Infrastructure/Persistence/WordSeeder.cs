@@ -1,5 +1,4 @@
 ﻿using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Models;
 namespace KoreanLearningApp.Infrastructure.Persistence;
 public static class WordSeeder
 {
