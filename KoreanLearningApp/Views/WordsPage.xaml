@@ -1,91 +1,49 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels" x:Class="KoreanLearningApp.Views.WordsPage" Title="Корейские слова" BackgroundColor="#FBF7F0">
+<ContentPage
+    x:Class="KoreanLearningApp.Views.WordsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    x:DataType="vm:WordsViewModel"
+    BackgroundColor="#F2F7F3"
+    Shell.NavBarIsVisible="False">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Color x:Key="InkColor">#2B2B2B</Color>
-            <Color x:Key="JadeColor">#2E6F65</Color>
-            <Color x:Key="PersimmonColor">#D64545</Color>
-            <Color x:Key="GoldColor">#C9A227</Color>
-            <Color x:Key="CardColor">#FFFFFF</Color>
-            <Color x:Key="MutedColor">#8A8378</Color>
-            <Color x:Key="BadgeColor">#F0EBE0</Color>
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20,16" RowSpacing="12">
-
-        <HorizontalStackLayout Grid.Row="0" Spacing="12" HorizontalOptions="Center">
-            <Border Stroke="{StaticResource JadeColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button x:Name="DirectionButton" Text="KR - RU" Clicked="OnToggleDirectionClicked" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,20,20,8" ColumnSpacing="12">
+            <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="Transparent" BackgroundColor="#4CAF50" Padding="0">
+                <Label Text="한" TextColor="White" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
-            <Border Stroke="{StaticResource GoldColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button Text="Перемешать" Clicked="OnShuffleClicked" BackgroundColor="Transparent" TextColor="{StaticResource GoldColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
-            </Border>
-            <Border Stroke="{StaticResource PersimmonColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 24" BackgroundColor="{StaticResource CardColor}" Padding="4">
-                <Button Text="JSON" Clicked="OnImportExportClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" FontSize="16" Padding="16,8" />
-            </Border>
-        </HorizontalStackLayout>
+            <Label Grid.Column="1" Text="Korean Dictionary" FontSize="18" FontAttributes="Bold" TextColor="#1B2E1F" VerticalOptions="Center" />
+        </Grid>
+        <Border Grid.Row="1" Margin="20,8,20,16" BackgroundColor="White" StrokeShape="RoundRectangle 20" Stroke="Transparent" Padding="16,10">
+            <Border.Shadow>
+                <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,2" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="Auto,*">
+                <Entry Grid.Column="1" Placeholder="Search for Words" PlaceholderColor="#8FA894" TextColor="#1B2E1F" Text="{Binding SearchText}" BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
 
-        <HorizontalStackLayout Grid.Row="1" Spacing="10" HorizontalOptions="Center">
-            <Button x:Name="FilterAllButton" Text="Все" Clicked="OnFilterAllClicked" BackgroundColor="{StaticResource JadeColor}" TextColor="White" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
-            <Button x:Name="FilterLearningButton" Text="Учу" Clicked="OnFilterLearningClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
-            <Button x:Name="FilterLearnedButton" Text="Выучено" Clicked="OnFilterLearnedClicked" BackgroundColor="{StaticResource CardColor}" TextColor="{StaticResource JadeColor}" FontSize="13" CornerRadius="16" HeightRequest="34" Padding="14,0" />
-        </HorizontalStackLayout>
-
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Cards}" SelectionMode="None">
+        <CollectionView Grid.Row="2" x:Name="WordsCollectionView" ItemsSource="{Binding Words}" SelectionMode="None" Margin="20,0,20,0">
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="14" />
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:WordCardViewModel">
-                    <Border BackgroundColor="{StaticResource CardColor}" Stroke="#EAE3D6" StrokeThickness="1" StrokeShape="RoundRectangle 18">
+                <DataTemplate x:DataType="vm:WordItemViewModel">
+                    <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="16,14">
                         <Border.Shadow>
-                            <Shadow Brush="#000000" Opacity="0.06" Radius="12" Offset="0,4" />
+                            <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
                         </Border.Shadow>
-                        <Grid Padding="20,18" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
 
-                            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                                <Label Grid.Column="0" Text="{Binding Number}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource JadeColor}" VerticalOptions="Center" />
-                                <Label Grid.Column="1" Text="{Binding FrontText}" FontSize="26" FontAttributes="Bold" TextColor="{StaticResource InkColor}" />
-                                <Button Grid.Column="2" Text="Слушать" Clicked="OnPlayAudioClicked" BackgroundColor="{StaticResource JadeColor}" TextColor="White" FontSize="12" CornerRadius="10" HeightRequest="32" Padding="10,0" VerticalOptions="Center" />
-                            </Grid>
-
-                            <Label Grid.Row="1" Text="{Binding TranscriptionText}" FontSize="14" TextColor="{StaticResource MutedColor}" FontAttributes="Italic" />
-
-                            <HorizontalStackLayout Grid.Row="2" Spacing="8">
-                                <Border BackgroundColor="{StaticResource BadgeColor}" StrokeShape="RoundRectangle 10" Padding="8,3" IsVisible="{Binding HasCategory}">
-                                    <Label Text="{Binding CategoryText}" FontSize="12" TextColor="{StaticResource MutedColor}" />
-                                </Border>
-                                <Border BackgroundColor="{StaticResource BadgeColor}" StrokeShape="RoundRectangle 10" Padding="8,3">
-                                    <Label Text="{Binding TypeText}" FontSize="12" TextColor="{StaticResource MutedColor}" />
-                                </Border>
-                            </HorizontalStackLayout>
-
-                            <Grid Grid.Row="3">
-                                <Button Text="Показать перевод" Clicked="OnRevealClicked" IsVisible="{Binding ShowButton}" BackgroundColor="{StaticResource GoldColor}" TextColor="White" FontSize="14" CornerRadius="12" HeightRequest="40" HorizontalOptions="Start" />
-                                <Label Text="{Binding BackText}" IsVisible="{Binding IsRevealed}" FontSize="20" TextColor="{StaticResource PersimmonColor}" FontAttributes="Bold" />
-                            </Grid>
-
-                            <Label Grid.Row="4" Text="{Binding PronunciationNoteText}" IsVisible="{Binding HasPronunciationNote}" FontSize="13" TextColor="{StaticResource MutedColor}" />
-
-                            <HorizontalStackLayout Grid.Row="5" Spacing="16">
-                                <Button Text="Правило" Clicked="OnRuleClicked" IsVisible="{Binding HasRule}" BackgroundColor="Transparent" TextColor="{StaticResource JadeColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
-                                <Button Text="{Binding StatusButtonText}" Clicked="OnStatusToggleClicked" BackgroundColor="Transparent" TextColor="{StaticResource PersimmonColor}" FontSize="13" FontAttributes="Bold" Padding="0" HorizontalOptions="Start" />
-                            </HorizontalStackLayout>
-
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Korean}" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />
+                            </VerticalStackLayout>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-
-        <Border Grid.Row="2" VerticalOptions="End" HorizontalOptions="End" Margin="0,0,8,8" WidthRequest="58" HeightRequest="58" StrokeShape="RoundRectangle 29" BackgroundColor="{StaticResource JadeColor}">
-            <Border.Shadow>
-                <Shadow Brush="#000000" Opacity="0.2" Radius="10" Offset="0,4" />
-            </Border.Shadow>
-            <Button Text="+" FontSize="30" TextColor="White" BackgroundColor="Transparent" Clicked="OnAddClicked" />
-        </Border>
-
     </Grid>
 </ContentPage>

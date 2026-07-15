@@ -1,170 +1,42 @@
-п»їusing System.Collections.ObjectModel;
-using KoreanLearningApp.Models;
-using KoreanLearningApp.Services;
+// Views/WordsPage.xaml.cs
 using KoreanLearningApp.ViewModels;
-using Microsoft.Maui.Media;
+
 namespace KoreanLearningApp.Views;
 
 public partial class WordsPage : ContentPage
 {
-    private readonly DatabaseService _db;
-    private bool _koreanToRussian = true;
-    private readonly Random _random = new();
-    private List<Word> _allWords = new();
-    private LearningStatus? _statusFilter = null;
-    private Locale? _koreanLocale;
-    private bool _localeChecked;
+    private readonly WordsViewModel _viewModel;
 
-    public ObservableCollection<WordCardViewModel> Cards { get; } = new();
-
-    public WordsPage(DatabaseService db)
+    // ViewModel приходит через DI (см. регистрацию ниже) — страница ничего сама не создаёт
+    public WordsPage(WordsViewModel viewModel)
     {
         InitializeComponent();
-        _db = db;
-        BindingContext = this;
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
     }
 
+    // OnAppearing вызывается каждый раз при переходе на страницу — хорошее место для загрузки данных
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadWordsAsync();
+        await _viewModel.LoadWordsAsync();
     }
 
-    private async Task LoadWordsAsync()
+    // Ловим изменение размера окна (актуально для десктопа при ресайзе — на телефоне почти не сработает,
+    // ориентация экрана меняется отдельным событием, если понадобится — добавим)
+    protected override void OnSizeAllocated(double width, double height)
     {
-        _allWords = await _db.GetWordsAsync();
-        ApplyFilter();
-    }
+        base.OnSizeAllocated(width, height);
 
-    private void ApplyFilter()
-    {
-        var filtered = _statusFilter is null ? _allWords : _allWords.Where(w => w.Status == _statusFilter).ToList();
-        Cards.Clear();
-        foreach (var word in filtered)
-            Cards.Add(new WordCardViewModel(word, _koreanToRussian));
-        RenumberCards();
-        UpdateFilterButtonStyles();
-    }
-
-    private void UpdateFilterButtonStyles()
-    {
-        var active = (Color)this.Resources["JadeColor"];
-        var inactive = (Color)this.Resources["CardColor"];
-
-        FilterAllButton.BackgroundColor = _statusFilter is null ? active : inactive;
-        FilterAllButton.TextColor = _statusFilter is null ? Colors.White : active;
-        FilterLearningButton.BackgroundColor = _statusFilter == LearningStatus.Learning ? active : inactive;
-        FilterLearningButton.TextColor = _statusFilter == LearningStatus.Learning ? Colors.White : active;
-        FilterLearnedButton.BackgroundColor = _statusFilter == LearningStatus.Learned ? active : inactive;
-        FilterLearnedButton.TextColor = _statusFilter == LearningStatus.Learned ? Colors.White : active;
-    }
-
-    private void RenumberCards()
-    {
-        for (int i = 0; i < Cards.Count; i++)
-            Cards[i].Number = i + 1;
-    }
-
-    private void OnFilterAllClicked(object sender, EventArgs e) { _statusFilter = null; ApplyFilter(); }
-    private void OnFilterLearningClicked(object sender, EventArgs e) { _statusFilter = LearningStatus.Learning; ApplyFilter(); }
-    private void OnFilterLearnedClicked(object sender, EventArgs e) { _statusFilter = LearningStatus.Learned; ApplyFilter(); }
-
-    private void OnToggleDirectionClicked(object sender, EventArgs e)
-    {
-        _koreanToRussian = !_koreanToRussian;
-        DirectionButton.Text = _koreanToRussian ? "KR - RU" : "RU - KR";
-        foreach (var card in Cards)
-            card.SetDirection(_koreanToRussian);
-    }
-
-    private void OnShuffleClicked(object sender, EventArgs e)
-    {
-        var shuffled = Cards.OrderBy(_ => _random.Next()).ToList();
-        Cards.Clear();
-        foreach (var card in shuffled)
-            Cards.Add(card);
-        RenumberCards();
-    }
-
-    private async void OnRuleClicked(object sender, EventArgs e)
-    {
-        if (sender is Button { BindingContext: WordCardViewModel card })
-            await DisplayAlert("РџСЂР°РІРёР»Рѕ", card.RuleText, "РџРѕРЅСЏС‚РЅРѕ");
-    }
-
-    private async void OnStatusToggleClicked(object sender, EventArgs e)
-    {
-        if (sender is Button { BindingContext: WordCardViewModel card })
+        // Условная граница: уже — телефон (1 колонка), шире — десктоп/планшет (несколько колонок)
+        var span = width switch
         {
-            card.ToggleStatus();
-            await _db.SaveWordAsync(card.UnderlyingWord);
-            if (_statusFilter is not null && card.UnderlyingWord.Status != _statusFilter)
-            {
-                Cards.Remove(card);
-                RenumberCards();
-            }
-        }
-    }
+            < 600 => 1,
+            < 900 => 2,
+            _ => 3
+        };
 
-    // РС‰РµРј РєРѕСЂРµР№СЃРєРёР№ РіРѕР»РѕСЃ СЃСЂРµРґРё СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹С… РЅР° СѓСЃС‚СЂРѕР№СЃС‚РІРµ TTS-РіРѕР»РѕСЃРѕРІ.
-    // Р•СЃР»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ СѓСЃС‚Р°РЅРѕРІРёР» РєРѕСЂРµР№СЃРєРёР№ СЏР·С‹РєРѕРІРѕР№ РїР°РєРµС‚ РІ СЃРёСЃС‚РµРјРµ вЂ” РІРµСЂРЅС‘С‚ null.
-    private async Task<Locale?> GetKoreanLocaleAsync()
-    {
-        if (_localeChecked)
-            return _koreanLocale;
-
-        var locales = await TextToSpeech.Default.GetLocalesAsync();
-        _koreanLocale = locales.FirstOrDefault(l =>
-            l.Language.StartsWith("ko", StringComparison.OrdinalIgnoreCase));
-        _localeChecked = true;
-        return _koreanLocale;
-    }
-
-    private async void OnPlayAudioClicked(object sender, EventArgs e)
-    {
-        if (sender is not Button { BindingContext: WordCardViewModel card })
-            return;
-
-        var locale = await GetKoreanLocaleAsync();
-        if (locale is null)
-        {
-            await DisplayAlert(
-                "РљРѕСЂРµР№СЃРєРёР№ РіРѕР»РѕСЃ РЅРµ РЅР°Р№РґРµРЅ",
-                "РќР° СЌС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІРµ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ РіРѕР»РѕСЃРѕРІРѕР№ СЃРёРЅС‚РµР· РґР»СЏ РєРѕСЂРµР№СЃРєРѕРіРѕ СЏР·С‹РєР°. " +
-                "РќР° Android: РќР°СЃС‚СЂРѕР№РєРё -> РЇР·С‹Рє Рё РІРІРѕРґ -> РЎРёРЅС‚РµР· СЂРµС‡Рё (TTS) -> СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РєРѕСЂРµР№СЃРєРёР№ СЏР·С‹РєРѕРІРѕР№ РїР°РєРµС‚ Google. " +
-                "Р‘РµР· СЌС‚РѕРіРѕ СЃРёСЃС‚РµРјРЅР°СЏ РѕР·РІСѓС‡РєР° РєРѕСЂРµР№СЃРєРёС… СЃР»РѕРІ РЅРµРґРѕСЃС‚СѓРїРЅР°.",
-                "РћРљ");
-            return;
-        }
-
-        try
-        {
-            await TextToSpeech.Default.SpeakAsync(card.UnderlyingWord.Korean, new SpeechOptions
-            {
-                Locale = locale,
-                Pitch = 1.0f,
-                Volume = 1.0f
-            });
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("РћС€РёР±РєР° РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ", ex.Message, "РћРљ");
-        }
-    }
-
-    private async void OnImportExportClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(nameof(ImportExportPage));
-    }
-
-    private void OnRevealClicked(object sender, EventArgs e)
-    {
-        if (sender is Button { BindingContext: WordCardViewModel card })
-            card.IsRevealed = true;
-    }
-
-    private async void OnAddClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(nameof(AddWordPage));
+        if (WordsCollectionView.ItemsLayout is GridItemsLayout gridLayout && gridLayout.Span != span)
+            gridLayout.Span = span;
     }
 }
