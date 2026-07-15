@@ -25,21 +25,13 @@
             </Grid>
         </Border>
 
-        <CollectionView
-            Grid.Row="2"
-            x:Name="WordsCollectionView"
-            ItemsSource="{Binding Words}"
-            SelectionMode="None"
-            Margin="20,0,20,0">
-
+        <CollectionView Grid.Row="2" x:Name="WordsCollectionView" ItemsSource="{Binding Words}" SelectionMode="None" Margin="20,0,20,0">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
-
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:WordItemViewModel">
                     <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="16,14">
-
                         <Border.Shadow>
                             <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
                         </Border.Shadow>
