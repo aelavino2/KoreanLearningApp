@@ -1,114 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
-    ContentPage — корневая страница.
-    x:DataType задаёт тип ViewModel для compiled bindings (быстрее, чем обычные string-биндинги,
-    и ошибки в именах свойств ловятся на этапе компиляции, а не в рантайме).
--->
 <ContentPage
     x:Class="KoreanLearningApp.Views.WordsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
-    xmlns:conv="clr-namespace:KoreanLearningApp.Converters"
     x:DataType="vm:WordsViewModel"
-    Title="Agricultural Dictionary"
-    BackgroundColor="#F2F7F3">
+    BackgroundColor="#F2F7F3"
+    Shell.NavBarIsVisible="False">
 
-    <!--
-        Grid с двумя строками: сверху поиск (фиксированная высота "Auto"),
-        снизу список (занимает всё оставшееся место — "*")
-    -->
-    <Grid RowDefinitions="Auto,*" Padding="20" RowSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
 
-        <!-- ================= ПОИСК ================= -->
-        <Border
-            Grid.Row="0"
-            BackgroundColor="White"
-            StrokeShape="RoundRectangle 20"
-            Stroke="Transparent"
-            Padding="16,10">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,20,20,8" ColumnSpacing="12">
+            <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="Transparent" BackgroundColor="#4CAF50" Padding="0">
+                <Label Text="한" TextColor="White" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="Korean Dictionary" FontSize="18" FontAttributes="Bold" TextColor="#1B2E1F" VerticalOptions="Center" />
+        </Grid>
+        <Border Grid.Row="1" Margin="20,8,20,16" BackgroundColor="White" StrokeShape="RoundRectangle 20" Stroke="Transparent" Padding="16,10">
+            <Border.Shadow>
+                <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,2" />
+            </Border.Shadow>
             <Grid ColumnDefinitions="Auto,*">
-                <Label
-                    Grid.Column="0"
-                    Text="&#xF002;"
-                    FontFamily="MaterialIcons"
-                    VerticalOptions="Center"
-                    TextColor="#8FA894"
-                    Margin="0,0,10,0" />
-
-                <!--
-                    Text биндится к SearchText в ViewModel двусторонне (TwoWay — режим по умолчанию для Entry),
-                    т.е. при вводе в поле VM.SearchText обновляется автоматически и запускает фильтрацию
-                -->
-                <Entry
-                    Grid.Column="1"
-                    Placeholder="Search for Words"
-                    Text="{Binding SearchText}"
-                    BackgroundColor="Transparent" />
+                <Entry Grid.Column="1" Placeholder="Search for Words" PlaceholderColor="#8FA894" TextColor="#1B2E1F" Text="{Binding SearchText}" BackgroundColor="Transparent" />
             </Grid>
         </Border>
 
-        <!-- ================= СПИСОК СЛОВ ================= -->
-        <!--
-            CollectionView — основной элемент для списков в MAUI (замена ListView).
-            ItemsSource — откуда брать данные, SelectionMode отключаем, т.к. выбор не нужен.
-        -->
         <CollectionView
-            Grid.Row="1"
+            Grid.Row="2"
             x:Name="WordsCollectionView"
             ItemsSource="{Binding Words}"
-            SelectionMode="None">
+            SelectionMode="None"
+            Margin="20,0,20,0">
 
-            <!--
-                ItemsLayout задаёт раскладку элементов.
-                Span="1" — по умолчанию одна колонка (мобильный вид).
-                Реальное число колонок для ПК/широких экранов меняется из code-behind (см. .cs файл)
-                в зависимости от ширины окна — это и даёт "адаптивность".
-            -->
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="12" HorizontalItemSpacing="12" />
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
 
-            <!--
-                ItemTemplate — как рисуется КАЖДЫЙ элемент списка.
-                x:DataType здесь — WordItemViewModel, а не WordsViewModel (мы теперь "внутри" одного элемента списка)
-            -->
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:WordItemViewModel">
+                    <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="16,14">
 
-                    <!-- Border вместо Frame — современный способ рисовать карточки с скруглением в MAUI -->
-                    <Border
-                        BackgroundColor="White"
-                        StrokeShape="RoundRectangle 16"
-                        Stroke="Transparent"
-                        Padding="16,14">
-
-                        <!-- Тень для карточки — лёгкая, чтобы список "дышал" -->
                         <Border.Shadow>
-                            <Shadow Brush="#000000" Opacity="0.06" Radius="8" Offset="0,2" />
+                            <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
                         </Border.Shadow>
 
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-
-                            <!-- Иконка слева (условная — категория/тип слова) -->
-                            <Label
-                                Grid.Column="0"
-                                Text="&#xF06C;"
-                                FontFamily="MaterialIcons"
-                                FontSize="20"
-                                TextColor="#4CAF50"
-                                VerticalOptions="Center" />
-
-                            <!-- Само слово: заголовок + подпись категории под ним -->
                             <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                 <Label Text="{Binding Korean}" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />
-                                <Label Text="{Binding Category}" FontSize="12" TextColor="#8FA894" />
                             </VerticalStackLayout>
-
-                            <!--
-                                Кнопка "избранное": ImageButton с командой ToggleFavoriteCommand,
-                                текст-иконка меняется через конвертер в зависимости от IsFavorite
-                            -->
                         </Grid>
                     </Border>
                 </DataTemplate>

@@ -24,21 +24,55 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, DatabaseConstants.DatabaseFileName);
+        var dbPath = GetDatabasePath("KoreanLearning.db");
         builder.Services.AddSingleton(new DbContext(dbPath));
-
-        builder.Services.AddSingleton(sp =>
-        {
-            var dbContext = sp.GetRequiredService<DbContext>();
-            return dbContext.GetConnectionAsync().GetAwaiter().GetResult();
-        });
-
         builder.Services.AddSingleton<BaseRepository<WordEntity>>();
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
 
-        return builder.Build();
+        var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
+            Task.Run(() => dbContext.SeedIfEmptyAsync()).GetAwaiter().GetResult();
+        }
+
+        return app;
     }
+
+    static string GetDatabasePath(string fileName)
+    {
+        string baseDir;
+
+#if WINDOWS && DEBUG
+    var projectRoot = FindProjectRoot();
+    baseDir = projectRoot is not null
+        ? Path.Combine(projectRoot, "Database")
+        : Path.Combine(FileSystem.AppDataDirectory, "Database");
+#else
+        baseDir = Path.Combine(FileSystem.AppDataDirectory, "Database");
+#endif
+
+        if (!Directory.Exists(baseDir))
+            Directory.CreateDirectory(baseDir);
+
+        return Path.Combine(baseDir, fileName);
+    }
+
+#if WINDOWS && DEBUG
+static string? FindProjectRoot()
+{
+    var dir = new DirectoryInfo(AppContext.BaseDirectory);
+    while (dir is not null)
+    {
+        if (dir.GetFiles("*.csproj").Length > 0)
+            return dir.FullName;
+        dir = dir.Parent;
+    }
+    return null;
+}
+#endif
 }
