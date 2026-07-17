@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
     x:DataType="vm:WordsViewModel"
-    BackgroundColor="#F2F7F3"
+    BackgroundColor="#F2F5F0"
     Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
@@ -35,7 +35,6 @@
                         <Border.Shadow>
                             <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
                         </Border.Shadow>
-
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
                             <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                 <Label Text="{Binding Korean}" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />

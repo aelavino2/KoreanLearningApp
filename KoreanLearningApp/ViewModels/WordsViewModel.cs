@@ -1,35 +1,30 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Services.Abstractions;
+using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.ViewModels;
 
-public class WordsViewModel : BaseViewModel
+public partial class WordsViewModel : ObservableObject
 {
     private readonly IWordService _wordService;
-
     private List<WordItemViewModel> _allWords = new();
+
     public ObservableCollection<WordItemViewModel> Words { get; } = new();
 
+    [ObservableProperty]
     private string _searchText = string.Empty;
-    public string SearchText
-    {
-        get => _searchText;
-        set
-        {
-            if (SetProperty(ref _searchText, value))
-                ApplyFilter();
-        }
-    }
-
-    public ICommand RefreshCommand { get; }
 
     public WordsViewModel(IWordService wordService)
     {
         _wordService = wordService;
-        RefreshCommand = new Command(async () => await LoadWordsAsync());
+    }
+    partial void OnSearchTextChanged(string value)
+    {
+        ApplyFilter();
     }
 
+    [RelayCommand]
     public async Task LoadWordsAsync()
     {
         var words = await _wordService.GetWordsAsync();
