@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Services.Abstractions;
+using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.ViewModels;

@@ -1,5 +1,6 @@
 ﻿using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Services.Abstractions;
+using KoreanLearningApp.Services.Abstractions.Repositories;
+using KoreanLearningApp.Services.Abstractions.Services;
 
 namespace KoreanLearningApp.Services;
 

@@ -1,6 +1,6 @@
 ﻿using KoreanLearningApp.Domain.Models;
 
-namespace KoreanLearningApp.Services.Abstractions
+namespace KoreanLearningApp.Services.Abstractions.Repositories
 {
     public interface IWordRepository
     {

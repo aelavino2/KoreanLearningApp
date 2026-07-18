@@ -1,7 +1,7 @@
 ﻿using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 using KoreanLearningApp.Infrastructure.Persistence.Mapster;
-using KoreanLearningApp.Services.Abstractions;
+using KoreanLearningApp.Services.Abstractions.Repositories;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Repositories;
 

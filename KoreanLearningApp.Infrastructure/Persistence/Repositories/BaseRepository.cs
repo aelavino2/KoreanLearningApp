@@ -28,6 +28,15 @@ public class BaseRepository<T> : IRepository<T> where T : new()
         return await db.InsertAsync(entity);
     }
 
+    public async Task<int> InsertAllAsync(List<T> entities)
+    {
+        if (entities.Count == 0)
+            return 0;
+
+        var db = await _dbContext.GetConnectionAsync();
+        return await db.InsertAllAsync(entities);
+    }
+
     public async Task<int> UpdateAsync(T entity)
     {
         var db = await _dbContext.GetConnectionAsync();
