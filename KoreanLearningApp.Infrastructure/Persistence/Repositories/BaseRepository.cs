@@ -1,5 +1,6 @@
 ﻿using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories.Abstractions;
+using System.Linq.Expressions;
 
 public class BaseRepository<T> : IRepository<T> where T : new()
 {
@@ -47,5 +48,11 @@ public class BaseRepository<T> : IRepository<T> where T : new()
     {
         var db = await _dbContext.GetConnectionAsync();
         return await db.DeleteAsync(entity);
+    }
+
+    public async Task<int> DeleteWhereAsync(Expression<Func<T, bool>> predicate)
+    {
+        var db = await _dbContext.GetConnectionAsync();
+        return await db.Table<T>().DeleteAsync(predicate);
     }
 }
