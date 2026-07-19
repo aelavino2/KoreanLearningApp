@@ -2,7 +2,7 @@
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO
 {
-    public class KrDictJsonDto
+    public abstract class KrDictJsonDto
     {
         [JsonPropertyName("target_code")]
         public string TargetCode { get; set; } = string.Empty;

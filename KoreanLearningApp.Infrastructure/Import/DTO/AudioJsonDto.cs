@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO
 {
-    public class AudioJsonDto
+    public abstract class AudioJsonDto
     {
         [JsonPropertyName("url")]
         public string Url { get; set; } = string.Empty;

@@ -12,10 +12,11 @@
 
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,20,20,8" ColumnSpacing="12">
             <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="Transparent" BackgroundColor="#4CAF50" Padding="0">
-                <Label Text="한" TextColor="White" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+                <Label Text="한s" TextColor="White" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
             <Label Grid.Column="1" Text="Korean Dictionary" FontSize="18" FontAttributes="Bold" TextColor="#1B2E1F" VerticalOptions="Center" />
         </Grid>
+        
         <Border Grid.Row="1" Margin="20,8,20,16" BackgroundColor="White" StrokeShape="RoundRectangle 20" Stroke="Transparent" Padding="16,10">
             <Border.Shadow>
                 <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,2" />

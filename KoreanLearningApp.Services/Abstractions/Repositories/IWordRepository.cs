@@ -1,4 +1,6 @@
-﻿using KoreanLearningApp.Domain.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using KoreanLearningApp.Domain.Models;
 
 namespace KoreanLearningApp.Services.Abstractions.Repositories
 {

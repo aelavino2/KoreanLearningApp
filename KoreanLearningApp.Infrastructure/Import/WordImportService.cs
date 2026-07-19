@@ -4,15 +4,8 @@ using KoreanLearningApp.Services.Abstractions.Services;
 
 namespace KoreanLearningApp.Infrastructure.Import;
 
-public class WordImportService : IWordImportService
+public class WordImportService(IWordImportRepository repository) : IWordImportService
 {
-    private readonly IWordImportRepository _repository;
-
-    public WordImportService(IWordImportRepository repository)
-    {
-        _repository = repository;
-    }
-
     public async Task<int> ImportFromFileAsync(string filePath)
     {
         var dtos = await KrDictJsonSerializer.DeserializeFileAsync(filePath);
@@ -30,7 +23,7 @@ public class WordImportService : IWordImportService
         if (dtos.Count == 0)
             return 0;
 
-        var existingKeys = await _repository.GetExistingKeysAsync();
+        var existingKeys = await repository.GetExistingKeysAsync();
 
         var newWords = dtos
             .Select(dto => dto.ToDomain())
@@ -40,7 +33,7 @@ public class WordImportService : IWordImportService
         if (newWords.Count == 0)
             return 0;
 
-        return await _repository.InsertManyAsync(newWords);
+        return await repository.InsertManyAsync(newWords);
     }
 
     private static string BuildKey(string korean, int supNo) => $"{korean}_{supNo}";

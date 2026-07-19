@@ -28,7 +28,7 @@ public class WordImportRepository : IWordImportRepository
         if (words.Count == 0)
             return 0;
 
-        var entities = words.Select(WordMapper.ToEntity).ToList();
+        var entities = words.Select(EntityMappingExtensions.ToEntity).ToList();
         return await _base.InsertAllAsync(entities);
     }
 
