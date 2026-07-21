@@ -2,8 +2,10 @@
 using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories;
+using KoreanLearningApp.Infrastructure.Persistence.Repositories.Abstractions;
 using KoreanLearningApp.Services;
-using KoreanLearningApp.Services.Abstractions;
+using KoreanLearningApp.Services.Abstractions.Repositories;
+using KoreanLearningApp.Services.Abstractions.Services;
 using KoreanLearningApp.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
@@ -26,18 +28,23 @@ public static class MauiProgram
 #endif
         var dbPath = GetDatabasePath("KoreanLearning.db");
         builder.Services.AddSingleton(new DbContext(dbPath));
-        builder.Services.AddSingleton<BaseRepository<WordEntity>>();
+        builder.Services.AddSingleton<IRepository<WordEntity>, BaseRepository<WordEntity>>();
+        builder.Services.AddSingleton<IRepository<WordSenseEntity>, BaseRepository<WordSenseEntity>>();
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
+        builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
 
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
-            Task.Run(() => dbContext.SeedIfEmptyAsync()).GetAwaiter().GetResult();
+
+            Task.Run(async () => await dbContext.SeedIfEmptyAsync())
+                .GetAwaiter()
+                .GetResult();
         }
 
         return app;

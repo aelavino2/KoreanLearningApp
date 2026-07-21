@@ -20,7 +20,14 @@ public class DbContext
             return _connection;
 
         _connection = new SQLiteAsyncConnection(_databasePath, DatabaseConstants.Flags);
+
         await _connection.CreateTableAsync<WordEntity>();
+        await _connection.CreateTableAsync<WordSenseEntity>();
+        await _connection.CreateTableAsync<KrDictEntity>();
+        await _connection.CreateTableAsync<KrDictSenseEntity>();
+        await _connection.CreateTableAsync<AudioEntity>();
+        await _connection.CreateTableAsync<LangInfoEntity>();
+
         return _connection;
     }
 
@@ -31,10 +38,14 @@ public class DbContext
         if (count > 0)
             return;
 
-        var entities = WordSeeder.GetSeedWords()
-            .Select(w => w.ToEntity())
-            .ToList();
+        foreach (var word in WordSeeder.GetSeedWords())
+        {
+            var wordEntity = word.ToEntity();
+            await connection.InsertAsync(wordEntity);
 
-        await connection.InsertAllAsync(entities);
+            var senseEntities = word.Senses.Select(s => s.ToEntity(wordEntity.Id)).ToList();
+            if (senseEntities.Count > 0)
+                await connection.InsertAllAsync(senseEntities);
+        }
     }
 }
