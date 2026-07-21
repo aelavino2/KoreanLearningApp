@@ -15,10 +15,12 @@ public partial class WordsViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+
     public WordsViewModel(IWordService wordService)
     {
         _wordService = wordService;
     }
+
     partial void OnSearchTextChanged(string value)
     {
         ApplyFilter();
@@ -43,5 +45,29 @@ public partial class WordsViewModel : ObservableObject
         Words.Clear();
         foreach (var word in filtered)
             Words.Add(word);
+    }
+
+    [RelayCommand]
+    private async Task GoToWordsAsync()
+    {
+        await Shell.Current.GoToAsync("//WordsPage");
+    }
+
+    [RelayCommand]
+    private async Task GoToPracticeAsync()
+    {
+        await Shell.Current.GoToAsync("//PracticePage");
+    }
+
+    [RelayCommand]
+    private async Task GoToImportExportAsync()
+    {
+        await Shell.Current.GoToAsync("//ImportExportPage");
+    }
+
+    [RelayCommand]
+    private async Task GoToSavedAsync()
+    {
+        await Shell.Current.GoToAsync("//SavedPage");
     }
 }
