@@ -3,6 +3,7 @@ using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories.Abstractions;
+using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services;
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
@@ -35,6 +36,8 @@ public static class MauiProgram
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
+        builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
+
 
         var app = builder.Build();
 
