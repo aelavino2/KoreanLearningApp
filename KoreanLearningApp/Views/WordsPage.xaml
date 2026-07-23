@@ -5,49 +5,60 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
     x:DataType="vm:WordsViewModel"
-    BackgroundColor="#F2F5F0"
+    BackgroundColor="{StaticResource ColorBackground}"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,20,20,8" ColumnSpacing="12">
-            <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="Transparent" BackgroundColor="#4CAF50" Padding="0">
-                <Image Source="logo_icon.png" WidthRequest="20" HeightRequest="20" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" RowSpacing="0">
+
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,18,24,4" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource LogoBadgeStyle}">
+                <Image Source="logo_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
-            <Label Grid.Column="1" Text="Korean Dictionary" FontSize="18" FontAttributes="Bold" TextColor="#1B2E1F" VerticalOptions="Center" />
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                <Label Text="Korean Dictionary" Style="{StaticResource PageTitleStyle}" />
+                <Label Text="{Binding Words.Count, StringFormat='{0} words on this page'}" Style="{StaticResource PageSubtitleStyle}" />
+            </VerticalStackLayout>
         </Grid>
 
-        <Border Grid.Row="1" Margin="20,8,20,16" BackgroundColor="White" StrokeShape="RoundRectangle 20" Stroke="Transparent" Padding="16,10">
-            <Border.Shadow>
-                <Shadow Brush="#000000" Opacity="0.05" Radius="10" Offset="0,2" />
-            </Border.Shadow>
+
+        <Border Grid.Row="1" Margin="24,14,24,14" Style="{StaticResource SearchBarBorderStyle}">
             <Grid ColumnDefinitions="Auto,*">
-                <Image Grid.Column="0" Source="search_icon.png" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" VerticalOptions="Center" Margin="0,0,8,0" />
-                <Entry Grid.Column="1" Placeholder="Search for Words" PlaceholderColor="#8FA894" TextColor="#1B2E1F" Text="{Binding SearchText}" BackgroundColor="Transparent" />
+                <Image Grid.Column="0" Source="search_icon.png" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" VerticalOptions="Center" Margin="0,0,10,0" />
+                <Entry Grid.Column="1" Placeholder="Search for Words" Text="{Binding SearchText}" Style="{StaticResource SearchEntryStyle}" />
             </Grid>
         </Border>
 
-        <CollectionView Grid.Row="2" x:Name="WordsCollectionView" ItemsSource="{Binding Words}" SelectionMode="None" Margin="20,0,20,0">
+
+        <CollectionView Grid.Row="2"
+                x:Name="WordsCollectionView"
+                ItemsSource="{Binding Words}"
+                SelectionMode="None"
+                Margin="24,0,24,0"
+                RemainingItemsThreshold="0"
+                RemainingItemsThresholdReachedCommand="{Binding ScrolledToEndCommand}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:WordItemViewModel">
-                    <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="16,14">
-                        <Border.Shadow>
-                            <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
-                        </Border.Shadow>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                <Label Text="{Binding Korean}" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />
-                                <Border StrokeShape="RoundRectangle 12" BackgroundColor="#F0F0F0" Stroke="Transparent" Padding="10,4" HorizontalOptions="Start">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                                <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />
+                                <Border Style="{StaticResource TagPillBorderStyle}">
                                     <HorizontalStackLayout Spacing="6">
-                                        <Ellipse Fill="Green" WidthRequest="6" HeightRequest="6" VerticalOptions="Center" />
-                                        <Label Text="{Binding PartOfSpeechDisplay}" TextColor="Green" FontSize="13" />
+                                        <Ellipse Style="{StaticResource TagPillDotStyle}" />
+                                        <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
                                     </HorizontalStackLayout>
                                 </Border>
                             </VerticalStackLayout>
+
+                            <Border Grid.Column="1" Style="{StaticResource RoundIconButtonStyle}" VerticalOptions="Center">
+                                <Image Source="chevron_right_icon.png" WidthRequest="14" HeightRequest="14" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
                         </Grid>
-                        
+
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer
                                 Command="{Binding Source={x:Reference WordsCollectionView}, Path=BindingContext.OpenWordDetailCommand}"
@@ -58,48 +69,75 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="4" RowDefinitions="Auto,Auto">
-            <Border Grid.Row="0" Grid.RowSpan="2" StrokeShape="RoundRectangle 24,24,0,0" Stroke="Transparent" BackgroundColor="White" Padding="0,10,0,20" VerticalOptions="End">
-                <Border.Shadow>
-                    <Shadow Brush="#000000" Opacity="0.10" Radius="12" Offset="0,-2" />
-                </Border.Shadow>
+        <Grid Grid.Row="3" RowDefinitions="Auto,Auto" Padding="24,10,24,10" IsVisible="{Binding IsPaginationVisible}">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="&#8592;"
+                        Command="{Binding PreviousPageCommand}"
+                        IsEnabled="{Binding CanGoToPreviousPage}"
+                        WidthRequest="44" HeightRequest="44" Padding="0"
+                        FontSize="16" CornerRadius="13"
+                        BackgroundColor="{StaticResource ColorChipBg}"
+                        TextColor="{StaticResource ColorPrimaryDark}" />
 
-                <Grid ColumnDefinitions="*,*,*,*">
-                    <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Words" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
+                <Label Grid.Column="1"
+                       Text="{Binding PageIndicatorText}"
+                       TextColor="{StaticResource ColorPrimaryDark}"
+                       FontSize="14" FontAttributes="Bold"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
 
-                    <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="practice_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Practice" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
+                <Button Grid.Column="2"
+                        Text="&#8594;"
+                        Command="{Binding NextPageCommand}"
+                        IsEnabled="{Binding CanGoToNextPage}"
+                        WidthRequest="44" HeightRequest="44" Padding="0"
+                        FontSize="16" CornerRadius="13"
+                        BackgroundColor="{StaticResource ColorPrimary}"
+                        TextColor="White" />
+            </Grid>
 
-                    <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Import" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
-
-                    <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Grid Grid.Row="0" HorizontalOptions="Center">
-                            <Image Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" />
-                        </Grid>
-                        <Label Grid.Row="1" Text="Saved" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" Margin="0,4,0,0" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
-                </Grid>
-            </Border>
+            <Label Grid.Row="1"
+                   Text="Долистайте список до конца, чтобы перейти дальше"
+                   FontSize="11" TextColor="{StaticResource ColorMuted}"
+                   HorizontalOptions="Center" Margin="0,6,0,0"
+                   IsVisible="{Binding CanGoToNextPage, Converter={StaticResource InverseBoolConverter}}" />
         </Grid>
+
+        <Border Grid.Row="4" Style="{StaticResource TabBarBorderStyle}">
+            <Grid ColumnDefinitions="*,*,*,*">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Words" Style="{StaticResource TabIconLabelActiveStyle}" />
+                    <BoxView Grid.Row="0" WidthRequest="4" HeightRequest="4" CornerRadius="2" BackgroundColor="{StaticResource ColorPrimary}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,-8" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="practice_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Practice" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Import" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Saved" Style="{StaticResource TabIconLabelStyle}" Margin="0,4,0,0" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>

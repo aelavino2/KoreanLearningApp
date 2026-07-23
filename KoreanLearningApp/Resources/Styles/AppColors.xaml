@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!--  База  -->
+    <Color x:Key="ColorBackground">#F5F9F6</Color>
+    <Color x:Key="ColorCard">#FFFFFF</Color>
+    <Color x:Key="ColorPrimary">#6FBF73</Color>
+    <Color x:Key="ColorPrimaryDark">#1B2E1F</Color>
+    <Color x:Key="ColorMuted">#8FA894</Color>
+    <Color x:Key="ColorMutedLight">#B0C0B4</Color>
+    <Color x:Key="ColorBorder">#E8EDEA</Color>
+    <Color x:Key="ColorChipBg">#F0F4F1</Color>
+    <Color x:Key="ColorDivider">#E5E5E5</Color>
+
+    <!--  Пилюли (уровни вежливости / часть речи)  -->
+    <Color x:Key="ColorPoliteBg">#EDF7EE</Color>
+    <Color x:Key="ColorPoliteText">#2D8040</Color>
+
+    <Color x:Key="ColorFormalBg">#EEF2FF</Color>
+    <Color x:Key="ColorFormalText">#4361CC</Color>
+
+    <Color x:Key="ColorCasualBg">#FFF4ED</Color>
+    <Color x:Key="ColorCasualText">#B05E28</Color>
+
+    <Color x:Key="ColorHonorBg">#F5F0FF</Color>
+    <Color x:Key="ColorHonorText">#6B3ABA</Color>
+
+    <Color x:Key="ColorInformalBg">#FFF0F3</Color>
+    <Color x:Key="ColorInformalText">#B53060</Color>
+
+    <!--  Готовые кисти  -->
+    <SolidColorBrush x:Key="BrushPrimary" Color="{StaticResource ColorPrimary}" />
+    <SolidColorBrush x:Key="BrushCard" Color="{StaticResource ColorCard}" />
+    <SolidColorBrush x:Key="BrushBackground" Color="{StaticResource ColorBackground}" />
+    <SolidColorBrush x:Key="BrushTransparent" Color="Transparent" />
+
+</ResourceDictionary>
