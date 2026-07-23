@@ -52,36 +52,71 @@ public class WordRepository(
     public async Task<int> SaveWordAsync(Word word)
     {
         var wordEntity = word.ToEntity();
-        var wordId = word.Id == 0
-            ? await wordRepo.InsertAsync(wordEntity)
-            : await wordRepo.UpdateAsync(wordEntity);
-        var resolvedWordId = word.Id == 0 ? wordId : word.Id;
-        
+
+        if (word.Id == 0)
+        {
+            await wordRepo.InsertAsync(wordEntity);
+        }
+        else
+        {
+            wordEntity.Id = word.Id;
+            await wordRepo.UpdateAsync(wordEntity);
+        }
+
+        var resolvedWordId = wordEntity.Id;
+
+        // чистим старые связанные записи перед перезаписью
         var oldKrDicts = (await krDictRepo.GetAllAsync()).Where(k => k.WordId == resolvedWordId).ToList();
         foreach (var old in oldKrDicts)
         {
+            var oldSenses = (await senseRepo.GetAllAsync()).Where(s => s.KrDictId == old.Id).ToList();
+            foreach (var oldSense in oldSenses)
+            {
+                if (oldSense.EnId.HasValue)
+                    await langInfoRepo.DeleteWhereAsync(l => l.Id == oldSense.EnId.Value);
+                if (oldSense.RuId.HasValue)
+                    await langInfoRepo.DeleteWhereAsync(l => l.Id == oldSense.RuId.Value);
+            }
             await senseRepo.DeleteWhereAsync(s => s.KrDictId == old.Id);
+
+            if (old.AudioId.HasValue)
+                await audioRepo.DeleteWhereAsync(a => a.Id == old.AudioId.Value);
         }
         await krDictRepo.DeleteWhereAsync(k => k.WordId == resolvedWordId);
 
         if (word.KrDict is null)
-            return wordId;
+            return resolvedWordId;
 
         int? audioId = null;
         if (word.KrDict.Audio is not null)
         {
             var audioEntity = word.KrDict.Audio.ToEntity();
-            audioId = await audioRepo.InsertAsync(audioEntity);
+            await audioRepo.InsertAsync(audioEntity);
+            audioId = audioEntity.Id;
         }
 
         var krDictEntity = word.KrDict.ToEntity(resolvedWordId);
         krDictEntity.AudioId = audioId;
-        var krDictId = await krDictRepo.InsertAsync(krDictEntity);
+        await krDictRepo.InsertAsync(krDictEntity);
+        var krDictId = krDictEntity.Id;
 
         foreach (var sense in word.KrDict.Senses)
         {
-            int? enId = sense.En is not null ? await langInfoRepo.InsertAsync(sense.En.ToEntity()) : null;
-            int? ruId = sense.Ru is not null ? await langInfoRepo.InsertAsync(sense.Ru.ToEntity()) : null;
+            int? enId = null;
+            if (sense.En is not null)
+            {
+                var enEntity = sense.En.ToEntity();
+                await langInfoRepo.InsertAsync(enEntity);
+                enId = enEntity.Id;
+            }
+
+            int? ruId = null;
+            if (sense.Ru is not null)
+            {
+                var ruEntity = sense.Ru.ToEntity();
+                await langInfoRepo.InsertAsync(ruEntity);
+                ruId = ruEntity.Id;
+            }
 
             var senseEntity = sense.ToEntity(krDictId);
             senseEntity.EnId = enId;
@@ -89,7 +124,7 @@ public class WordRepository(
             await senseRepo.InsertAsync(senseEntity);
         }
 
-        return wordId;
+        return resolvedWordId;
     }
 
     public async Task<int> DeleteWordAsync(Word word)
@@ -97,13 +132,23 @@ public class WordRepository(
         var krDicts = (await krDictRepo.GetAllAsync()).Where(k => k.WordId == word.Id).ToList();
         foreach (var k in krDicts)
         {
+            var senses = (await senseRepo.GetAllAsync()).Where(s => s.KrDictId == k.Id).ToList();
+            foreach (var s in senses)
+            {
+                if (s.EnId.HasValue)
+                    await langInfoRepo.DeleteWhereAsync(l => l.Id == s.EnId.Value);
+                if (s.RuId.HasValue)
+                    await langInfoRepo.DeleteWhereAsync(l => l.Id == s.RuId.Value);
+            }
             await senseRepo.DeleteWhereAsync(s => s.KrDictId == k.Id);
+
             if (k.AudioId.HasValue)
                 await audioRepo.DeleteWhereAsync(a => a.Id == k.AudioId.Value);
         }
         await krDictRepo.DeleteWhereAsync(k => k.WordId == word.Id);
 
         var entity = word.ToEntity();
+        entity.Id = word.Id;
         return await wordRepo.DeleteAsync(entity);
     }
 }

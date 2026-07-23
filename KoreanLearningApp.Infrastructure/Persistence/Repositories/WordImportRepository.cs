@@ -50,7 +50,8 @@ public class WordImportRepository : IWordImportRepository
         foreach (var word in words)
         {
             var wordEntity = word.ToEntity();
-            var wordId = await _wordRepo.InsertAsync(wordEntity);
+            await _wordRepo.InsertAsync(wordEntity);
+            var wordId = wordEntity.Id; // <-- берём Id из сущности, не из результата InsertAsync
             inserted++;
 
             if (word.KrDict is null)
@@ -59,17 +60,33 @@ public class WordImportRepository : IWordImportRepository
             int? audioId = null;
             if (word.KrDict.Audio is not null)
             {
-                audioId = await _audioRepo.InsertAsync(word.KrDict.Audio.ToEntity());
+                var audioEntity = word.KrDict.Audio.ToEntity();
+                await _audioRepo.InsertAsync(audioEntity);
+                audioId = audioEntity.Id;
             }
 
             var krDictEntity = word.KrDict.ToEntity(wordId);
             krDictEntity.AudioId = audioId;
-            var krDictId = await _krDictRepo.InsertAsync(krDictEntity);
+            await _krDictRepo.InsertAsync(krDictEntity);
+            var krDictId = krDictEntity.Id;
 
             foreach (var sense in word.KrDict.Senses)
             {
-                int? enId = sense.En is not null ? await _langInfoRepo.InsertAsync(sense.En.ToEntity()) : null;
-                int? ruId = sense.Ru is not null ? await _langInfoRepo.InsertAsync(sense.Ru.ToEntity()) : null;
+                int? enId = null;
+                if (sense.En is not null)
+                {
+                    var enEntity = sense.En.ToEntity();
+                    await _langInfoRepo.InsertAsync(enEntity);
+                    enId = enEntity.Id;
+                }
+
+                int? ruId = null;
+                if (sense.Ru is not null)
+                {
+                    var ruEntity = sense.Ru.ToEntity();
+                    await _langInfoRepo.InsertAsync(ruEntity);
+                    ruId = ruEntity.Id;
+                }
 
                 var senseEntity = sense.ToEntity(krDictId);
                 senseEntity.EnId = enId;

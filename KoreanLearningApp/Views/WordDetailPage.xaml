@@ -72,8 +72,6 @@
                                FontSize="13"
                                TextColor="{StaticResource ColorMuted}"
                                IsVisible="{Binding HasPronunciation}" />
-
-                        <Label Text="{Binding PrimaryTranslation}" FontSize="16" TextColor="{StaticResource ColorPrimary}" FontAttributes="Bold" />
                     </VerticalStackLayout>
                 </Border>
 
