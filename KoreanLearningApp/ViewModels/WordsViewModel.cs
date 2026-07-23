@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
@@ -34,6 +35,15 @@ public partial class WordsViewModel : ObservableObject
         var words = await _wordService.GetWordsAsync();
         _allWords = words.Select(w => new WordItemViewModel(w)).ToList();
         ApplyFilter();
+    }
+
+    [RelayCommand]
+    private async Task OpenWordDetailAsync(Word word)
+    {
+        if (word is null)
+            return;
+
+        await _navigationService.GoToDetailAsync(AppRoutes.WordDetail, word);
     }
 
     private void ApplyFilter()

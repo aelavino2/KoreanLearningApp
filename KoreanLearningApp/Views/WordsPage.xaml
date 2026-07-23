@@ -47,6 +47,12 @@
                                 </Border>
                             </VerticalStackLayout>
                         </Grid>
+                        
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:Reference WordsCollectionView}, Path=BindingContext.OpenWordDetailCommand}"
+                                CommandParameter="{Binding Word}" />
+                        </Border.GestureRecognizers>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

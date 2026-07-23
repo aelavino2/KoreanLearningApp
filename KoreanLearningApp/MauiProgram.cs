@@ -41,7 +41,10 @@ public static class MauiProgram
         builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
         builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
-        
+        builder.Services.AddTransient<WordDetailViewModel>();
+        builder.Services.AddTransient<WordDetailPage>();
+
+
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())

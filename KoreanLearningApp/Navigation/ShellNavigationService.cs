@@ -23,5 +23,13 @@ namespace KoreanLearningApp.Navigation
         {
             return Shell.Current.GoToAsync("..");
         }
+
+        public async Task GoToDetailAsync(string route, object parameter)
+        {
+            await Shell.Current.GoToAsync(route, new Dictionary<string, object>
+            {
+                ["Word"] = parameter
+            });
+        }
     }
 }

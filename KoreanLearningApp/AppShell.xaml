@@ -11,14 +11,11 @@
         Title="Слова"
         ContentTemplate="{DataTemplate views:WordsPage}"
         Route="WordsPage" />
-
-
-
     <ShellContent
         Title="ImportExport"
         ContentTemplate="{DataTemplate views:ImportExportPage}"
         Route="ImportExportPage" />
-
-
+    
+    
 
 </Shell>
