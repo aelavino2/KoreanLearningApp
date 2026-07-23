@@ -2,7 +2,7 @@
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO;
 
-public abstract class WordJsonDto
+public class WordJsonDto
 {
     [JsonPropertyName("rank")]
     public string Rank { get; set; } = string.Empty;

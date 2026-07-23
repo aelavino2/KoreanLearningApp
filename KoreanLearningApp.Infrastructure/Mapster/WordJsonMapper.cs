@@ -1,5 +1,4 @@
-﻿// Infrastructure/Import/WordImportMapper.cs
-using KoreanLearningApp.Domain.Models;
+﻿using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Infrastructure.Import.DTO;
 
 namespace KoreanLearningApp.Infrastructure.Import;

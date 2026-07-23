@@ -19,5 +19,5 @@ public class KrDictEntity
     [Indexed]
     public int WordId { get; set; }
 
-    public int? AudioId { get; set; } // FK -> AudioEntity.Id, nullable
+    public int? AudioId { get; set; }
 }

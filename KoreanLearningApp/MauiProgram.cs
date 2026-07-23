@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Maui;
+using KoreanLearningApp.Infrastructure.Import;
 using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories.Abstractions;
+using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services;
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
@@ -32,10 +34,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRepository<WordSenseEntity>, BaseRepository<WordSenseEntity>>();
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
+        builder.Services.AddSingleton<IWordImportService, WordImportService>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
+        builder.Services.AddTransient<ImportExportViewModel>();
+        builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
-
+        builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
+        
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())

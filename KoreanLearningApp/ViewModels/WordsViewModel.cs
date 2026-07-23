@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
 
@@ -8,6 +9,7 @@ namespace KoreanLearningApp.ViewModels;
 public partial class WordsViewModel : ObservableObject
 {
     private readonly IWordService _wordService;
+    private readonly INavigationService _navigationService;
     private List<WordItemViewModel> _allWords = new();
 
     public ObservableCollection<WordItemViewModel> Words { get; } = new();
@@ -15,10 +17,10 @@ public partial class WordsViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText = string.Empty;
 
-
-    public WordsViewModel(IWordService wordService)
+    public WordsViewModel(IWordService wordService, INavigationService navigationService)
     {
         _wordService = wordService;
+        _navigationService = navigationService;
     }
 
     partial void OnSearchTextChanged(string value)
@@ -48,26 +50,14 @@ public partial class WordsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task GoToWordsAsync()
-    {
-        await Shell.Current.GoToAsync("//WordsPage");
-    }
+    private Task GoToWordsAsync() => _navigationService.GoToRootAsync(AppRoutes.Words);
 
     [RelayCommand]
-    private async Task GoToPracticeAsync()
-    {
-        await Shell.Current.GoToAsync("//PracticePage");
-    }
+    private Task GoToPracticeAsync() => _navigationService.GoToRootAsync(AppRoutes.Practice);
 
     [RelayCommand]
-    private async Task GoToImportExportAsync()
-    {
-        await Shell.Current.GoToAsync("//ImportExportPage");
-    }
+    private Task GoToImportExportAsync() => _navigationService.GoToRootAsync(AppRoutes.ImportExport);
 
     [RelayCommand]
-    private async Task GoToSavedAsync()
-    {
-        await Shell.Current.GoToAsync("//SavedPage");
-    }
+    private Task GoToSavedAsync() => _navigationService.GoToRootAsync(AppRoutes.Saved);
 }

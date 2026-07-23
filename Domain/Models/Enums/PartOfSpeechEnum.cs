@@ -2,7 +2,7 @@
 
 public enum PartOfSpeechEnum
 {
-    Empty = 0,               // 전체 / не задано
+    Empty = 0,               // 전체
     Noun = 1,                // 명사
     Pronoun = 2,             // 대명사
     Numeral = 3,             // 수사

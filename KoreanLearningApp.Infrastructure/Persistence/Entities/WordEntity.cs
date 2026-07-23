@@ -1,5 +1,4 @@
-﻿// Entities/WordEntity.cs
-using SQLite;
+﻿using SQLite;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Entities;
 

@@ -2,7 +2,7 @@
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO
 {
-    public abstract class AudioJsonDto
+    public class AudioJsonDto
     {
         [JsonPropertyName("url")]
         public string Url { get; set; } = string.Empty;
