@@ -39,10 +39,53 @@
                             <Label Grid.Column="1" Text="{Binding Word.TopikLevel}" FontSize="11" TextColor="{StaticResource ColorMutedLight}" FontAttributes="Bold" VerticalOptions="Start" />
                         </Grid>
 
-                        <Label Text="{Binding Word.Korean}" Style="{StaticResource WordKoreanHeroStyle}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Word.Korean}" Style="{StaticResource WordKoreanHeroStyle}" />
+                                <Label Text="{Binding Word.Hanja}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource ColorMuted}"
+                                       IsVisible="{Binding HasHanja}" />
+                            </VerticalStackLayout>
+
+                            <Border Grid.Column="1"
+                                    Style="{StaticResource RoundIconButtonStyle}"
+                                    VerticalOptions="Start"
+                                    IsVisible="{Binding HasAudio}">
+                                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="audio_icon.png"
+                                           WidthRequest="16" HeightRequest="16"
+                                           Aspect="AspectFit"
+                                           IsVisible="{Binding IsAudioBusy, Converter={StaticResource InverseBoolConverter}}" />
+                                    <ActivityIndicator IsRunning="{Binding IsAudioBusy}"
+                                                        IsVisible="{Binding IsAudioBusy}"
+                                                        Color="{StaticResource ColorPrimary}"
+                                                        WidthRequest="16" HeightRequest="16" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlayAudioCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                        <Label Text="{Binding Word.PronunciationNote}"
+                               FontSize="13"
+                               TextColor="{StaticResource ColorMuted}"
+                               IsVisible="{Binding HasPronunciation}" />
+
                         <Label Text="{Binding PrimaryTranslation}" FontSize="16" TextColor="{StaticResource ColorPrimary}" FontAttributes="Bold" />
                     </VerticalStackLayout>
                 </Border>
+
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding HasRuleExplanation}">
+                    <Label Text="ГРАММАТИКА" Style="{StaticResource SectionLabelStyle}" Margin="4,4,0,0" />
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <Label Text="{Binding Word.RuleExplanation}"
+                               FontSize="13"
+                               TextColor="{StaticResource ColorMuted}"
+                               LineHeight="1.5" />
+                    </Border>
+                </VerticalStackLayout>
 
                 <Label Text="TRANSLATIONS &amp; MEANINGS" Style="{StaticResource SectionLabelStyle}" Margin="4,4,0,0" />
 

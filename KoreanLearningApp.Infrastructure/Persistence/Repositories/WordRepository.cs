@@ -6,54 +6,104 @@ using KoreanLearningApp.Services.Abstractions.Repositories;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Repositories;
 
-public class WordRepository : IWordRepository
+public class WordRepository(
+    IRepository<WordEntity> wordRepo,
+    IRepository<KrDictEntity> krDictRepo,
+    IRepository<KrDictSenseEntity> senseRepo,
+    IRepository<AudioEntity> audioRepo,
+    IRepository<LangInfoEntity> langInfoRepo)
+    : IWordRepository
 {
-    private readonly IRepository<WordEntity> _base;
-    private readonly IRepository<WordSenseEntity> _senseRepo;
-
-    public WordRepository(IRepository<WordEntity> baseRepository, IRepository<WordSenseEntity> senseRepo)
-    {
-        _base = baseRepository;
-        _senseRepo = senseRepo;
-    }
-
     public async Task<List<Word>> GetWordsAsync()
     {
-        var wordEntities = await _base.GetAllAsync();
-        var allSenses = await _senseRepo.GetAllAsync();
+        var wordEntities = await wordRepo.GetAllAsync();
+        var krDictEntities = await krDictRepo.GetAllAsync();
+        var senseEntities = await senseRepo.GetAllAsync();
+        var audioEntities = await audioRepo.GetAllAsync();
+        var langInfoEntities = await langInfoRepo.GetAllAsync();
 
-        var sensesByWordId = allSenses
-            .GroupBy(s => s.WordId)
-            .ToDictionary(g => g.Key, g => g.Select(EntityMappingExtensions.ToDomain).ToList());
+        var audiosById = audioEntities.ToDictionary(a => a.Id);
+        var langInfoById = langInfoEntities.ToDictionary(l => l.Id);
+
+        var sensesByKrDictId = senseEntities
+            .GroupBy(s => s.KrDictId)
+            .ToDictionary(g => g.Key, g => g.Select(s =>
+            {
+                var en = s.EnId.HasValue && langInfoById.TryGetValue(s.EnId.Value, out var enEntity)
+                    ? enEntity.ToDomain() : null;
+                var ru = s.RuId.HasValue && langInfoById.TryGetValue(s.RuId.Value, out var ruEntity)
+                    ? ruEntity.ToDomain() : null;
+                return s.ToDomain(en, ru);
+            }).ToList());
+
+        var krDictByWordId = krDictEntities.ToDictionary(k => k.WordId, k =>
+        {
+            var senses = sensesByKrDictId.GetValueOrDefault(k.Id, new List<Sense>());
+            Audio? audio = k.AudioId.HasValue && audiosById.TryGetValue(k.AudioId.Value, out var audioEntity)
+                ? audioEntity.ToDomain() : null;
+            return k.ToDomain(senses, audio);
+        });
 
         return wordEntities
-           .Select(e => EntityMappingExtensions.ToDomain(e, sensesByWordId.GetValueOrDefault(e.Id, new List<Sense>())))
+            .Select(e => e.ToDomain(krDictByWordId.GetValueOrDefault(e.Id)))
             .ToList();
     }
 
     public async Task<int> SaveWordAsync(Word word)
     {
-        var entity = EntityMappingExtensions.ToEntity(word);
+        var wordEntity = word.ToEntity();
+        var wordId = word.Id == 0
+            ? await wordRepo.InsertAsync(wordEntity)
+            : await wordRepo.UpdateAsync(wordEntity);
+        var resolvedWordId = word.Id == 0 ? wordId : word.Id;
+        
+        var oldKrDicts = (await krDictRepo.GetAllAsync()).Where(k => k.WordId == resolvedWordId).ToList();
+        foreach (var old in oldKrDicts)
+        {
+            await senseRepo.DeleteWhereAsync(s => s.KrDictId == old.Id);
+        }
+        await krDictRepo.DeleteWhereAsync(k => k.WordId == resolvedWordId);
 
-        var wordId = word.Id == 0 
-            ? await _base.InsertAsync(entity) 
-            : await _base.UpdateAsync(entity);
+        if (word.KrDict is null)
+            return wordId;
 
-        var resolvedId = word.Id == 0 ? wordId : word.Id;
+        int? audioId = null;
+        if (word.KrDict.Audio is not null)
+        {
+            var audioEntity = word.KrDict.Audio.ToEntity();
+            audioId = await audioRepo.InsertAsync(audioEntity);
+        }
 
-        await _senseRepo.DeleteWhereAsync(s => s.WordId == resolvedId);
+        var krDictEntity = word.KrDict.ToEntity(resolvedWordId);
+        krDictEntity.AudioId = audioId;
+        var krDictId = await krDictRepo.InsertAsync(krDictEntity);
 
-        var senseEntities = word.Senses.Select(s => s.ToEntity(resolvedId)).ToList();
-        if (senseEntities.Count > 0)
-            await _senseRepo.InsertAllAsync(senseEntities);
+        foreach (var sense in word.KrDict.Senses)
+        {
+            int? enId = sense.En is not null ? await langInfoRepo.InsertAsync(sense.En.ToEntity()) : null;
+            int? ruId = sense.Ru is not null ? await langInfoRepo.InsertAsync(sense.Ru.ToEntity()) : null;
+
+            var senseEntity = sense.ToEntity(krDictId);
+            senseEntity.EnId = enId;
+            senseEntity.RuId = ruId;
+            await senseRepo.InsertAsync(senseEntity);
+        }
 
         return wordId;
     }
 
     public async Task<int> DeleteWordAsync(Word word)
     {
-        await _senseRepo.DeleteWhereAsync(s => s.WordId == word.Id);
-        var entity = EntityMappingExtensions.ToEntity(word);
-        return await _base.DeleteAsync(entity);
+        var krDicts = (await krDictRepo.GetAllAsync()).Where(k => k.WordId == word.Id).ToList();
+        foreach (var k in krDicts)
+        {
+            await senseRepo.DeleteWhereAsync(s => s.KrDictId == k.Id);
+            if (k.AudioId.HasValue)
+                await audioRepo.DeleteWhereAsync(a => a.Id == k.AudioId.Value);
+        }
+        await krDictRepo.DeleteWhereAsync(k => k.WordId == word.Id);
+
+        var entity = word.ToEntity();
+        return await wordRepo.DeleteAsync(entity);
     }
 }

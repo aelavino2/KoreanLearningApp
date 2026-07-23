@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
 
@@ -14,10 +13,10 @@ public partial class SenseItemViewModel : ObservableObject
         Sense = sense;
     }
 
-    public string EnText => Sense.EnWord;
-    public string EnDefinition => Sense.EnDefinition;
-    public string RuText => Sense.RuWord;
-    public string RuDefinition => Sense.RuDefinition;
+    public string EnText => Sense.En?.Word ?? string.Empty;
+    public string EnDefinition => Sense.En?.Definition ?? string.Empty;
+    public string RuText => Sense.Ru?.Word ?? string.Empty;
+    public string RuDefinition => Sense.Ru?.Definition ?? string.Empty;
 
     [ObservableProperty]
     private bool _isExpanded;
