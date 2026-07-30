@@ -68,7 +68,7 @@
                             </Border>
                         </Grid>
 
-                        <Label Text="{Binding Word.PronunciationNote}"
+                        <Label Text="{Binding Word.KrDict.Pronunciation}"
                                FontSize="13"
                                TextColor="{StaticResource ColorMuted}"
                                IsVisible="{Binding HasPronunciation}" />

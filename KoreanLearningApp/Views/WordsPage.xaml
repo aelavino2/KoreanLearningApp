@@ -41,31 +41,42 @@
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:WordItemViewModel">
-                    <Border Style="{StaticResource CardBorderStyle}">
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                            <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
-                                <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />
-                                <Border Style="{StaticResource TagPillBorderStyle}">
-                                    <HorizontalStackLayout Spacing="6">
-                                        <Ellipse Style="{StaticResource TagPillDotStyle}" />
-                                        <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
-                                    </HorizontalStackLayout>
-                                </Border>
-                            </VerticalStackLayout>
-
-                            <Border Grid.Column="1" Style="{StaticResource RoundIconButtonStyle}" VerticalOptions="Center">
-                                <Image Source="chevron_right_icon.png" WidthRequest="14" HeightRequest="14" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-                        </Grid>
-
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Command="{Binding Source={x:Reference WordsCollectionView}, Path=BindingContext.OpenWordDetailCommand}"
-                                CommandParameter="{Binding Word}" />
-                        </Border.GestureRecognizers>
+<DataTemplate x:DataType="vm:WordItemViewModel">
+    <Border Style="{StaticResource CardBorderStyle}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />
+                <HorizontalStackLayout Spacing="6">
+                    <Border Style="{StaticResource TagPillBorderStyle}">
+                        <HorizontalStackLayout Spacing="6">
+                            <Ellipse Style="{StaticResource TagPillDotStyle}" />
+                            <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                        </HorizontalStackLayout>
                     </Border>
-                </DataTemplate>
+                    <Border BackgroundColor="{StaticResource ColorChipBg}"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,3"
+                            IsVisible="{Binding HasTopikLevel}">
+                        <Label Text="{Binding TopikLevel, StringFormat='TOPIK {0}'}"
+                               FontSize="10"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource ColorPrimaryDark}" />
+                    </Border>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <Border Grid.Column="1" Style="{StaticResource RoundIconButtonStyle}" VerticalOptions="Center">
+                <Image Source="chevron_right_icon.png" WidthRequest="14" HeightRequest="14" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer
+                Command="{Binding Source={x:Reference WordsCollectionView}, Path=BindingContext.OpenWordDetailCommand}"
+                CommandParameter="{Binding Word}" />
+        </Border.GestureRecognizers>
+    </Border>
+</DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 

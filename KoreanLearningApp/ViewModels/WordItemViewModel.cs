@@ -17,6 +17,10 @@ public partial class WordItemViewModel : ObservableObject
 
     public string Korean => Word.Korean;
 
+    public string TopikLevel => Word.TopikLevel;
+
+    public bool HasTopikLevel => !string.IsNullOrWhiteSpace(TopikLevel);
+
     [ObservableProperty]
     private string _translationRu;
 
