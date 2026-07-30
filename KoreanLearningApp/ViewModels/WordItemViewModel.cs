@@ -11,18 +11,22 @@ public partial class WordItemViewModel : ObservableObject
     public WordItemViewModel(Word word)
     {
         Word = word;
-        _translationRu = word.TranslationRu;
+        _translationRu = word.KrDict?.Senses.FirstOrDefault()?.Ru?.Word ?? string.Empty;
         _partOfSpeech = PartOfSpeechMapper.Parse(word.PartOfSpeech);
     }
 
     public string Korean => Word.Korean;
+
+    public string TopikLevel => Word.TopikLevel;
+
+    public bool HasTopikLevel => !string.IsNullOrWhiteSpace(TopikLevel);
 
     [ObservableProperty]
     private string _translationRu;
 
     [ObservableProperty]
     private PartOfSpeechEnum _partOfSpeech;
-    
+
     public string PartOfSpeechDisplay => PartOfSpeech.ToRussian();
 
     partial void OnPartOfSpeechChanged(PartOfSpeechEnum value)

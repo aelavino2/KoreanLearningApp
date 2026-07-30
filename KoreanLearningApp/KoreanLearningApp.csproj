@@ -78,6 +78,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\WordDetailPage.xaml.cs">
+	    <DependentUpon>WordDetailPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\WordDetailPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\WordsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

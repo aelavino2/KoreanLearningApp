@@ -27,7 +27,7 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
 
         var newWords = dtos
             .Select(dto => dto.ToDomain())
-            .Where(word => !existingKeys.Contains(BuildKey(word.Korean, word.SupNo)))
+            .Where(word => !existingKeys.Contains(BuildKey(word)))
             .ToList();
 
         if (newWords.Count == 0)
@@ -36,5 +36,6 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
         return await repository.InsertManyAsync(newWords);
     }
 
-    private static string BuildKey(string korean, int supNo) => $"{korean}_{supNo}";
+    private static string BuildKey(Domain.Models.Word word) =>
+        $"{word.Korean}_{word.KrDict?.SupNo ?? 0}";
 }

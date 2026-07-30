@@ -7,5 +7,6 @@
         public const string Practice = "PracticePage";
         public const string ImportExport = "ImportExportPage";
         public const string Saved = "SavedPage";
+        public const string WordDetail = "WordDetail";
     }
 }

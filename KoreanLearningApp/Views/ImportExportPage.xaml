@@ -5,81 +5,78 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
     x:DataType="vm:ImportExportViewModel"
-    BackgroundColor="#F2F5F0"
+    BackgroundColor="{StaticResource ColorBackground}"
     Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,20,20,8" ColumnSpacing="12">
-            <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="Transparent" BackgroundColor="#4CAF50" Padding="0">
-                <Image Source="logo_icon.png" WidthRequest="20" HeightRequest="20" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,18,24,4" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource LogoBadgeStyle}">
+                <Image Source="logo_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
-            <Label Grid.Column="1" Text="Import &amp; Export" FontSize="18" FontAttributes="Bold" TextColor="#1B2E1F" VerticalOptions="Center" />
+            <Label Grid.Column="1" Text="Import &amp; Export" Style="{StaticResource PageTitleStyle}" VerticalOptions="Center" />
         </Grid>
 
-        <VerticalStackLayout Grid.Row="1" Padding="20,8,20,0" Spacing="16">
-            <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="18">
-                <Border.Shadow>
-                    <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
-                </Border.Shadow>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Экспорт слов" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />
-                    <Label Text="Сохраните все ваши слова в JSON файл" FontSize="13" TextColor="#8FA894" />
-                    <Button Text="Экспортировать (JSON)" BackgroundColor="#4CAF50" TextColor="White" CornerRadius="12" Command="{Binding ExportCommand}" />
+        <VerticalStackLayout Grid.Row="1" Padding="24,14,24,0" Spacing="14">
+
+            <Border Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="12">
+                    <Border StrokeShape="RoundRectangle 14" Stroke="Transparent" BackgroundColor="{StaticResource ColorPoliteBg}" Padding="10" HorizontalOptions="Start">
+                        <Image Source="import_export_icon.png" WidthRequest="20" HeightRequest="20" Aspect="AspectFit" />
+                    </Border>
+                    <Label Text="Экспорт слов" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource ColorPrimaryDark}" />
+                    <Label Text="Сохраните все ваши слова в JSON файл" FontSize="13" TextColor="{StaticResource ColorMuted}" />
+                    <Button Text="Экспортировать (JSON)" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ExportCommand}" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border BackgroundColor="White" StrokeShape="RoundRectangle 16" Stroke="Transparent" Padding="18">
-                <Border.Shadow>
-                    <Shadow Brush="#000000" Opacity="0.05" Radius="8" Offset="0,2" />
-                </Border.Shadow>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Импорт слов" FontSize="16" FontAttributes="Bold" TextColor="#1B2E1F" />
-                    <Label Text="Загрузите слова из JSON файла" FontSize="13" TextColor="#8FA894" />
-                    <Button Text="Импортировать (JSON)" BackgroundColor="#4CAF50" TextColor="White" CornerRadius="12" Command="{Binding ImportCommand}" />
+            <Border Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="12">
+                    <Border StrokeShape="RoundRectangle 14" Stroke="Transparent" BackgroundColor="{StaticResource ColorFormalBg}" Padding="10" HorizontalOptions="Start">
+                        <Image Source="import_export_icon.png" WidthRequest="20" HeightRequest="20" Aspect="AspectFit" />
+                    </Border>
+                    <Label Text="Импорт слов" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource ColorPrimaryDark}" />
+                    <Label Text="Загрузите слова из JSON файла" FontSize="13" TextColor="{StaticResource ColorMuted}" />
+                    <Button Text="Импортировать (JSON)" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ImportCommand}" />
                 </VerticalStackLayout>
             </Border>
+
         </VerticalStackLayout>
 
-        <Grid Grid.Row="2" RowDefinitions="Auto,Auto">
-            <Border Grid.Row="0" Grid.RowSpan="2" StrokeShape="RoundRectangle 24,24,0,0" Stroke="Transparent" BackgroundColor="White" Padding="0,10,0,20" VerticalOptions="End">
-                <Border.Shadow>
-                    <Shadow Brush="#000000" Opacity="0.10" Radius="12" Offset="0,-2" />
-                </Border.Shadow>
-
-                <Grid ColumnDefinitions="*,*,*,*">
-                    <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Words" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
-
-                    <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="practice_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Practice" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
-
-                    <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Import" FontSize="12" TextColor="#4CAF50" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
-
-                    <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Image Grid.Row="0" Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                        <Label Grid.Row="1" Text="Saved" FontSize="12" TextColor="#8FA894" HorizontalOptions="Center" Margin="0,4,0,0" />
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
-                        </Grid.GestureRecognizers>
-                    </Grid>
+        <Border Grid.Row="2" Style="{StaticResource TabBarBorderStyle}">
+            <Grid ColumnDefinitions="*,*,*,*">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Words" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
+                    </Grid.GestureRecognizers>
                 </Grid>
-            </Border>
-        </Grid>
+
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="practice_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Practice" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Import" Style="{StaticResource TabIconLabelActiveStyle}" />
+                    <BoxView Grid.Row="0" WidthRequest="4" HeightRequest="4" CornerRadius="2" BackgroundColor="{StaticResource ColorPrimary}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,-8" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Saved" Style="{StaticResource TabIconLabelStyle}" Margin="0,4,0,0" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>

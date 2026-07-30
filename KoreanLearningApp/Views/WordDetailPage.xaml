@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KoreanLearningApp.Views.WordDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    x:DataType="vm:WordDetailViewModel"
+    BackgroundColor="{StaticResource ColorBackground}"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="0">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,18,24,4" ColumnSpacing="10">
+            <Border Grid.Column="0" Style="{StaticResource BackButtonBadgeStyle}">
+                <Image Source="back_icon.png" WidthRequest="16" HeightRequest="16" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Label Grid.Column="1" Text="Back" FontSize="14" TextColor="{StaticResource ColorMuted}" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,10,24,28" Spacing="18">
+
+                <Border Style="{StaticResource HeroCardBorderStyle}">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Border Grid.Column="0" Style="{StaticResource TagPillBorderStyle}">
+                                <HorizontalStackLayout Spacing="6">
+                                    <Ellipse Style="{StaticResource TagPillDotStyle}" />
+                                    <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                                </HorizontalStackLayout>
+                            </Border>
+                            <Label Grid.Column="1" Text="{Binding Word.TopikLevel}" FontSize="11" TextColor="{StaticResource ColorMutedLight}" FontAttributes="Bold" VerticalOptions="Start" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Word.Korean}" Style="{StaticResource WordKoreanHeroStyle}" />
+                                <Label Text="{Binding Word.Hanja}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource ColorMuted}"
+                                       IsVisible="{Binding HasHanja}" />
+                            </VerticalStackLayout>
+
+                            <Border Grid.Column="1"
+                                    Style="{StaticResource RoundIconButtonStyle}"
+                                    VerticalOptions="Start"
+                                    IsVisible="{Binding HasAudio}">
+                                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="audio_icon.png"
+                                           WidthRequest="16" HeightRequest="16"
+                                           Aspect="AspectFit"
+                                           IsVisible="{Binding IsAudioBusy, Converter={StaticResource InverseBoolConverter}}" />
+                                    <ActivityIndicator IsRunning="{Binding IsAudioBusy}"
+                                                        IsVisible="{Binding IsAudioBusy}"
+                                                        Color="{StaticResource ColorPrimary}"
+                                                        WidthRequest="16" HeightRequest="16" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlayAudioCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+
+                        <Label Text="{Binding Word.KrDict.Pronunciation}"
+                               FontSize="13"
+                               TextColor="{StaticResource ColorMuted}"
+                               IsVisible="{Binding HasPronunciation}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding HasRuleExplanation}">
+                    <Label Text="ГРАММАТИКА" Style="{StaticResource SectionLabelStyle}" Margin="4,4,0,0" />
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <Label Text="{Binding Word.RuleExplanation}"
+                               FontSize="13"
+                               TextColor="{StaticResource ColorMuted}"
+                               LineHeight="1.5" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <Label Text="TRANSLATIONS &amp; MEANINGS" Style="{StaticResource SectionLabelStyle}" Margin="4,4,0,0" />
+
+                <CollectionView ItemsSource="{Binding Senses}" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SenseItemViewModel">
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <VerticalStackLayout Spacing="12">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <Label Grid.Column="0" Text="{Binding EnText}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource ColorPrimaryDark}" VerticalOptions="Center" />
+                                        <Border Grid.Column="1" Style="{StaticResource NeutralChipBorderStyle}">
+                                            <Label Text="Examples" Style="{StaticResource NeutralChipLabelStyle}" FontAttributes="Bold" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
+
+                                    <VerticalStackLayout Spacing="8" IsVisible="{Binding IsExpanded}">
+                                        <Label Text="{Binding EnDefinition}" FontSize="13" TextColor="{StaticResource ColorMuted}" LineHeight="1.4" />
+                                        <BoxView HeightRequest="1" BackgroundColor="{StaticResource ColorDivider}" Margin="0,4" />
+                                        <Label Text="{Binding RuText}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource ColorPrimaryDark}" />
+                                        <Label Text="{Binding RuDefinition}" FontSize="13" TextColor="{StaticResource ColorMuted}" />
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

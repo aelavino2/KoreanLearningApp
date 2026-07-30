@@ -7,17 +7,10 @@ internal static class WordImportMapper
 {
     public static Word ToDomain(this WordJsonDto dto)
     {
-        var krdict = dto.KrDict;
-        var firstSense = krdict?.Senses.FirstOrDefault();
-
-        return new Word
+        var word = new Word
         {
-            Korean = dto.Word,
-            TranslationEn = firstSense?.En?.Word ?? string.Empty,
-            TranslationRu = firstSense?.Ru?.Word ?? string.Empty,
+            Korean = !string.IsNullOrWhiteSpace(dto.KrDict?.Word) ? dto.KrDict!.Word : dto.Word,
             RuleExplanation = dto.Explanation,
-            PronunciationNote = krdict?.Pronunciation ?? string.Empty,
-
             Rank = ParseRank(dto.Rank),
             PartOfSpeech = dto.PartOfSpeech,
             Hanja = dto.Hanja,
@@ -25,36 +18,44 @@ internal static class WordImportMapper
             TopikLevel = dto.TopikLevel,
             Status = dto.Status,
             SourceIndex = dto.Idx,
-
-            TargetCode = krdict?.TargetCode ?? string.Empty,
-            SupNo = krdict?.SupNo ?? 0,
-            Pos = krdict?.Pos ?? string.Empty,
-            WordGrade = krdict?.WordGrade ?? string.Empty,
-            DictLink = krdict?.Link ?? string.Empty,
-
-            AudioUrl = krdict?.Audio?.Url ?? string.Empty,
-            AudioFile = krdict?.Audio?.File ?? string.Empty,
-
-            Senses = MapSenses(krdict?.Senses),
         };
+
+        word.KrDict = dto.KrDict?.ToDomain();
+
+        return word;
     }
 
-    private static List<Sense> MapSenses(List<SenseJsonDto>? senses)
+    private static KrDict ToDomain(this KrDictJsonDto dto) => new()
     {
-        if (senses is null || senses.Count == 0)
-            return new List<Sense>();
+        TargetCode = dto.TargetCode,
+        Word = dto.Word,
+        SupNo = dto.SupNo,
+        Pos = dto.Pos,
+        Pronunciation = dto.Pronunciation,
+        WordGrade = dto.WordGrade,
+        Link = dto.Link,
+        Audio = dto.Audio?.ToDomain(),
+        Senses = dto.Senses.Select(s => s.ToDomain()).ToList(),
+    };
 
-        return senses
-            .Select(s => new Sense
-            {
-                DefinitionKo = s.DefinitionKo,
-                EnWord = s.En?.Word ?? string.Empty,
-                EnDefinition = s.En?.Definition ?? string.Empty,
-                RuWord = s.Ru?.Word ?? string.Empty,
-                RuDefinition = s.Ru?.Definition ?? string.Empty,
-            })
-            .ToList();
-    }
+    private static Audio ToDomain(this AudioJsonDto dto) => new()
+    {
+        Url = dto.Url,
+        File = dto.File,
+    };
+
+    private static Sense ToDomain(this SenseJsonDto dto) => new()
+    {
+        DefinitionKo = dto.DefinitionKo,
+        En = dto.En?.ToDomain(),
+        Ru = dto.Ru?.ToDomain(),
+    };
+
+    private static LangInfo ToDomain(this LangInfoJsonDto dto) => new()
+    {
+        Word = dto.Word,
+        Definition = dto.Definition,
+    };
 
     private static int ParseRank(string rank) => int.TryParse(rank, out var value) ? value : 0;
 }
