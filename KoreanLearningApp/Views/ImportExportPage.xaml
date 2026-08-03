@@ -61,7 +61,7 @@
                 </Grid>
 
                 <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
-                    <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Image Grid.Row="0" Source="import_export_icon_active.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
                     <Label Grid.Row="1" Text="Import" Style="{StaticResource TabIconLabelActiveStyle}" />
                     <BoxView Grid.Row="0" WidthRequest="4" HeightRequest="4" CornerRadius="2" BackgroundColor="{StaticResource ColorPrimary}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,-8" />
                     <Grid.GestureRecognizers>
