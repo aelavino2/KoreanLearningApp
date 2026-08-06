@@ -13,6 +13,7 @@ using KoreanLearningApp.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
+using System.Text.Json;
 
 namespace KoreanLearningApp;
 
@@ -48,6 +49,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWordService, WordService>();
         builder.Services.AddSingleton<IWordImportService, WordImportService>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
+        builder.Services.AddSingleton(new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        });
 
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();

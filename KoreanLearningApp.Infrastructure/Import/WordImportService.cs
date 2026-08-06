@@ -1,18 +1,14 @@
-﻿using System.Text.Json;
-using KoreanLearningApp.Domain.Models;
+﻿using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Infrastructure.Import.DTO;
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
+using Mapster;
+using System.Text.Json;
 
 namespace KoreanLearningApp.Infrastructure.Import;
 
-public class WordImportService(IWordImportRepository repository) : IWordImportService
+public class WordImportService(IWordImportRepository repository, JsonSerializerOptions exportOptions) : IWordImportService
 {
-    private static readonly JsonSerializerOptions ExportOptions = new()
-    {
-        WriteIndented = true,
-    };
-
     public async Task<int> ImportFromFileAsync(string filePath)
     {
         var dtos = await KrDictJsonSerializer.DeserializeFileAsync(filePath);
@@ -27,8 +23,8 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
 
     public Task<string> ExportToJsonAsync(IEnumerable<Word> words)
     {
-        var dtos = words.Select(w => w.ToDto()).ToList();
-        var json = JsonSerializer.Serialize(dtos, ExportOptions);
+        var dtos = words.Select(w => w.Adapt<WordJsonDto>()).ToList();
+        var json = JsonSerializer.Serialize(dtos, exportOptions);
         return Task.FromResult(json);
     }
 
@@ -40,7 +36,7 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
         var existingKeys = await repository.GetExistingKeysAsync();
 
         var newWords = dtos
-            .Select(dto => dto.ToDomain())
+            .Select(dto => dto.Adapt<Word>())
             .Where(word => !existingKeys.Contains(BuildKey(word)))
             .ToList();
 
@@ -50,6 +46,5 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
         return await repository.InsertManyAsync(newWords);
     }
 
-    private static string BuildKey(Word word) =>
-        $"{word.Korean}_{word.KrDict?.SupNo ?? 0}";
+    private static string BuildKey(Word word) => $"{word.Korean}_{word.KrDict?.SupNo ?? 0}";
 }
