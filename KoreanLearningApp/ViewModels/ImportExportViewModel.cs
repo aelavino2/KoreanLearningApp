@@ -9,6 +9,7 @@ public partial class ImportExportViewModel : ObservableObject
 {
     private readonly IWordService _wordService;
     private readonly IWordImportService _wordImportService;
+    private readonly IWordExportService _wordExportService;
     private readonly INavigationService _navigationService;
 
     private static readonly FilePickerFileType JsonFileType = new(
@@ -20,13 +21,11 @@ public partial class ImportExportViewModel : ObservableObject
             { DevicePlatform.MacCatalyst, new[] { "json" } },
         });
 
-    public ImportExportViewModel(
-        IWordService wordService,
-        IWordImportService wordImportService,
-        INavigationService navigationService)
+    public ImportExportViewModel(IWordService wordService, IWordImportService wordImportService, IWordExportService wordExportService, INavigationService navigationService)
     {
         _wordService = wordService;
         _wordImportService = wordImportService;
+        _wordExportService = wordExportService;
         _navigationService = navigationService;
     }
 
@@ -36,7 +35,7 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var words = await _wordService.GetWordsAsync();
-            var json = await _wordImportService.ExportToJsonAsync(words);
+            var json = await _wordExportService.ExportToJsonAsync(words);
 
             var fileName = $"korean_words_{DateTime.Now:yyyyMMdd_HHmmss}.json";
             var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
