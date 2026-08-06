@@ -20,6 +20,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        WordMappingConfig.Configure();
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()

@@ -1,4 +1,6 @@
-﻿using KoreanLearningApp.Infrastructure.Import.DTO;
+﻿using System.Text.Json;
+using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Infrastructure.Import.DTO;
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
 
@@ -6,6 +8,11 @@ namespace KoreanLearningApp.Infrastructure.Import;
 
 public class WordImportService(IWordImportRepository repository) : IWordImportService
 {
+    private static readonly JsonSerializerOptions ExportOptions = new()
+    {
+        WriteIndented = true,
+    };
+
     public async Task<int> ImportFromFileAsync(string filePath)
     {
         var dtos = await KrDictJsonSerializer.DeserializeFileAsync(filePath);
@@ -16,6 +23,13 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
     {
         var dtos = KrDictJsonSerializer.DeserializeArray(json);
         return await ImportInternalAsync(dtos);
+    }
+
+    public Task<string> ExportToJsonAsync(IEnumerable<Word> words)
+    {
+        var dtos = words.Select(w => w.ToDto()).ToList();
+        var json = JsonSerializer.Serialize(dtos, ExportOptions);
+        return Task.FromResult(json);
     }
 
     private async Task<int> ImportInternalAsync(List<WordJsonDto> dtos)
@@ -36,6 +50,6 @@ public class WordImportService(IWordImportRepository repository) : IWordImportSe
         return await repository.InsertManyAsync(newWords);
     }
 
-    private static string BuildKey(Domain.Models.Word word) =>
+    private static string BuildKey(Word word) =>
         $"{word.Korean}_{word.KrDict?.SupNo ?? 0}";
 }

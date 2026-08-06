@@ -36,11 +36,7 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var words = await _wordService.GetWordsAsync();
-
-            var json = System.Text.Json.JsonSerializer.Serialize(words, new System.Text.Json.JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            var json = await _wordImportService.ExportToJsonAsync(words);
 
             var fileName = $"korean_words_{DateTime.Now:yyyyMMdd_HHmmss}.json";
             var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
