@@ -2,7 +2,7 @@
 using KoreanLearningApp.Infrastructure.Import.DTO;
 using Mapster;
 
-namespace KoreanLearningApp.Infrastructure.Import;
+namespace KoreanLearningApp.Infrastructure.Constants;
 
 public static class WordMappingConfig
 {
@@ -21,24 +21,13 @@ public static class WordMappingConfig
                 .Map(dest => dest.Korean, src => ResolveKorean(src))
                 .Map(dest => dest.Rank, src => ParseRank(src.Rank))
                 .Map(dest => dest.RuleExplanation, src => src.Explanation)
-                .Map(dest => dest.SourceIndex, src => src.Idx)
-                .Map(dest => dest.KrDict, src => src.KrDict);
-
-            TypeAdapterConfig<KrDictJsonDto, KrDict>.NewConfig();
-            TypeAdapterConfig<AudioJsonDto, Audio>.NewConfig();
-            TypeAdapterConfig<SenseJsonDto, Sense>.NewConfig();
-            TypeAdapterConfig<LangInfoJsonDto, LangInfo>.NewConfig();
+                .Map(dest => dest.SourceIndex, src => src.Idx);
 
             TypeAdapterConfig<Word, WordJsonDto>.NewConfig()
                 .Map(dest => dest.Word, src => src.Korean)
                 .Map(dest => dest.Explanation, src => src.RuleExplanation)
                 .Map(dest => dest.Idx, src => src.SourceIndex)
                 .Map(dest => dest.Rank, src => src.Rank.ToString());
-
-            TypeAdapterConfig<KrDict, KrDictJsonDto>.NewConfig();
-            TypeAdapterConfig<Audio, AudioJsonDto>.NewConfig();
-            TypeAdapterConfig<Sense, SenseJsonDto>.NewConfig();
-            TypeAdapterConfig<LangInfo, LangInfoJsonDto>.NewConfig();
 
             _configured = true;
         }
