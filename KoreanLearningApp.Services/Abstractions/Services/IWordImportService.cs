@@ -1,7 +1,9 @@
-﻿namespace KoreanLearningApp.Services.Abstractions.Services;
+﻿using KoreanLearningApp.Domain.Models;
+
+namespace KoreanLearningApp.Services.Abstractions.Services;
 
 public interface IWordImportService
 {
-    Task<int> ImportFromJsonAsync(string json);
     Task<int> ImportFromFileAsync(string filePath);
+    Task<int> ImportFromJsonAsync(string json);
 }

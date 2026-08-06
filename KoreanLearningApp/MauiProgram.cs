@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Maui;
+using KoreanLearningApp.Infrastructure.Constants;
 using KoreanLearningApp.Infrastructure.Import;
+using KoreanLearningApp.Infrastructure.Import.Abstraction;
 using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 using KoreanLearningApp.Infrastructure.Persistence.Repositories;
@@ -13,6 +15,7 @@ using KoreanLearningApp.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
+using System.Text.Json;
 
 namespace KoreanLearningApp;
 
@@ -20,6 +23,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        WordMappingConfig.Configure();
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -47,6 +51,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWordService, WordService>();
         builder.Services.AddSingleton<IWordImportService, WordImportService>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();
+        builder.Services.AddSingleton<ImportJsonOptions>();
+        builder.Services.AddSingleton<ExportJsonOptions>();
+
+        builder.Services.AddSingleton<IKrDictJsonSerializer, KrDictJsonSerializer>();
+        builder.Services.AddSingleton<IWordImportService, WordImportService>();
+
+        builder.Services.AddSingleton<IWordExportService, WordExportService>();
+
 
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
