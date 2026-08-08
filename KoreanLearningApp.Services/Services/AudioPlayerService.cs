@@ -3,17 +3,11 @@ using Plugin.Maui.Audio;
 
 namespace KoreanLearningApp.Services.Services;
 
-public class AudioPlayerService : IAudioPlayerService
+public class AudioPlayerService(IAudioManager audioManager) : IAudioPlayerService
 {
-    private readonly IAudioManager _audioManager;
-    private static readonly HttpClient _httpClient = new();
+    private static readonly HttpClient HttpClient = new();
 
     private IAudioPlayer? _currentPlayer;
-
-    public AudioPlayerService(IAudioManager audioManager)
-    {
-        _audioManager = audioManager;
-    }
 
     public bool IsPlaying => _currentPlayer?.IsPlaying ?? false;
 
@@ -25,7 +19,7 @@ public class AudioPlayerService : IAudioPlayerService
         if (stream is null)
             return;
 
-        _currentPlayer = _audioManager.CreatePlayer(stream);
+        _currentPlayer = audioManager.CreatePlayer(stream);
         _currentPlayer.Play();
     }
 
@@ -68,7 +62,7 @@ public class AudioPlayerService : IAudioPlayerService
         
         if (!string.IsNullOrWhiteSpace(audioUrl))
         {
-            var bytes = await _httpClient.GetByteArrayAsync(audioUrl, cancellationToken);
+            var bytes = await HttpClient.GetByteArrayAsync(audioUrl, cancellationToken);
             return new MemoryStream(bytes);
         }
 

@@ -2,20 +2,16 @@
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
 
-namespace KoreanLearningApp.Services;
+namespace KoreanLearningApp.Services.Services;
 
-public class WordService : IWordService
+public class WordService(IWordRepository repository) : IWordService
 {
-    private readonly IWordRepository _repository;
+    public Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(int page, int pageSize, string? search)
+        => repository.GetWordsPageAsync(page, pageSize, search);
 
-    public WordService(IWordRepository repository)
-    {
-        _repository = repository;
-    }
+    public Task<List<Word>> GetWordsAsync() => repository.GetWordsAsync();
 
-    public Task<List<Word>> GetWordsAsync() => _repository.GetWordsAsync();
+    public Task<int> SaveWordAsync(Word word) => repository.SaveWordAsync(word);
 
-    public Task<int> SaveWordAsync(Word word) => _repository.SaveWordAsync(word);
-
-    public Task<int> DeleteWordAsync(Word word) => _repository.DeleteWordAsync(word);
+    public Task<int> DeleteWordAsync(Word word) => repository.DeleteWordAsync(word);
 }
