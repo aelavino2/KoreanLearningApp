@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using KoreanLearningApp.Domain.Models;
+using SQLite;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Queries;
 
@@ -42,7 +43,7 @@ public class GetWordsPageQuery(DbContext dbContext) : IGetWordsPageQuery
         if (!hasSearch)
         {
             const string plainSql = "SELECT Id FROM Words ORDER BY Rank LIMIT ? OFFSET ?";
-            var plainRows = await db.QueryAsync<IdRow>(plainSql, pageSize, offset);
+            var plainRows = await db.QueryAsync<Word>(plainSql, pageSize, offset);
             return plainRows.Select(r => r.Id).ToList();
         }
 
@@ -57,13 +58,8 @@ public class GetWordsPageQuery(DbContext dbContext) : IGetWordsPageQuery
         ORDER BY w.Rank
         LIMIT ? OFFSET ?";
 
-        var searchRows = await db.QueryAsync<IdRow>(
+        var searchRows = await db.QueryAsync<Word>(
             searchSql, likePattern, likePattern, likePattern, pageSize, offset);
         return searchRows.Select(r => r.Id).ToList();
-    }
-
-    private class IdRow
-    {
-        public int Id { get; set; }
     }
 }
