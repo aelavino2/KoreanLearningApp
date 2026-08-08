@@ -23,14 +23,15 @@ public class GetWordsPageQuery(DbContext dbContext) : IGetWordsPageQuery
             return await db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Words");
 
         const string countSql = @"
-            SELECT COUNT(DISTINCT w.Id)
-            FROM Words w
-            LEFT JOIN KrDicts k ON k.WordId = w.Id
-            LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
-            LEFT JOIN LangInfos li ON li.Id = s.RuId
-            WHERE w.Korean LIKE ? OR li.Word LIKE ?";
+        SELECT COUNT(DISTINCT w.Id)
+        FROM Words w
+        LEFT JOIN KrDicts k ON k.WordId = w.Id
+        LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
+        LEFT JOIN LangInfos liRu ON liRu.Id = s.RuId
+        LEFT JOIN LangInfos liEn ON liEn.Id = s.EnId
+        WHERE w.Korean LIKE ? OR liRu.Word LIKE ? OR liEn.Word LIKE ?";
 
-        return await db.ExecuteScalarAsync<int>(countSql, likePattern, likePattern);
+        return await db.ExecuteScalarAsync<int>(countSql, likePattern, likePattern, likePattern);
     }
 
     private static async Task<List<int>> GetPageIdsAsync(
@@ -46,16 +47,18 @@ public class GetWordsPageQuery(DbContext dbContext) : IGetWordsPageQuery
         }
 
         const string searchSql = @"
-            SELECT DISTINCT w.Id
-            FROM Words w
-            LEFT JOIN KrDicts k ON k.WordId = w.Id
-            LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
-            LEFT JOIN LangInfos li ON li.Id = s.RuId
-            WHERE w.Korean LIKE ? OR li.Word LIKE ?
-            ORDER BY w.Rank
-            LIMIT ? OFFSET ?";
+        SELECT DISTINCT w.Id
+        FROM Words w
+        LEFT JOIN KrDicts k ON k.WordId = w.Id
+        LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
+        LEFT JOIN LangInfos liRu ON liRu.Id = s.RuId
+        LEFT JOIN LangInfos liEn ON liEn.Id = s.EnId
+        WHERE w.Korean LIKE ? OR liRu.Word LIKE ? OR liEn.Word LIKE ?
+        ORDER BY w.Rank
+        LIMIT ? OFFSET ?";
 
-        var searchRows = await db.QueryAsync<IdRow>(searchSql, likePattern, likePattern, pageSize, offset);
+        var searchRows = await db.QueryAsync<IdRow>(
+            searchSql, likePattern, likePattern, likePattern, pageSize, offset);
         return searchRows.Select(r => r.Id).ToList();
     }
 

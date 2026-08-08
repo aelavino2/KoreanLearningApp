@@ -10,6 +10,7 @@ public class WordEntity
     [Indexed]
     public string Korean { get; set; } = string.Empty;
     public string RuleExplanation { get; set; } = string.Empty;
+    [Indexed]
     public int Rank { get; set; }
     public string PartOfSpeech { get; set; } = string.Empty;
     public string Hanja { get; set; } = string.Empty;
