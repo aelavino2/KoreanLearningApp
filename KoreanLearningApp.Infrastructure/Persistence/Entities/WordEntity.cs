@@ -7,9 +7,10 @@ public class WordEntity
 {
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
-
+    [Indexed]
     public string Korean { get; set; } = string.Empty;
     public string RuleExplanation { get; set; } = string.Empty;
+    [Indexed]
     public int Rank { get; set; }
     public string PartOfSpeech { get; set; } = string.Empty;
     public string Hanja { get; set; } = string.Empty;
