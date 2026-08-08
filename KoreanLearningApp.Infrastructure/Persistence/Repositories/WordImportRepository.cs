@@ -6,32 +6,14 @@ using KoreanLearningApp.Services.Abstractions.Repositories;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Repositories;
 
-public class WordImportRepository : IWordImportRepository
+public class WordImportRepository(IRepository<WordEntity> wordRepo,
+    IRepository<KrDictEntity> krDictRepo, IRepository<KrDictSenseEntity> senseRepo,
+    IRepository<AudioEntity> audioRepo, IRepository<LangInfoEntity> langInfoRepo) : IWordImportRepository
 {
-    private readonly IRepository<WordEntity> _wordRepo;
-    private readonly IRepository<KrDictEntity> _krDictRepo;
-    private readonly IRepository<KrDictSenseEntity> _senseRepo;
-    private readonly IRepository<AudioEntity> _audioRepo;
-    private readonly IRepository<LangInfoEntity> _langInfoRepo;
-
-    public WordImportRepository(
-        IRepository<WordEntity> wordRepo,
-        IRepository<KrDictEntity> krDictRepo,
-        IRepository<KrDictSenseEntity> senseRepo,
-        IRepository<AudioEntity> audioRepo,
-        IRepository<LangInfoEntity> langInfoRepo)
-    {
-        _wordRepo = wordRepo;
-        _krDictRepo = krDictRepo;
-        _senseRepo = senseRepo;
-        _audioRepo = audioRepo;
-        _langInfoRepo = langInfoRepo;
-    }
-
     public async Task<HashSet<string>> GetExistingKeysAsync()
     {
-        var words = await _wordRepo.GetAllAsync();
-        var krDicts = await _krDictRepo.GetAllAsync();
+        var words = await wordRepo.GetAllAsync();
+        var krDicts = await krDictRepo.GetAllAsync();
 
         var krDictByWordId = krDicts.ToDictionary(k => k.WordId, k => k.SupNo);
 
@@ -50,8 +32,8 @@ public class WordImportRepository : IWordImportRepository
         foreach (var word in words)
         {
             var wordEntity = word.ToEntity();
-            await _wordRepo.InsertAsync(wordEntity);
-            var wordId = wordEntity.Id; // <-- берём Id из сущности, не из результата InsertAsync
+            await wordRepo.InsertAsync(wordEntity);
+            var wordId = wordEntity.Id;
             inserted++;
 
             if (word.KrDict is null)
@@ -61,13 +43,13 @@ public class WordImportRepository : IWordImportRepository
             if (word.KrDict.Audio is not null)
             {
                 var audioEntity = word.KrDict.Audio.ToEntity();
-                await _audioRepo.InsertAsync(audioEntity);
+                await audioRepo.InsertAsync(audioEntity);
                 audioId = audioEntity.Id;
             }
 
             var krDictEntity = word.KrDict.ToEntity(wordId);
             krDictEntity.AudioId = audioId;
-            await _krDictRepo.InsertAsync(krDictEntity);
+            await krDictRepo.InsertAsync(krDictEntity);
             var krDictId = krDictEntity.Id;
 
             foreach (var sense in word.KrDict.Senses)
@@ -76,7 +58,7 @@ public class WordImportRepository : IWordImportRepository
                 if (sense.En is not null)
                 {
                     var enEntity = sense.En.ToEntity();
-                    await _langInfoRepo.InsertAsync(enEntity);
+                    await langInfoRepo.InsertAsync(enEntity);
                     enId = enEntity.Id;
                 }
 
@@ -84,14 +66,14 @@ public class WordImportRepository : IWordImportRepository
                 if (sense.Ru is not null)
                 {
                     var ruEntity = sense.Ru.ToEntity();
-                    await _langInfoRepo.InsertAsync(ruEntity);
+                    await langInfoRepo.InsertAsync(ruEntity);
                     ruId = ruEntity.Id;
                 }
 
                 var senseEntity = sense.ToEntity(krDictId);
                 senseEntity.EnId = enId;
                 senseEntity.RuId = ruId;
-                await _senseRepo.InsertAsync(senseEntity);
+                await senseRepo.InsertAsync(senseEntity);
             }
         }
 

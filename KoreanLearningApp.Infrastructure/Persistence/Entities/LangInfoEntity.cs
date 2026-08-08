@@ -8,6 +8,7 @@ public class LangInfoEntity
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
 
+    [Indexed]
     public string Word { get; set; } = string.Empty;
     public string Definition { get; set; } = string.Empty;
 }

@@ -16,6 +16,7 @@ using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
 using System.Text.Json;
+using KoreanLearningApp.Infrastructure.Persistence.Queries;
 
 namespace KoreanLearningApp;
 
@@ -59,7 +60,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IWordExportService, WordExportService>();
 
-
+        builder.Services.AddSingleton<IGetWordsPageQuery, GetWordsPageQuery>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
         builder.Services.AddTransient<ImportExportViewModel>();

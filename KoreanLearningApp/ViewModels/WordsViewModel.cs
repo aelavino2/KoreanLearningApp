@@ -7,15 +7,13 @@ using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.ViewModels;
 
-public partial class WordsViewModel : ObservableObject
+public partial class WordsViewModel(IWordService wordService, INavigationService navigationService)
+    : ObservableObject
 {
     private const int PageSize = 100;
+    private const int SearchDebounceMs = 300;
 
-    private readonly IWordService _wordService;
-    private readonly INavigationService _navigationService;
-
-    private List<WordItemViewModel> _allWords = new();
-    private List<WordItemViewModel> _filteredWords = new();
+    private CancellationTokenSource? _searchDebounceCts;
     private bool _reachedEndOfCurrentPage;
 
     public ObservableCollection<WordItemViewModel> Words { get; } = new();
@@ -38,28 +36,71 @@ public partial class WordsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isPaginationVisible;
 
-    public string PageIndicatorText => $"{CurrentPage} / {TotalPages}";
+    [ObservableProperty]
+    private bool _isLoading;
 
-    public WordsViewModel(IWordService wordService, INavigationService navigationService)
-    {
-        _wordService = wordService;
-        _navigationService = navigationService;
-    }
+    public string PageIndicatorText => $"{CurrentPage} / {TotalPages}";
 
     partial void OnCurrentPageChanged(int value) => OnPropertyChanged(nameof(PageIndicatorText));
     partial void OnTotalPagesChanged(int value) => OnPropertyChanged(nameof(PageIndicatorText));
 
     partial void OnSearchTextChanged(string value)
     {
-        ApplyFilter();
+        _searchDebounceCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _searchDebounceCts = cts;
+
+        _ = DebouncedSearchAsync(cts.Token);
+    }
+
+    private async Task DebouncedSearchAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(SearchDebounceMs, token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (token.IsCancellationRequested)
+            return;
+
+        CurrentPage = 1;
+        _reachedEndOfCurrentPage = false;
+        await LoadCurrentPageAsync();
     }
 
     [RelayCommand]
     public async Task LoadWordsAsync()
     {
-        var words = await _wordService.GetWordsAsync();
-        _allWords = words.Select(w => new WordItemViewModel(w)).ToList();
-        ApplyFilter();
+        CurrentPage = 1;
+        _reachedEndOfCurrentPage = false;
+        await LoadCurrentPageAsync();
+    }
+
+    private async Task LoadCurrentPageAsync()
+    {
+        IsLoading = true;
+        try
+        {
+            var search = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText;
+            var (items, totalCount) = await wordService.GetWordsPageAsync(CurrentPage, PageSize, search);
+
+            Words.Clear();
+            foreach (var word in items)
+                Words.Add(new WordItemViewModel(word));
+
+            TotalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)PageSize));
+            IsPaginationVisible = TotalPages > 1;
+
+            UpdatePaginationState();
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     [RelayCommand]
@@ -68,38 +109,7 @@ public partial class WordsViewModel : ObservableObject
         if (word is null)
             return;
 
-        await _navigationService.GoToDetailAsync(AppRoutes.WordDetail, word);
-    }
-
-    private void ApplyFilter()
-    {
-        _filteredWords = string.IsNullOrWhiteSpace(SearchText)
-            ? _allWords
-            : _allWords.Where(w =>
-                w.Korean.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                w.TranslationRu.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-              .ToList();
-
-        TotalPages = Math.Max(1, (int)Math.Ceiling(_filteredWords.Count / (double)PageSize));
-        IsPaginationVisible = TotalPages > 1;
-
-        CurrentPage = 1;
-        _reachedEndOfCurrentPage = false;
-
-        LoadCurrentPage();
-    }
-
-    private void LoadCurrentPage()
-    {
-        var pageItems = _filteredWords
-            .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize);
-
-        Words.Clear();
-        foreach (var word in pageItems)
-            Words.Add(word);
-
-        UpdatePaginationState();
+        await navigationService.GoToDetailAsync(AppRoutes.WordDetail, word);
     }
 
     private void UpdatePaginationState()
@@ -107,7 +117,6 @@ public partial class WordsViewModel : ObservableObject
         CanGoToPreviousPage = CurrentPage > 1;
         CanGoToNextPage = _reachedEndOfCurrentPage && CurrentPage < TotalPages;
     }
-
 
     [RelayCommand]
     private void ScrolledToEnd()
@@ -120,36 +129,36 @@ public partial class WordsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void NextPage()
+    private async Task NextPageAsync()
     {
         if (!CanGoToNextPage)
             return;
 
         CurrentPage++;
         _reachedEndOfCurrentPage = false;
-        LoadCurrentPage();
+        await LoadCurrentPageAsync();
     }
 
     [RelayCommand]
-    private void PreviousPage()
+    private async Task PreviousPageAsync()
     {
         if (!CanGoToPreviousPage)
             return;
 
         CurrentPage--;
         _reachedEndOfCurrentPage = true;
-        LoadCurrentPage();
+        await LoadCurrentPageAsync();
     }
 
     [RelayCommand]
-    private Task GoToWordsAsync() => _navigationService.GoToRootAsync(AppRoutes.Words);
+    private Task GoToWordsAsync() => navigationService.GoToRootAsync(AppRoutes.Words);
 
     [RelayCommand]
-    private Task GoToPracticeAsync() => _navigationService.GoToRootAsync(AppRoutes.Practice);
+    private Task GoToPracticeAsync() => navigationService.GoToRootAsync(AppRoutes.Practice);
 
     [RelayCommand]
-    private Task GoToImportExportAsync() => _navigationService.GoToRootAsync(AppRoutes.ImportExport);
+    private Task GoToImportExportAsync() => navigationService.GoToRootAsync(AppRoutes.ImportExport);
 
     [RelayCommand]
-    private Task GoToSavedAsync() => _navigationService.GoToRootAsync(AppRoutes.Saved);
+    private Task GoToSavedAsync() => navigationService.GoToRootAsync(AppRoutes.Saved);
 }
