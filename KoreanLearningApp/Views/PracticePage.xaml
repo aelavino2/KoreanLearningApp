@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KoreanLearningApp.Views.PracticePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    x:DataType="vm:PracticeViewModel"
+    BackgroundColor="{StaticResource ColorBackground}"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,18,24,4" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource LogoBadgeStyle}">
+                <Image Source="logo_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                <Label Text="Practice" Style="{StaticResource PageTitleStyle}" />
+                <Label Text="{Binding Cards.Count, StringFormat='{0} cards to review'}" Style="{StaticResource PageSubtitleStyle}" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="24,0,24,0">
+
+            <CollectionView
+                x:Name="PracticeCollectionView"
+                ItemsSource="{Binding Cards}"
+                SelectionMode="None"
+                IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBoolConverter}}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PracticeCardViewModel">
+                        <Border Style="{StaticResource CardBorderStyle}">
+                            <VerticalStackLayout Spacing="10">
+
+                                <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" HorizontalOptions="Center" />
+
+                                <Border Style="{StaticResource TagPillBorderStyle}" HorizontalOptions="Center">
+                                    <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                                </Border>
+
+                                <VerticalStackLayout Spacing="4" IsVisible="{Binding IsTranslationVisible}">
+                                    <Label Text="{Binding Ru}" HorizontalOptions="Center" FontSize="14" />
+                                    <Label Text="{Binding En}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource ColorMuted}" />
+                                </VerticalStackLayout>
+
+                                <Button
+                                    Text="Показать перевод"
+                                    Command="{Binding ToggleTranslationCommand}"
+                                    BackgroundColor="{StaticResource ColorChipBg}"
+                                    TextColor="{StaticResource ColorPrimaryDark}"
+                                    FontSize="12"
+                                    HeightRequest="36" />
+
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Grid.Column="0"
+                                            Text="Не знаю"
+                                            Command="{Binding Source={x:Reference PracticeCollectionView}, Path=BindingContext.MarkUnknownCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="{StaticResource ColorChipBg}"
+                                            TextColor="{StaticResource ColorPrimaryDark}"
+                                            FontSize="12" />
+                                    <Button Grid.Column="1"
+                                            Text="Знаю"
+                                            Command="{Binding Source={x:Reference PracticeCollectionView}, Path=BindingContext.MarkKnownCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="{StaticResource ColorPrimary}"
+                                            TextColor="White"
+                                            FontSize="12" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                <Label Text="Пока нечего повторять" FontSize="14" TextColor="{StaticResource ColorMuted}" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
+
+        <Border Grid.Row="2" Style="{StaticResource TabBarBorderStyle}">
+            <Grid ColumnDefinitions="*,*,*,*">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Words" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="practice_icon_active.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Practice" Style="{StaticResource TabIconLabelActiveStyle}" />
+                    <BoxView Grid.Row="0" WidthRequest="4" HeightRequest="4" CornerRadius="2" BackgroundColor="{StaticResource ColorPrimary}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,-8" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="import_export_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Import" Style="{StaticResource TabIconLabelStyle}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+                <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
+                    <Image Grid.Row="0" Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
+                    <Label Grid.Row="1" Text="Saved" Style="{StaticResource TabIconLabelStyle}" Margin="0,4,0,0" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

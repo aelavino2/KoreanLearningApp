@@ -57,9 +57,11 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IKrDictJsonSerializer, KrDictJsonSerializer>();
         builder.Services.AddSingleton<IWordImportService, WordImportService>();
-
+        builder.Services.AddTransient<SavedViewModel>();
+        builder.Services.AddTransient<SavedPage>();
         builder.Services.AddSingleton<IWordExportService, WordExportService>();
-
+        builder.Services.AddTransient<PracticeViewModel>();
+        builder.Services.AddTransient<PracticePage>();
         builder.Services.AddSingleton<IGetWordsPageQuery, GetWordsPageQuery>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();
