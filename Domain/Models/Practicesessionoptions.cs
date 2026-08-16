@@ -1,4 +1,6 @@
-﻿namespace KoreanLearningApp.Domain.Models;
+﻿using KoreanLearningApp.Domain.Models.Enums;
+
+namespace KoreanLearningApp.Domain.Models;
 
 /// <summary>
 /// Настройки сессии практики, которые пользователь задаёт на экране запуска
@@ -20,4 +22,10 @@ public class PracticeSessionOptions
     /// первыми в очереди, приоритетнее due-слов и новых слов.
     /// </summary>
     public bool IncludeSavedWords { get; set; } = true;
+
+    /// <summary>
+    /// Направление вопроса в квизе: корейское → перевод, перевод → корейское,
+    /// или случайно на каждую карточку.
+    /// </summary>
+    public QuizDirectionEnum QuizDirection { get; set; } = QuizDirectionEnum.KoreanToTranslation;
 }

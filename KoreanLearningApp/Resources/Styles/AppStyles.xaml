@@ -3,6 +3,65 @@
                      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- ============================================================ -->
+    <!--  ГЛОБАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ БАЗОВЫХ СТИЛЕЙ                    -->
+    <!--  Styles.xaml задаёт цвета через AppThemeBinding (Light/Dark), -->
+    <!--  но у приложения нет тёмной палитры и фон страниц жёстко      -->
+    <!--  зафиксирован на ColorBackground. Из-за этого в тёмной теме   -->
+    <!--  ОС текст/акценты уезжают в белый и сливаются со светлым      -->
+    <!--  фоном. Этот блок подключается последним (после Styles.xaml)  -->
+    <!--  и фиксирует все базовые контролы на светлой палитре.         -->
+    <!-- ============================================================ -->
+
+    <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="RadioButton">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="CheckBox">
+        <Setter Property="Color" Value="{StaticResource ColorPrimary}" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="TitleColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Editor">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Switch">
+        <Setter Property="OnColor" Value="{StaticResource ColorPrimary}" />
+        <Setter Property="ThumbColor" Value="White" />
+    </Style>
+
+    <Style TargetType="Border">
+        <Setter Property="Stroke" Value="{StaticResource ColorBorder}" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource ColorPrimary}" />
+    </Style>
+
+    <Style TargetType="ProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource ColorPrimary}" />
+    </Style>
+
+    <!-- ============================================================ -->
     <!--  ШАПКА СТРАНИЦЫ                                               -->
     <!-- ============================================================ -->
 

@@ -21,4 +21,13 @@ public partial class PracticePage : ContentPage
         // (пересоздаётся при навигации), но на случай, если это изменится, сбрасываем явно.
         _viewModel.BackToSetupCommand.Execute(null);
     }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        // Останавливаем таймер вопроса, если пользователь ушёл со страницы
+        // посреди квиза (иначе таймер карточки продолжит тикать в фоне).
+        _viewModel.StopSession();
+    }
 }
