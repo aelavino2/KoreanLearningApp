@@ -68,7 +68,6 @@ public class WordProgressRepository(DbContext dbContext, IRepository<WordProgres
 
         if (levels.Count == 0)
         {
-            // Слова, для которых ещё нет ни одной записи прогресса, по частотности (Rank)
             const string sql = @"
                 SELECT w.Id
                 FROM Words w
@@ -77,8 +76,6 @@ public class WordProgressRepository(DbContext dbContext, IRepository<WordProgres
                 ORDER BY w.Rank
                 LIMIT ?";
 
-            // Мапим в Domain-модель Word — тот же приём, что и в GetWordsPageQuery:
-            // из всех колонок Word нам нужна только Id, остальные останутся дефолтными.
             var rows = await db.QueryAsync<Word>(sql, limit);
             return rows.Select(r => r.Id).ToList();
         }

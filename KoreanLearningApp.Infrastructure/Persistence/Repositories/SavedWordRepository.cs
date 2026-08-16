@@ -23,7 +23,6 @@ public class SavedWordRepository(IRepository<SavedWordEntity> savedRepo) : ISave
 
     public async Task AddAsync(int wordId)
     {
-        // Защита от дубля на уровне кода — на уровне БД это уже гарантирует [Unique] на WordId
         if (await IsSavedAsync(wordId))
             return;
 

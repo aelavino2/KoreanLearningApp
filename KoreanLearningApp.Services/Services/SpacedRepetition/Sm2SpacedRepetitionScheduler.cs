@@ -6,8 +6,6 @@ namespace KoreanLearningApp.Services.Services.SpacedRepetition;
 
 public class Sm2SpacedRepetitionScheduler : ISpacedRepetitionScheduler
 {
-    // Порог интервала, начиная с которого слово считается "выученным" (Known).
-    // Значение ориентировочное — 3 недели без ошибок, легко вынести в конфиг позже.
     private const int KnownIntervalThresholdDays = 21;
 
     public WordProgress CreateInitialProgress(int wordId, DateTime now)

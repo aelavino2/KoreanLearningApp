@@ -8,29 +8,17 @@ using KoreanLearningApp.Services.Abstractions.Services;
 namespace KoreanLearningApp.ViewModels;
 
 public partial class PracticeViewModel(
-    IWordPracticeService practiceService,
-    ISavedWordsService savedWordsService,
-    IWordService wordService,
-    INavigationService navigationService)
+    IWordPracticeService practiceService, ISavedWordsService savedWordsService,
+    IWordService wordService, INavigationService navigationService)
     : ObservableObject
 {
-    /// <summary>Сколько очков за верный ответ, если он дан очень медленно (минимум).</summary>
     private const int BaseCorrectPoints = 10;
-
-    /// <summary>Через сколько мс после ответа автоматически переходим к следующему вопросу.</summary>
     private const int AnswerRevealDelayMs = 1100;
 
     private List<PracticeCardViewModel> _sessionCards = new();
     private int _cardIndex;
-
-    /// <summary>
-    /// Растёт при каждом старте/сбросе сессии. Нужен, чтобы отложенный переход к
-    /// следующему вопросу (после Task.Delay в HandleAnswerAsync) не применился к уже
-    /// сброшенной сессии, если пользователь успел нажать "Изменить настройки".
-    /// </summary>
     private int _sessionToken;
 
-    /// <summary>Варианты количества карточек для Picker'а на экране настроек.</summary>
     public List<int> WordCountOptions { get; } = new() { 5, 10, 15, 20, 30, 50 };
 
     [ObservableProperty]
@@ -39,11 +27,9 @@ public partial class PracticeViewModel(
     [ObservableProperty]
     private bool _isEmpty;
 
-    /// <summary>false — показан экран настроек, true — идёт сессия квиза.</summary>
     [ObservableProperty]
     private bool _isSessionActive;
 
-    /// <summary>true — все вопросы сессии закончились, показан экран результатов.</summary>
     [ObservableProperty]
     private bool _isSessionComplete;
 
@@ -61,8 +47,6 @@ public partial class PracticeViewModel(
 
     [ObservableProperty]
     private bool _includeSavedWords = true;
-
-    // --- Направление квиза: ровно один из трёх флагов true (радио-группа в XAML) ---
 
     [ObservableProperty]
     private bool _isKoreanToRuDirection = true;
@@ -100,24 +84,18 @@ public partial class PracticeViewModel(
         }
     }
 
-    // --- Текущее состояние сессии квиза ---
-
     [ObservableProperty]
     private PracticeCardViewModel? _currentCard;
 
-    /// <summary>Номер текущего вопроса (1-based) для "Вопрос N из M".</summary>
     [ObservableProperty]
     private int _currentIndex;
 
-    /// <summary>Всего вопросов в сессии.</summary>
     [ObservableProperty]
     private int _totalCount;
 
-    /// <summary>Набранные очки за сессию: +10 плюс бонус за скорость ответа за каждый верный ответ.</summary>
     [ObservableProperty]
     private int _score;
 
-    /// <summary>Сколько ответов из отвеченных оказались верными.</summary>
     [ObservableProperty]
     private int _correctCount;
 
@@ -130,12 +108,6 @@ public partial class PracticeViewModel(
 
     partial void OnTotalCountChanged(int value) => OnPropertyChanged(nameof(QuestionProgressText));
 
-    /// <summary>
-    /// true, когда реально есть текущий вопрос для показа: сессия активна, ещё не все
-    /// вопросы отвечены и в сессии вообще есть слова. Используется в XAML вместо трёх
-    /// отдельных условий, чтобы экран вопроса не накладывался на "нечего повторять"
-    /// или на экран результатов.
-    /// </summary>
     public bool HasActiveQuestion => IsSessionActive && !IsSessionComplete && !IsEmpty;
 
     partial void OnIsSessionActiveChanged(bool value) => OnPropertyChanged(nameof(HasActiveQuestion));
@@ -159,13 +131,7 @@ public partial class PracticeViewModel(
             };
 
             var practiceCards = await practiceService.GetPracticeSessionAsync(options);
-
-            // Один batch-запрос статуса "сохранено" на всю сессию вместо N вызовов
-            // IsSavedAsync по одному на карточку.
             var savedIds = await savedWordsService.GetSavedWordIdSetAsync();
-
-            // Пул слов для отвлекающих вариантов ответа — берём весь словарь, а не только
-            // слова этой сессии, чтобы неверные варианты были разнообразнее.
             var distractorPool = await wordService.GetWordsAsync();
 
             _sessionCards = BuildQuizCards(practiceCards, savedIds, distractorPool, options.QuizDirection);
@@ -198,7 +164,6 @@ public partial class PracticeViewModel(
         }
     }
 
-    /// <summary>Вернуться к экрану настроек, не завершая приложение и не теряя контекст страницы.</summary>
     [RelayCommand]
     private void BackToSetup()
     {
@@ -208,7 +173,6 @@ public partial class PracticeViewModel(
         IsEmpty = false;
     }
 
-    /// <summary>Останавливает таймеры всех карточек сессии — вызывается при уходе со страницы.</summary>
     public void StopSession()
     {
         _sessionToken++;
@@ -237,16 +201,9 @@ public partial class PracticeViewModel(
         return QuizDirectionEnum.KoreanToTranslation;
     }
 
-    /// <summary>
-    /// Строит карточки квиза: для каждого слова сессии определяет направление вопроса,
-    /// собирает 1 верный + 3 отвлекающих варианта ответа из общего пула словаря
-    /// (с фолбэком на слова этой же сессии, если пул слишком мал) и перемешивает порядок.
-    /// </summary>
     private List<PracticeCardViewModel> BuildQuizCards(
-        List<PracticeCard> practiceCards,
-        HashSet<int> savedIds,
-        List<Word> distractorPool,
-        QuizDirectionEnum sessionDirection)
+        List<PracticeCard> practiceCards, HashSet<int> savedIds,
+        List<Word> distractorPool, QuizDirectionEnum sessionDirection)
     {
         var rng = Random.Shared;
         var result = new List<PracticeCardViewModel>(practiceCards.Count);
@@ -259,8 +216,6 @@ public partial class PracticeViewModel(
 
             var ruTranslation = card.Word.KrDict?.Senses.FirstOrDefault()?.Ru?.Word;
 
-            // Если у слова нет русского перевода — всегда спрашиваем по корейскому слову,
-            // чтобы не показывать пустой вопрос.
             var askKoreanShowTranslation = direction == QuizDirectionEnum.KoreanToTranslation
                                             || string.IsNullOrWhiteSpace(ruTranslation);
 
@@ -282,8 +237,6 @@ public partial class PracticeViewModel(
                 .Select(t => t!)
                 .ToList();
 
-            // Фолбэк: если в общем пуле не хватило вариантов (маленький словарь) — добираем
-            // из других слов этой же сессии.
             if (distractors.Count < 3)
             {
                 var fallback = practiceCards
@@ -305,22 +258,14 @@ public partial class PracticeViewModel(
             options.AddRange(distractors.Select(d => new AnswerOptionViewModel(d, isCorrect: false)));
             options = options.OrderBy(_ => rng.Next()).ToList();
 
-            result.Add(new PracticeCardViewModel(
-                card,
-                savedWordsService,
-                savedIds.Contains(card.Word.Id),
-                questionText,
-                options,
-                OnCardAnswered));
+            result.Add(new PracticeCardViewModel(card, savedWordsService,
+                savedIds.Contains(card.Word.Id), questionText,
+                options, OnCardAnswered));
         }
 
         return result;
     }
 
-    /// <summary>
-    /// Колбэк из PracticeCardViewModel, когда пользователь ответил или истекло время.
-    /// Начисляет очки, отправляет SM-2 оценку и через паузу переходит к следующему вопросу.
-    /// </summary>
     private void OnCardAnswered(PracticeCardViewModel card, bool wasCorrect) => _ = HandleAnswerAsync(card, wasCorrect, _sessionToken);
 
     private async Task HandleAnswerAsync(PracticeCardViewModel card, bool wasCorrect, int startedWithToken)
@@ -328,7 +273,6 @@ public partial class PracticeViewModel(
         if (wasCorrect)
         {
             CorrectCount++;
-            // Бонус за скорость: чем больше секунд осталось на момент ответа, тем больше очков.
             Score += BaseCorrectPoints + card.TimeLeft;
         }
 
@@ -342,8 +286,6 @@ public partial class PracticeViewModel(
 
         await Task.Delay(AnswerRevealDelayMs);
 
-        // Пока ждали, пользователь мог выйти из сессии или начать новую — не трогаем
-        // состояние чужой сессии.
         if (startedWithToken != _sessionToken)
             return;
 

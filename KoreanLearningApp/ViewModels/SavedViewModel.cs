@@ -8,8 +8,6 @@ using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.ViewModels;
 
-// KoreanLearningApp.Domain.Models.Enums нужен здесь ради PartOfSpeechMapper.ToRussian() —
-// он объявлен именно в этом namespace, хотя физически лежит в Infrastructure/Mapster.
 public partial class SavedViewModel(ISavedWordsService savedWordsService, INavigationService navigationService)
     : ObservableObject
 {

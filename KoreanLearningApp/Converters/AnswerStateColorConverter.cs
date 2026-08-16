@@ -2,14 +2,6 @@
 using KoreanLearningApp.ViewModels;
 
 namespace KoreanLearningApp.Converters;
-
-/// <summary>
-/// Превращает AnswerOptionState варианта ответа квиза в цвет.
-/// ConverterParameter задаёт роль цвета: "Background", "Stroke" или "Text".
-/// Для состояния Default подставляет цвета приложения (если заданы в ресурсах),
-/// иначе — нейтральный серый по умолчанию, чтобы конвертер работал даже без
-/// подключённой темы приложения.
-/// </summary>
 public class AnswerStateColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

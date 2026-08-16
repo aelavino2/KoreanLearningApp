@@ -9,8 +9,7 @@ namespace KoreanLearningApp.ViewModels;
 
 [QueryProperty(nameof(Word), "Word")]
 public partial class WordDetailViewModel(
-    INavigationService navigationService,
-    IAudioPlayerService audioPlayerService,
+    INavigationService navigationService, IAudioPlayerService audioPlayerService,
     ISavedWordsService savedWordsService)
     : ObservableObject
 {
@@ -38,8 +37,6 @@ public partial class WordDetailViewModel(
 
         PlayAudioCommand.NotifyCanExecuteChanged();
 
-        // OnWordChanged синхронный (генерируется CommunityToolkit.Mvvm), поэтому
-        // статус "сохранено" подгружаем отдельным fire-and-forget вызовом.
         _ = LoadSavedStateAsync(value.Id);
     }
 

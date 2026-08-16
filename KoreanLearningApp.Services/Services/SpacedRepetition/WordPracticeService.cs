@@ -5,11 +5,6 @@ using KoreanLearningApp.Services.Abstractions.Services;
 
 namespace KoreanLearningApp.Services.Services.SpacedRepetition;
 
-/// <summary>
-/// Связывает вместе три вещи, которые по отдельности ничего не знают друг о друге:
-/// репозиторий прогресса, репозиторий словаря и планировщик SM-2. Это единственное
-/// место в приложении, где формируется сессия практики и обрабатывается ответ пользователя.
-/// </summary>
 public class WordPracticeService(
     IWordProgressRepository progressRepository,
     IReviewLogRepository reviewLogRepository,
@@ -26,20 +21,16 @@ public class WordPracticeService(
         var cards = new List<PracticeCard>();
         var usedWordIds = new HashSet<int>();
 
-        // 1) Сохранённые слова — наивысший приоритет, если пользователь включил опцию.
         if (options.IncludeSavedWords)
-        {
             await AddSavedWordsAsync(cards, usedWordIds, wordCount, topikLevels);
-        }
 
-        // 2) Due-слова (уже наступил срок повторения) — приоритетнее новых.
+
         var remaining = wordCount - cards.Count;
         if (remaining > 0)
         {
             await AddDueWordsAsync(cards, usedWordIds, now, remaining, topikLevels);
         }
 
-        // 3) Новые слова, которые ещё ни разу не показывались — по частотности (Rank).
         remaining = wordCount - cards.Count;
         if (remaining > 0)
         {
@@ -49,8 +40,7 @@ public class WordPracticeService(
         return cards;
     }
 
-    private async Task AddSavedWordsAsync(
-        List<PracticeCard> cards, HashSet<int> usedWordIds, int wordCount, List<string> topikLevels)
+    private async Task AddSavedWordsAsync(List<PracticeCard> cards, HashSet<int> usedWordIds, int wordCount, List<string> topikLevels)
     {
         var savedIds = await savedWordRepository.GetSavedWordIdsAsync();
         if (savedIds.Count == 0)
@@ -58,8 +48,6 @@ public class WordPracticeService(
 
         var savedWords = await wordRepository.GetByIdsAsync(savedIds);
 
-        // savedIds уже отсортированы по дате сохранения (новые сверху) в репозитории —
-        // сохраняем этот порядок, а не порядок, в котором вернулись Words.
         var wordsById = savedWords.ToDictionary(w => w.Id);
         var orderedFiltered = savedIds
             .Where(id => wordsById.ContainsKey(id))
@@ -85,8 +73,7 @@ public class WordPracticeService(
         }
     }
 
-    private async Task AddDueWordsAsync(
-        List<PracticeCard> cards, HashSet<int> usedWordIds, DateTime now, int limit, List<string> topikLevels)
+    private async Task AddDueWordsAsync(List<PracticeCard> cards, HashSet<int> usedWordIds, DateTime now, int limit, List<string> topikLevels)
     {
         var dueProgress = await progressRepository.GetDueAsync(now, limit, topikLevels);
         var freshDue = dueProgress.Where(p => !usedWordIds.Contains(p.WordId)).ToList();
@@ -106,8 +93,7 @@ public class WordPracticeService(
         }
     }
 
-    private async Task AddNewWordsAsync(
-        List<PracticeCard> cards, HashSet<int> usedWordIds, int limit, List<string> topikLevels)
+    private async Task AddNewWordsAsync(List<PracticeCard> cards, HashSet<int> usedWordIds, int limit, List<string> topikLevels)
     {
         var newWordIds = await progressRepository.GetNewWordIdsAsync(limit, topikLevels);
         var freshIds = newWordIds.Where(id => !usedWordIds.Contains(id)).ToList();
