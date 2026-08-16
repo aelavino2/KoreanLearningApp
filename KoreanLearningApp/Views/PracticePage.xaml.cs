@@ -13,9 +13,12 @@ public partial class PracticePage : ContentPage
         BindingContext = _viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadPracticeAsync();
+
+        // Каждый заход на страницу начинается с экрана настроек — VM транзиентный
+        // (пересоздаётся при навигации), но на случай, если это изменится, сбрасываем явно.
+        _viewModel.BackToSetupCommand.Execute(null);
     }
 }

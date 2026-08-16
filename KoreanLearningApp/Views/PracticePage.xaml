@@ -16,37 +16,135 @@
             </Border>
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
                 <Label Text="Practice" Style="{StaticResource PageTitleStyle}" />
-                <Label Text="{Binding Cards.Count, StringFormat='{0} cards to review'}" Style="{StaticResource PageSubtitleStyle}" />
+                <Label Text="Настройте параметры сессии" Style="{StaticResource PageSubtitleStyle}"
+                       IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Text="{Binding Cards.Count, StringFormat='{0} cards to review'}" Style="{StaticResource PageSubtitleStyle}"
+                       IsVisible="{Binding IsSessionActive}" />
             </VerticalStackLayout>
         </Grid>
 
         <Grid Grid.Row="1" Margin="24,0,24,0">
 
-            <CollectionView
+            <!-- ЭКРАН НАСТРОЕК: количество слов, уровни TOPIK, включать ли сохранённые слова -->
+            <ScrollView IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}">
+                <VerticalStackLayout Spacing="22" Padding="0,10,0,20">
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="КОЛИЧЕСТВО СЛОВ" Style="{StaticResource SectionLabelStyle}" />
+                        <Picker ItemsSource="{Binding WordCountOptions}" SelectedItem="{Binding WordCount}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="УРОВЕНЬ TOPIK" Style="{StaticResource SectionLabelStyle}" />
+                        <Label Text="Ничего не выбрано — берём слова всех уровней" FontSize="11" TextColor="{StaticResource ColorMuted}" />
+                        <HorizontalStackLayout Spacing="20">
+                            <HorizontalStackLayout Spacing="6">
+                                <CheckBox IsChecked="{Binding IsTopik1Selected}" Color="{StaticResource ColorPrimary}" />
+                                <Label Text="TOPIK 1" VerticalOptions="Center" FontSize="13" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <CheckBox IsChecked="{Binding IsTopik2Selected}" Color="{StaticResource ColorPrimary}" />
+                                <Label Text="TOPIK 2" VerticalOptions="Center" FontSize="13" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <CheckBox IsChecked="{Binding IsTopik3Selected}" Color="{StaticResource ColorPrimary}" />
+                                <Label Text="TOPIK 3" VerticalOptions="Center" FontSize="13" />
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Сохранённые слова" FontAttributes="Bold" FontSize="14" />
+                                <Label Text="Если включено — идут первыми в сессии, приоритетнее due и новых"
+                                       FontSize="11" TextColor="{StaticResource ColorMuted}" LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="1" IsToggled="{Binding IncludeSavedWords}"
+                                    OnColor="{StaticResource ColorPrimary}" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Button Text="Начать практику"
+                            Command="{Binding StartPracticeCommand}"
+                            BackgroundColor="{StaticResource ColorPrimary}"
+                            TextColor="White"
+                            HeightRequest="48"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}" />
+
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                                        Color="{StaticResource ColorPrimary}" />
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- АКТИВНАЯ СЕССИЯ: карточки практики -->
+            <Grid IsVisible="{Binding IsSessionActive}" RowDefinitions="Auto,*">
+
+                <Button Grid.Row="0"
+                        Text="⚙ Изменить настройки"
+                        Command="{Binding BackToSetupCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource ColorMuted}"
+                        FontSize="12"
+                        HorizontalOptions="Start"
+                        Padding="0"
+                        Margin="0,0,0,8" />
+
+                <CollectionView
+                Grid.Row="1"
                 x:Name="PracticeCollectionView"
                 ItemsSource="{Binding Cards}"
                 SelectionMode="None"
                 IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBoolConverter}}">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:PracticeCardViewModel">
-                        <Border Style="{StaticResource CardBorderStyle}">
-                            <VerticalStackLayout Spacing="10">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PracticeCardViewModel">
+                            <Border Style="{StaticResource CardBorderStyle}">
+                                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="10">
 
-                                <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" HorizontalOptions="Center" />
+                                    <!-- Звезда сохранения в правом верхнем углу карточки -->
+                                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                                        <BoxView Grid.Column="0" IsVisible="False" />
+                                        <Label Grid.Column="1" Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" HorizontalOptions="Center" />
 
-                                <Border Style="{StaticResource TagPillBorderStyle}" HorizontalOptions="Center">
-                                    <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
-                                </Border>
+                                        <Border Grid.Column="2"
+                                            Style="{StaticResource RoundIconButtonStyle}"
+                                            WidthRequest="28" HeightRequest="28"
+                                            HorizontalOptions="End" VerticalOptions="Start"
+                                            IsEnabled="{Binding IsSaveBusy, Converter={StaticResource InverseBoolConverter}}">
+                                            <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Image Source="star_icon.png"
+                                                   WidthRequest="14" HeightRequest="14"
+                                                   Aspect="AspectFit"
+                                                   IsVisible="{Binding IsSaved, Converter={StaticResource InverseBoolConverter}}" />
+                                                <Image Source="star_filled_icon.png"
+                                                   WidthRequest="14" HeightRequest="14"
+                                                   Aspect="AspectFit"
+                                                   IsVisible="{Binding IsSaved}" />
+                                                <ActivityIndicator IsRunning="{Binding IsSaveBusy}"
+                                                                IsVisible="{Binding IsSaveBusy}"
+                                                                Color="{StaticResource ColorPrimary}"
+                                                                WidthRequest="14" HeightRequest="14" />
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleSaveCommand}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
 
-                                <VerticalStackLayout Spacing="4" IsVisible="{Binding IsTranslationVisible}">
-                                    <Label Text="{Binding Ru}" HorizontalOptions="Center" FontSize="14" />
-                                    <Label Text="{Binding En}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource ColorMuted}" />
-                                </VerticalStackLayout>
+                                    <Border Grid.Row="1" Style="{StaticResource TagPillBorderStyle}" HorizontalOptions="Center">
+                                        <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                                    </Border>
 
-                                <Button
+                                    <VerticalStackLayout Grid.Row="2" Spacing="4" IsVisible="{Binding IsTranslationVisible}">
+                                        <Label Text="{Binding Ru}" HorizontalOptions="Center" FontSize="14" />
+                                        <Label Text="{Binding En}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource ColorMuted}" />
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Row="3"
                                     Text="Показать перевод"
                                     Command="{Binding ToggleTranslationCommand}"
                                     BackgroundColor="{StaticResource ColorChipBg}"
@@ -54,31 +152,45 @@
                                     FontSize="12"
                                     HeightRequest="36" />
 
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                    <Button Grid.Column="0"
+                                    <!-- Три оценки SM-2: Forgot / Hard / Good — раньше в UI было только 2,
+                                     хотя Sm2Formula и ReviewRatingEnum.Hard уже поддерживали 3-уровневую шкалу -->
+                                    <Grid Grid.Row="4" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                        <Button Grid.Column="0"
                                             Text="Не знаю"
                                             Command="{Binding Source={x:Reference PracticeCollectionView}, Path=BindingContext.MarkUnknownCommand}"
                                             CommandParameter="{Binding .}"
                                             BackgroundColor="{StaticResource ColorChipBg}"
                                             TextColor="{StaticResource ColorPrimaryDark}"
-                                            FontSize="12" />
-                                    <Button Grid.Column="1"
+                                            FontSize="11"
+                                            Padding="4,0" />
+                                        <Button Grid.Column="1"
+                                            Text="Трудно"
+                                            Command="{Binding Source={x:Reference PracticeCollectionView}, Path=BindingContext.MarkHardCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="{StaticResource ColorChipBg}"
+                                            TextColor="{StaticResource ColorPrimaryDark}"
+                                            FontSize="11"
+                                            Padding="4,0" />
+                                        <Button Grid.Column="2"
                                             Text="Знаю"
                                             Command="{Binding Source={x:Reference PracticeCollectionView}, Path=BindingContext.MarkKnownCommand}"
                                             CommandParameter="{Binding .}"
                                             BackgroundColor="{StaticResource ColorPrimary}"
                                             TextColor="White"
-                                            FontSize="12" />
+                                            FontSize="11"
+                                            Padding="4,0" />
+                                    </Grid>
                                 </Grid>
-                            </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-            <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
-                <Label Text="Пока нечего повторять" FontSize="14" TextColor="{StaticResource ColorMuted}" HorizontalOptions="Center" />
-            </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                    <Label Text="Пока нечего повторять" FontSize="14" TextColor="{StaticResource ColorMuted}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </Grid>
 
         </Grid>
 

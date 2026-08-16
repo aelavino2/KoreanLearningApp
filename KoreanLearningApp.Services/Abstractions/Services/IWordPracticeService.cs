@@ -6,10 +6,12 @@ namespace KoreanLearningApp.Services.Abstractions.Services;
 public interface IWordPracticeService
 {
     /// <summary>
-    /// Собирает сессию практики: слова с наступившей датой повторения + новые слова по частотности.
-    /// Due-слова идут первыми (они отсортированы по NextReviewDate), затем новые (по Rank).
+    /// Собирает сессию практики согласно опциям пользователя. Порядок приоритета:
+    /// 1) сохранённые слова (если options.IncludeSavedWords), 2) due-слова (по NextReviewDate),
+    /// 3) новые слова (по Rank). Список ограничен options.WordCount и отфильтрован
+    /// по options.TopikLevels (пусто — без фильтра).
     /// </summary>
-    Task<List<PracticeCard>> GetPracticeSessionAsync(int dueLimit = 20, int newLimit = 5);
+    Task<List<PracticeCard>> GetPracticeSessionAsync(PracticeSessionOptions options);
 
     /// <summary>
     /// Обрабатывает ответ пользователя на слово: пересчитывает прогресс по SM-2,

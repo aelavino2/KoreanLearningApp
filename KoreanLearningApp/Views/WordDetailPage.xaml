@@ -39,7 +39,7 @@
                             <Label Grid.Column="1" Text="{Binding Word.TopikLevel}" FontSize="11" TextColor="{StaticResource ColorMutedLight}" FontAttributes="Bold" VerticalOptions="Start" />
                         </Grid>
 
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                             <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
                                 <Label Text="{Binding Word.Korean}" Style="{StaticResource WordKoreanHeroStyle}" />
                                 <Label Text="{Binding Word.Hanja}"
@@ -48,7 +48,33 @@
                                        IsVisible="{Binding HasHanja}" />
                             </VerticalStackLayout>
 
+                            <!-- Кнопка "Сохранить слово": звезда пустая/закрашенная в зависимости от IsSaved.
+                                 IsEnabled завязан на IsSaveBusy, чтобы нельзя было натыкать двойных тапов
+                                 и словить гонку с ToggleAsync. -->
                             <Border Grid.Column="1"
+                                    Style="{StaticResource RoundIconButtonStyle}"
+                                    VerticalOptions="Start"
+                                    IsEnabled="{Binding IsSaveBusy, Converter={StaticResource InverseBoolConverter}}">
+                                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="star_icon.png"
+                                           WidthRequest="16" HeightRequest="16"
+                                           Aspect="AspectFit"
+                                           IsVisible="{Binding IsSaved, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Image Source="star_filled_icon.png"
+                                           WidthRequest="16" HeightRequest="16"
+                                           Aspect="AspectFit"
+                                           IsVisible="{Binding IsSaved}" />
+                                    <ActivityIndicator IsRunning="{Binding IsSaveBusy}"
+                                                        IsVisible="{Binding IsSaveBusy}"
+                                                        Color="{StaticResource ColorPrimary}"
+                                                        WidthRequest="16" HeightRequest="16" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleSaveCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Grid.Column="2"
                                     Style="{StaticResource RoundIconButtonStyle}"
                                     VerticalOptions="Start"
                                     IsVisible="{Binding HasAudio}">

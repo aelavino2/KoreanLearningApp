@@ -15,38 +15,89 @@ public class WordProgressRepository(DbContext dbContext, IRepository<WordProgres
         return entity?.ToDomain();
     }
 
-    public async Task<List<WordProgress>> GetDueAsync(DateTime asOf, int limit)
+    public async Task<List<WordProgress>> GetByWordIdsAsync(List<int> wordIds)
     {
-        var db = await dbContext.GetConnectionAsync();
+        if (wordIds.Count == 0)
+            return new List<WordProgress>();
 
-        const string sql = @"
-            SELECT *
-            FROM WordProgresses
-            WHERE NextReviewDate <= ?
-            ORDER BY NextReviewDate
-            LIMIT ?";
-
-        var rows = await db.QueryAsync<WordProgressEntity>(sql, asOf, limit);
-        return rows.Select(r => r.ToDomain()).ToList();
+        var entities = await progressRepo.GetWhereAsync(p => wordIds.Contains(p.WordId));
+        return entities.Select(e => e.ToDomain()).ToList();
     }
 
-    public async Task<List<int>> GetNewWordIdsAsync(int limit)
+    public async Task<List<WordProgress>> GetDueAsync(DateTime asOf, int limit, IReadOnlyCollection<string>? topikLevels = null)
     {
         var db = await dbContext.GetConnectionAsync();
+        var levels = NormalizeLevels(topikLevels);
 
-        // Слова, для которых ещё нет ни одной записи прогресса, по частотности (Rank)
-        const string sql = @"
+        if (levels.Count == 0)
+        {
+            const string sql = @"
+                SELECT *
+                FROM WordProgresses
+                WHERE NextReviewDate <= ?
+                ORDER BY NextReviewDate
+                LIMIT ?";
+
+            var rows = await db.QueryAsync<WordProgressEntity>(sql, asOf, limit);
+            return rows.Select(r => r.ToDomain()).ToList();
+        }
+
+        // JOIN с Words нужен только когда задан фильтр по уровню — без него достаточно
+        // и исходного плоского запроса по WordProgresses.
+        var placeholders = string.Join(",", levels.Select(_ => "?"));
+        var filteredSql = $@"
+            SELECT p.*
+            FROM WordProgresses p
+            JOIN Words w ON w.Id = p.WordId
+            WHERE p.NextReviewDate <= ? AND w.TopikLevel IN ({placeholders})
+            ORDER BY p.NextReviewDate
+            LIMIT ?";
+
+        var args = new List<object> { asOf };
+        args.AddRange(levels);
+        args.Add(limit);
+
+        var filteredRows = await db.QueryAsync<WordProgressEntity>(filteredSql, args.ToArray());
+        return filteredRows.Select(r => r.ToDomain()).ToList();
+    }
+
+    public async Task<List<int>> GetNewWordIdsAsync(int limit, IReadOnlyCollection<string>? topikLevels = null)
+    {
+        var db = await dbContext.GetConnectionAsync();
+        var levels = NormalizeLevels(topikLevels);
+
+        if (levels.Count == 0)
+        {
+            // Слова, для которых ещё нет ни одной записи прогресса, по частотности (Rank)
+            const string sql = @"
+                SELECT w.Id
+                FROM Words w
+                LEFT JOIN WordProgresses p ON p.WordId = w.Id
+                WHERE p.Id IS NULL
+                ORDER BY w.Rank
+                LIMIT ?";
+
+            // Мапим в Domain-модель Word — тот же приём, что и в GetWordsPageQuery:
+            // из всех колонок Word нам нужна только Id, остальные останутся дефолтными.
+            var rows = await db.QueryAsync<Word>(sql, limit);
+            return rows.Select(r => r.Id).ToList();
+        }
+
+        var placeholders = string.Join(",", levels.Select(_ => "?"));
+        var filteredSql = $@"
             SELECT w.Id
             FROM Words w
             LEFT JOIN WordProgresses p ON p.WordId = w.Id
-            WHERE p.Id IS NULL
+            WHERE p.Id IS NULL AND w.TopikLevel IN ({placeholders})
             ORDER BY w.Rank
             LIMIT ?";
 
-        // Мапим в Domain-модель Word — тот же приём, что и в GetWordsPageQuery:
-        // из всех колонок Word нам нужна только Id, остальные останутся дефолтными.
-        var rows = await db.QueryAsync<Word>(sql, limit);
-        return rows.Select(r => r.Id).ToList();
+        var args = new List<object>();
+        args.AddRange(levels);
+        args.Add(limit);
+
+        var filteredRows = await db.QueryAsync<Word>(filteredSql, args.ToArray());
+        return filteredRows.Select(r => r.Id).ToList();
     }
 
     public async Task UpsertAsync(WordProgress progress)
@@ -67,6 +118,13 @@ public class WordProgressRepository(DbContext dbContext, IRepository<WordProgres
 
         progress.Id = entity.Id;
     }
+
+    private static List<string> NormalizeLevels(IReadOnlyCollection<string>? topikLevels) =>
+        (topikLevels ?? Array.Empty<string>())
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .Select(l => l.Trim())
+            .Distinct()
+            .ToList();
 
     private async Task<WordProgressEntity?> GetEntityByWordIdAsync(int wordId)
     {

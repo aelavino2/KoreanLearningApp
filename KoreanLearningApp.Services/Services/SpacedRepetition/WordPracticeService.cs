@@ -14,46 +14,128 @@ public class WordPracticeService(
     IWordProgressRepository progressRepository,
     IReviewLogRepository reviewLogRepository,
     ISpacedRepetitionScheduler scheduler,
-    IWordRepository wordRepository) : IWordPracticeService
+    IWordRepository wordRepository,
+    ISavedWordRepository savedWordRepository) : IWordPracticeService
 {
-    public async Task<List<PracticeCard>> GetPracticeSessionAsync(int dueLimit = 20, int newLimit = 5)
+    public async Task<List<PracticeCard>> GetPracticeSessionAsync(PracticeSessionOptions options)
     {
         var now = DateTime.Now;
-
-        var dueProgress = await progressRepository.GetDueAsync(now, dueLimit);
-        var newWordIds = await progressRepository.GetNewWordIdsAsync(newLimit);
-
-        var allWordIds = dueProgress
-            .Select(p => p.WordId)
-            .Concat(newWordIds)
-            .Distinct()
-            .ToList();
-
-        if (allWordIds.Count == 0)
-            return new List<PracticeCard>();
-
-        var words = await wordRepository.GetByIdsAsync(allWordIds);
-        var wordsById = words.ToDictionary(w => w.Id);
+        var wordCount = Math.Max(1, options.WordCount);
+        var topikLevels = NormalizeLevels(options.TopikLevels);
 
         var cards = new List<PracticeCard>();
+        var usedWordIds = new HashSet<int>();
 
-        // Сначала due-слова (уже отсортированы по NextReviewDate в репозитории) —
-        // повторение существующих слов приоритетнее показа новых.
-        foreach (var progress in dueProgress)
+        // 1) Сохранённые слова — наивысший приоритет, если пользователь включил опцию.
+        if (options.IncludeSavedWords)
         {
-            if (wordsById.TryGetValue(progress.WordId, out var word))
-                cards.Add(new PracticeCard { Word = word, Progress = progress });
+            await AddSavedWordsAsync(cards, usedWordIds, wordCount, topikLevels);
         }
 
-        // Затем новые слова (уже отсортированы по Rank в репозитории)
-        foreach (var wordId in newWordIds)
+        // 2) Due-слова (уже наступил срок повторения) — приоритетнее новых.
+        var remaining = wordCount - cards.Count;
+        if (remaining > 0)
         {
-            if (wordsById.TryGetValue(wordId, out var word))
-                cards.Add(new PracticeCard { Word = word, Progress = null });
+            await AddDueWordsAsync(cards, usedWordIds, now, remaining, topikLevels);
+        }
+
+        // 3) Новые слова, которые ещё ни разу не показывались — по частотности (Rank).
+        remaining = wordCount - cards.Count;
+        if (remaining > 0)
+        {
+            await AddNewWordsAsync(cards, usedWordIds, remaining, topikLevels);
         }
 
         return cards;
     }
+
+    private async Task AddSavedWordsAsync(
+        List<PracticeCard> cards, HashSet<int> usedWordIds, int wordCount, List<string> topikLevels)
+    {
+        var savedIds = await savedWordRepository.GetSavedWordIdsAsync();
+        if (savedIds.Count == 0)
+            return;
+
+        var savedWords = await wordRepository.GetByIdsAsync(savedIds);
+
+        // savedIds уже отсортированы по дате сохранения (новые сверху) в репозитории —
+        // сохраняем этот порядок, а не порядок, в котором вернулись Words.
+        var wordsById = savedWords.ToDictionary(w => w.Id);
+        var orderedFiltered = savedIds
+            .Where(id => wordsById.ContainsKey(id))
+            .Select(id => wordsById[id])
+            .Where(w => MatchesTopik(w.TopikLevel, topikLevels))
+            .Take(wordCount)
+            .ToList();
+
+        if (orderedFiltered.Count == 0)
+            return;
+
+        var progressList = await progressRepository.GetByWordIdsAsync(orderedFiltered.Select(w => w.Id).ToList());
+        var progressByWordId = progressList.ToDictionary(p => p.WordId);
+
+        foreach (var word in orderedFiltered)
+        {
+            cards.Add(new PracticeCard
+            {
+                Word = word,
+                Progress = progressByWordId.GetValueOrDefault(word.Id)
+            });
+            usedWordIds.Add(word.Id);
+        }
+    }
+
+    private async Task AddDueWordsAsync(
+        List<PracticeCard> cards, HashSet<int> usedWordIds, DateTime now, int limit, List<string> topikLevels)
+    {
+        var dueProgress = await progressRepository.GetDueAsync(now, limit, topikLevels);
+        var freshDue = dueProgress.Where(p => !usedWordIds.Contains(p.WordId)).ToList();
+        if (freshDue.Count == 0)
+            return;
+
+        var dueWords = await wordRepository.GetByIdsAsync(freshDue.Select(p => p.WordId).ToList());
+        var wordsById = dueWords.ToDictionary(w => w.Id);
+
+        foreach (var progress in freshDue)
+        {
+            if (!wordsById.TryGetValue(progress.WordId, out var word))
+                continue;
+
+            cards.Add(new PracticeCard { Word = word, Progress = progress });
+            usedWordIds.Add(progress.WordId);
+        }
+    }
+
+    private async Task AddNewWordsAsync(
+        List<PracticeCard> cards, HashSet<int> usedWordIds, int limit, List<string> topikLevels)
+    {
+        var newWordIds = await progressRepository.GetNewWordIdsAsync(limit, topikLevels);
+        var freshIds = newWordIds.Where(id => !usedWordIds.Contains(id)).ToList();
+        if (freshIds.Count == 0)
+            return;
+
+        var newWords = await wordRepository.GetByIdsAsync(freshIds);
+        var wordsById = newWords.ToDictionary(w => w.Id);
+
+        foreach (var id in freshIds)
+        {
+            if (!wordsById.TryGetValue(id, out var word))
+                continue;
+
+            cards.Add(new PracticeCard { Word = word, Progress = null });
+            usedWordIds.Add(id);
+        }
+    }
+
+    private static bool MatchesTopik(string? wordTopikLevel, List<string> topikLevels) =>
+        topikLevels.Count == 0 || topikLevels.Contains((wordTopikLevel ?? string.Empty).Trim());
+
+    private static List<string> NormalizeLevels(List<string>? levels) =>
+        (levels ?? new List<string>())
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .Select(l => l.Trim())
+            .Distinct()
+            .ToList();
 
     public async Task SubmitReviewAsync(int wordId, ReviewRatingEnum rating)
     {
