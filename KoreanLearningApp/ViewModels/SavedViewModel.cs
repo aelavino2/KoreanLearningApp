@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Domain.Models.Enums;
 using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.ViewModels;
 
-public partial class SavedViewModel(INavigationService navigationService)
+// KoreanLearningApp.Domain.Models.Enums нужен здесь ради PartOfSpeechMapper.ToRussian() —
+// он объявлен именно в этом namespace, хотя физически лежит в Infrastructure/Mapster.
+public partial class SavedViewModel(ISavedWordsService savedWordsService, INavigationService navigationService)
     : ObservableObject
 {
     public ObservableCollection<SavedWordItemViewModel> SavedWords { get; } = new();
@@ -23,13 +27,11 @@ public partial class SavedViewModel(INavigationService navigationService)
         IsLoading = true;
         try
         {
-            // TODO: заменить на реальную выборку сохранённых слов,
-            // когда появится IWordService.GetSavedWordsAsync() (или аналог)
-            await Task.Delay(200);
+            var words = await savedWordsService.GetSavedWordsAsync();
 
             SavedWords.Clear();
-            foreach (var mock in GetMockSavedWords())
-                SavedWords.Add(mock);
+            foreach (var word in words)
+                SavedWords.Add(new SavedWordItemViewModel(word));
 
             IsEmpty = SavedWords.Count == 0;
         }
@@ -39,49 +41,13 @@ public partial class SavedViewModel(INavigationService navigationService)
         }
     }
 
-    private static List<SavedWordItemViewModel> GetMockSavedWords() =>
-    [
-        new SavedWordItemViewModel
-        {
-            Korean = "안녕하세요",
-            Ru = "Здравствуйте",
-            En = "Hello",
-            PartOfSpeechDisplay = "Приветствие",
-            TopikLevel = "1"
-        },
-        new SavedWordItemViewModel
-        {
-            Korean = "감사합니다",
-            Ru = "Спасибо",
-            En = "Thank you",
-            PartOfSpeechDisplay = "Приветствие",
-            TopikLevel = "1"
-        },
-        new SavedWordItemViewModel
-        {
-            Korean = "사랑",
-            Ru = "Любовь",
-            En = "Love",
-            PartOfSpeechDisplay = "Существительное",
-            TopikLevel = "2"
-        },
-        new SavedWordItemViewModel
-        {
-            Korean = "공부하다",
-            Ru = "Учиться",
-            En = "To study",
-            PartOfSpeechDisplay = "Глагол",
-            TopikLevel = "3"
-        }
-    ];
-
     [RelayCommand]
-    private void RemoveFromSaved(SavedWordItemViewModel item)
+    private async Task RemoveFromSaved(SavedWordItemViewModel item)
     {
-        // TODO: заглушка, реальное удаление из сохранённых появится позже,
-        // когда будет известна структура хранения "избранного"
         if (item is null)
             return;
+
+        await savedWordsService.RemoveAsync(item.WordId);
 
         SavedWords.Remove(item);
         IsEmpty = SavedWords.Count == 0;
@@ -98,24 +64,4 @@ public partial class SavedViewModel(INavigationService navigationService)
 
     [RelayCommand]
     private Task GoToSavedAsync() => navigationService.GoToRootAsync(AppRoutes.Saved);
-}
-
-public partial class SavedWordItemViewModel : ObservableObject
-{
-    [ObservableProperty]
-    private string _korean = string.Empty;
-
-    [ObservableProperty]
-    private string _ru = string.Empty;
-
-    [ObservableProperty]
-    private string _en = string.Empty;
-
-    [ObservableProperty]
-    private string _partOfSpeechDisplay = string.Empty;
-
-    [ObservableProperty]
-    private string _topikLevel = string.Empty;
-
-    public bool HasTopikLevel => !string.IsNullOrEmpty(TopikLevel);
 }

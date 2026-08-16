@@ -56,6 +56,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<IReviewLogRepository, ReviewLogRepository>();
         builder.Services.AddSingleton<ISavedWordRepository, SavedWordRepository>();
         builder.Services.AddSingleton<ISpacedRepetitionScheduler, Sm2SpacedRepetitionScheduler>();
+        builder.Services.AddSingleton<IWordPracticeService, WordPracticeService>();
+        builder.Services.AddSingleton<ISavedWordsService, SavedWordsService>();
 
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
