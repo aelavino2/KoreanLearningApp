@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreanLearningApp", "KoreanLearningApp\KoreanLearningApp.csproj", "{367E342B-B479-2C93-878D-2E39D4E3D010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreanLearningApp.Domain", "Domain\KoreanLearningApp.Domain.csproj", "{339F0953-0A4A-4E49-A0E4-8ACBF732E16D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreanLearningApp.Domain", "KoreanLearningApp.Domain\KoreanLearningApp.Domain.csproj", "{339F0953-0A4A-4E49-A0E4-8ACBF732E16D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KoreanLearningApp.Services", "KoreanLearningApp.Services\KoreanLearningApp.Services.csproj", "{C148B12E-BB3A-4D77-B368-1238F2212CC7}"
 EndProject
