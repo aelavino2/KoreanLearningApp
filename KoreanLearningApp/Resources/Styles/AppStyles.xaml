@@ -3,8 +3,63 @@
                      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- ============================================================ -->
-    <!--  ШАПКА СТРАНИЦЫ                                               -->
+    <!--  ГЛОБАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ БАЗОВЫХ СТИЛЕЙ                    -->
+    <!--  Styles.xaml задаёт цвета через AppThemeBinding (Light/Dark), -->
+    <!--  но у приложения нет тёмной палитры и фон страниц жёстко      -->
+    <!--  зафиксирован на ColorBackground. Из-за этого в тёмной теме   -->
+    <!--  ОС текст/акценты уезжают в белый и сливаются со светлым      -->
+    <!--  фоном. Этот блок подключается последним (после Styles.xaml)  -->
+    <!--  и фиксирует все базовые контролы на светлой палитре.         -->
     <!-- ============================================================ -->
+
+    <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="RadioButton">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="CheckBox">
+        <Setter Property="Color" Value="{StaticResource ColorPrimary}" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="TitleColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Editor">
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Switch">
+        <Setter Property="OnColor" Value="{StaticResource ColorPrimary}" />
+        <Setter Property="ThumbColor" Value="White" />
+    </Style>
+
+    <Style TargetType="Border">
+        <Setter Property="Stroke" Value="{StaticResource ColorBorder}" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource ColorPrimary}" />
+    </Style>
+
+    <Style TargetType="ProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource ColorPrimary}" />
+    </Style>
 
     <Style x:Key="LogoBadgeStyle" TargetType="Border">
         <Setter Property="WidthRequest" Value="44" />
@@ -41,10 +96,6 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!-- ============================================================ -->
-    <!--  ПОИСК                                                        -->
-    <!-- ============================================================ -->
-
     <Style x:Key="SearchBarBorderStyle" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorCard}" />
         <Setter Property="StrokeShape" Value="RoundRectangle 18" />
@@ -64,20 +115,12 @@
         <Setter Property="FontSize" Value="15" />
     </Style>
 
-    <!-- ============================================================ -->
-    <!--  СЕКЦИИ / НАДПИСИ                                             -->
-    <!-- ============================================================ -->
-
     <Style x:Key="SectionLabelStyle" TargetType="Label">
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorMutedLight}" />
         <Setter Property="CharacterSpacing" Value="1.0" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  КАРТОЧКИ                                                     -->
-    <!-- ============================================================ -->
 
     <Style x:Key="CardBorderStyle" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorCard}" />
@@ -103,24 +146,18 @@
         </Setter>
     </Style>
 
-    <!--  Заголовок слова (корейский текст) внутри карточки списка  -->
     <Style x:Key="WordKoreanStyle" TargetType="Label">
         <Setter Property="FontSize" Value="20" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
     </Style>
 
-    <!--  Крупный заголовок слова на странице деталей  -->
     <Style x:Key="WordKoreanHeroStyle" TargetType="Label">
         <Setter Property="FontSize" Value="40" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
         <Setter Property="CharacterSpacing" Value="-0.5" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  ПИЛЮЛИ (POS / уровень вежливости)                            -->
-    <!-- ============================================================ -->
 
     <Style x:Key="TagPillBorderStyle" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 100" />
@@ -143,7 +180,6 @@
         <Setter Property="TextColor" Value="{StaticResource ColorPoliteText}" />
     </Style>
 
-    <!--  Нейтральный серый чип (категория и т.п.)  -->
     <Style x:Key="NeutralChipBorderStyle" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 100" />
         <Setter Property="Stroke" Value="Transparent" />
@@ -156,9 +192,6 @@
         <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
     </Style>
 
-    <!-- ============================================================ -->
-    <!--  КНОПКИ                                                       -->
-    <!-- ============================================================ -->
 
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
@@ -182,10 +215,6 @@
         <Setter Property="BackgroundColor" Value="{StaticResource ColorChipBg}" />
         <Setter Property="Padding" Value="0" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  НИЖНЯЯ НАВИГАЦИЯ                                             -->
-    <!-- ============================================================ -->
 
     <Style x:Key="TabBarBorderStyle" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 26,26,0,0" />

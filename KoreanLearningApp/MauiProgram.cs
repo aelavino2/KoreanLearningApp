@@ -11,6 +11,7 @@ using KoreanLearningApp.Services;
 using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
 using KoreanLearningApp.Services.Services;
+using KoreanLearningApp.Services.Services.SpacedRepetition;
 using KoreanLearningApp.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,16 @@ public static class MauiProgram
         builder.Services.AddSingleton<IRepository<KrDictSenseEntity>, BaseRepository<KrDictSenseEntity>>();
         builder.Services.AddSingleton<IRepository<AudioEntity>, BaseRepository<AudioEntity>>();
         builder.Services.AddSingleton<IRepository<LangInfoEntity>, BaseRepository<LangInfoEntity>>();
+        builder.Services.AddSingleton<IRepository<WordProgressEntity>, BaseRepository<WordProgressEntity>>();
+        builder.Services.AddSingleton<IRepository<ReviewLogEntity>, BaseRepository<ReviewLogEntity>>();
+        builder.Services.AddSingleton<IRepository<SavedWordEntity>, BaseRepository<SavedWordEntity>>();
+
+        builder.Services.AddSingleton<IWordProgressRepository, WordProgressRepository>();
+        builder.Services.AddSingleton<IReviewLogRepository, ReviewLogRepository>();
+        builder.Services.AddSingleton<ISavedWordRepository, SavedWordRepository>();
+        builder.Services.AddSingleton<ISpacedRepetitionScheduler, Sm2SpacedRepetitionScheduler>();
+        builder.Services.AddSingleton<IWordPracticeService, WordPracticeService>();
+        builder.Services.AddSingleton<ISavedWordsService, SavedWordsService>();
 
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
@@ -57,9 +68,11 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IKrDictJsonSerializer, KrDictJsonSerializer>();
         builder.Services.AddSingleton<IWordImportService, WordImportService>();
-
+        builder.Services.AddTransient<SavedViewModel>();
+        builder.Services.AddTransient<SavedPage>();
         builder.Services.AddSingleton<IWordExportService, WordExportService>();
-
+        builder.Services.AddTransient<PracticeViewModel>();
+        builder.Services.AddTransient<PracticePage>();
         builder.Services.AddSingleton<IGetWordsPageQuery, GetWordsPageQuery>();
         builder.Services.AddTransient<WordsViewModel>();
         builder.Services.AddTransient<WordsPage>();

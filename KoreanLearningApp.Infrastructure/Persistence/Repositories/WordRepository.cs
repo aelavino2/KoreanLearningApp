@@ -21,6 +21,9 @@ public class WordRepository(IGetWordsPageQuery getWordsPageQuery,
         
         return allIds.Count == 0 ? new List<Word>() : await BuildWordsAsync(allIds);
     }
+
+    public Task<List<Word>> GetByIdsAsync(List<int> wordIds) =>
+        wordIds.Count == 0 ? Task.FromResult(new List<Word>()) : BuildWordsAsync(wordIds);
     
     public async Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(int page, int pageSize, string? search)
     {
