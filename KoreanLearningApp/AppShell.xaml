@@ -15,13 +15,7 @@
         Title="ImportExport"
         ContentTemplate="{DataTemplate views:ImportExportPage}"
         Route="ImportExportPage" />
-    <ShellContent
-        Title="Practice"
-        ContentTemplate="{DataTemplate views:PracticePage}"
-        Route="PracticePage" />
-    <ShellContent
-        Title="Saved"
-        ContentTemplate="{DataTemplate views:SavedPage}"
-        Route="SavedPage" />
+    
+    
 
 </Shell>

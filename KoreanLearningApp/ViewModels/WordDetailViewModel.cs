@@ -8,19 +8,11 @@ using KoreanLearningApp.Services.Abstractions.Services;
 namespace KoreanLearningApp.ViewModels;
 
 [QueryProperty(nameof(Word), "Word")]
-public partial class WordDetailViewModel(
-    INavigationService navigationService, IAudioPlayerService audioPlayerService,
-    ISavedWordsService savedWordsService)
+public partial class WordDetailViewModel(INavigationService navigationService, IAudioPlayerService audioPlayerService)
     : ObservableObject
 {
     [ObservableProperty]
     private Word _word = new();
-
-    [ObservableProperty]
-    private bool _isSaved;
-
-    [ObservableProperty]
-    private bool _isSaveBusy;
 
     partial void OnWordChanged(Word value)
     {
@@ -36,19 +28,6 @@ public partial class WordDetailViewModel(
         OnPropertyChanged(nameof(HasAudio));
 
         PlayAudioCommand.NotifyCanExecuteChanged();
-
-        _ = LoadSavedStateAsync(value.Id);
-    }
-
-    private async Task LoadSavedStateAsync(int wordId)
-    {
-        if (wordId == 0)
-        {
-            IsSaved = false;
-            return;
-        }
-
-        IsSaved = await savedWordsService.IsSavedAsync(wordId);
     }
 
     [ObservableProperty]
@@ -78,27 +57,6 @@ public partial class WordDetailViewModel(
 
     [RelayCommand]
     private Task GoBackAsync() => navigationService.GoBackAsync();
-
-    [RelayCommand]
-    private async Task ToggleSaveAsync()
-    {
-        if (IsSaveBusy || Word.Id == 0)
-            return;
-
-        try
-        {
-            IsSaveBusy = true;
-            IsSaved = await savedWordsService.ToggleAsync(Word.Id);
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("Ошибка", $"Не удалось сохранить слово: {ex.Message}", "OK");
-        }
-        finally
-        {
-            IsSaveBusy = false;
-        }
-    }
 
     [RelayCommand(CanExecute = nameof(HasAudio))]
     private async Task PlayAudioAsync()
