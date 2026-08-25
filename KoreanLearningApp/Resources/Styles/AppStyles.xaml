@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-
-    <!-- ============================================================ -->
-    <!--  ШАПКА СТРАНИЦЫ                                               -->
-    <!-- ============================================================ -->
-
+    
     <Style x:Key="LogoBadgeStyle" TargetType="Border">
         <Setter Property="WidthRequest" Value="44" />
         <Setter Property="HeightRequest" Value="44" />
@@ -40,10 +36,7 @@
         <Setter Property="BackgroundColor" Value="{StaticResource ColorChipBg}" />
         <Setter Property="Padding" Value="0" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  ПОИСК                                                        -->
-    <!-- ============================================================ -->
+    
 
     <Style x:Key="SearchBarBorderStyle" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorCard}" />
@@ -63,10 +56,7 @@
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontSize" Value="15" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  СЕКЦИИ / НАДПИСИ                                             -->
-    <!-- ============================================================ -->
+    
 
     <Style x:Key="SectionLabelStyle" TargetType="Label">
         <Setter Property="FontSize" Value="11" />
@@ -74,10 +64,7 @@
         <Setter Property="TextColor" Value="{StaticResource ColorMutedLight}" />
         <Setter Property="CharacterSpacing" Value="1.0" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  КАРТОЧКИ                                                     -->
-    <!-- ============================================================ -->
+    
 
     <Style x:Key="CardBorderStyle" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorCard}" />
@@ -102,25 +89,20 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!--  Заголовок слова (корейский текст) внутри карточки списка  -->
+    
     <Style x:Key="WordKoreanStyle" TargetType="Label">
         <Setter Property="FontSize" Value="20" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
     </Style>
-
-    <!--  Крупный заголовок слова на странице деталей  -->
+    
     <Style x:Key="WordKoreanHeroStyle" TargetType="Label">
         <Setter Property="FontSize" Value="40" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
         <Setter Property="CharacterSpacing" Value="-0.5" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  ПИЛЮЛИ (POS / уровень вежливости)                            -->
-    <!-- ============================================================ -->
+    
 
     <Style x:Key="TagPillBorderStyle" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 100" />
@@ -142,8 +124,7 @@
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{StaticResource ColorPoliteText}" />
     </Style>
-
-    <!--  Нейтральный серый чип (категория и т.п.)  -->
+    
     <Style x:Key="NeutralChipBorderStyle" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 100" />
         <Setter Property="Stroke" Value="Transparent" />
@@ -155,10 +136,6 @@
         <Setter Property="FontSize" Value="11" />
         <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
     </Style>
-
-    <!-- ============================================================ -->
-    <!--  КНОПКИ                                                       -->
-    <!-- ============================================================ -->
 
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
@@ -181,33 +158,6 @@
         <Setter Property="Stroke" Value="Transparent" />
         <Setter Property="BackgroundColor" Value="{StaticResource ColorChipBg}" />
         <Setter Property="Padding" Value="0" />
-    </Style>
-
-    <!-- ============================================================ -->
-    <!--  НИЖНЯЯ НАВИГАЦИЯ                                             -->
-    <!-- ============================================================ -->
-
-    <Style x:Key="TabBarBorderStyle" TargetType="Border">
-        <Setter Property="StrokeShape" Value="RoundRectangle 26,26,0,0" />
-        <Setter Property="Stroke" Value="Transparent" />
-        <Setter Property="BackgroundColor" Value="{StaticResource ColorCard}" />
-        <Setter Property="Padding" Value="0,12,0,20" />
-        <Setter Property="Shadow">
-            <Setter.Value>
-                <Shadow Brush="#1B2E1F" Opacity="0.10" Radius="16" Offset="0,-3" />
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="TabIconLabelStyle" TargetType="Label">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
-        <Setter Property="HorizontalOptions" Value="Center" />
-    </Style>
-
-    <Style x:Key="TabIconLabelActiveStyle" TargetType="Label" BasedOn="{StaticResource TabIconLabelStyle}">
-        <Setter Property="TextColor" Value="{StaticResource ColorPrimary}" />
-        <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
 </ResourceDictionary>

@@ -70,7 +70,7 @@ public static class MauiProgram
         builder.Services.AddTransient<WordDetailPage>();
         builder.Services.AddSingleton(AudioManager.Current);
         builder.Services.AddSingleton<IAudioPlayerService, AudioPlayerService>();
-
+        builder.Services.AddSingleton<NavigationBarViewModel>();
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())

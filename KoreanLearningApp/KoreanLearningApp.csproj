@@ -81,6 +81,10 @@
 	  <Compile Update="Views\WordDetailPage.xaml.cs">
 	    <DependentUpon>WordDetailPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Control\NavigationBarView.xaml.cs">
+	    <DependentUpon>NavigationBarView.xaml</DependentUpon>
+	    <SubType>Code</SubType>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -89,6 +93,9 @@
 	  </MauiXaml>
 	  <MauiXaml Update="Views\WordsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Control\NavigationBarView.xaml">
+	    <SubType>Designer</SubType>
 	  </MauiXaml>
 	</ItemGroup>
 

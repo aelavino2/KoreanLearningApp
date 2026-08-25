@@ -5,13 +5,10 @@ using KoreanLearningApp.Services.Abstractions.Services;
 
 namespace KoreanLearningApp.ViewModels;
 
-public partial class ImportExportViewModel : ObservableObject
+public partial class ImportExportViewModel(IWordService wordService,
+    IWordImportService wordImportService, IWordExportService wordExportService, INavigationService navigationService)
+    : ObservableObject
 {
-    private readonly IWordService _wordService;
-    private readonly IWordImportService _wordImportService;
-    private readonly IWordExportService _wordExportService;
-    private readonly INavigationService _navigationService;
-
     private static readonly FilePickerFileType JsonFileType = new(
         new Dictionary<DevicePlatform, IEnumerable<string>>
         {
@@ -21,21 +18,13 @@ public partial class ImportExportViewModel : ObservableObject
             { DevicePlatform.MacCatalyst, new[] { "json" } },
         });
 
-    public ImportExportViewModel(IWordService wordService, IWordImportService wordImportService, IWordExportService wordExportService, INavigationService navigationService)
-    {
-        _wordService = wordService;
-        _wordImportService = wordImportService;
-        _wordExportService = wordExportService;
-        _navigationService = navigationService;
-    }
-
     [RelayCommand]
     private async Task ExportAsync()
     {
         try
         {
-            var words = await _wordService.GetWordsAsync();
-            var json = await _wordExportService.ExportToJsonAsync(words);
+            var words = await wordService.GetWordsAsync();
+            var json = await wordExportService.ExportToJsonAsync(words);
 
             var fileName = $"korean_words_{DateTime.Now:yyyyMMdd_HHmmss}.json";
             var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
@@ -73,7 +62,7 @@ public partial class ImportExportViewModel : ObservableObject
             using var reader = new StreamReader(stream);
             var json = await reader.ReadToEndAsync();
 
-            var importedCount = await _wordImportService.ImportFromJsonAsync(json);
+            var importedCount = await wordImportService.ImportFromJsonAsync(json);
 
             var message = importedCount > 0
                 ? $"Успешно импортировано слов: {importedCount}"
@@ -88,14 +77,14 @@ public partial class ImportExportViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private Task GoToWordsAsync() => _navigationService.GoToRootAsync(AppRoutes.Words);
+    private Task GoToWordsAsync() => navigationService.GoToRootAsync(AppRoutes.Words);
 
     [RelayCommand]
-    private Task GoToPracticeAsync() => _navigationService.GoToRootAsync(AppRoutes.Practice);
+    private Task GoToPracticeAsync() => navigationService.GoToRootAsync(AppRoutes.Practice);
 
     [RelayCommand]
-    private Task GoToImportExportAsync() => _navigationService.GoToRootAsync(AppRoutes.ImportExport);
+    private Task GoToImportExportAsync() => navigationService.GoToRootAsync(AppRoutes.ImportExport);
 
     [RelayCommand]
-    private Task GoToSavedAsync() => _navigationService.GoToRootAsync(AppRoutes.Saved);
+    private Task GoToSavedAsync() => navigationService.GoToRootAsync(AppRoutes.Saved);
 }

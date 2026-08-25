@@ -12,6 +12,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <conv:EnumEqualsConverter x:Key="EnumEqualsConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -4,14 +4,9 @@ using KoreanLearningApp.Domain.Models;
 
 namespace KoreanLearningApp.ViewModels;
 
-public partial class SenseItemViewModel : ObservableObject
+public partial class SenseItemViewModel(Sense sense) : ObservableObject
 {
-    public Sense Sense { get; }
-
-    public SenseItemViewModel(Sense sense)
-    {
-        Sense = sense;
-    }
+    private Sense Sense { get; } = sense;
 
     public string EnText => Sense.En?.Word ?? string.Empty;
     public string EnDefinition => Sense.En?.Definition ?? string.Empty;
