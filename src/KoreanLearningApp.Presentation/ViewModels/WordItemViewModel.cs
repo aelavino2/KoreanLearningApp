@@ -7,7 +7,16 @@ namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class WordItemViewModel(Word word) : ObservableObject
 {
+    private const int VisibleTagCount = 2;
+
     public Word Word { get; } = word;
+
+    public IReadOnlyList<string> TagTitles { get; } = word.Tags
+        .Take(VisibleTagCount)
+        .Select(t => t.ToDisplayName())
+        .ToList();
+
+    public bool HasTags => TagTitles.Count > 0;
 
     public string Korean => Word.Korean;
 

@@ -1,14 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Presentation.Dialogs;
 using KoreanLearningApp.Presentation.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
 
 namespace KoreanLearningApp.Presentation.ViewModels;
 
-public partial class WordsViewModel(IWordService wordService, INavigationService navigationService)
-    : ObservableObject
+public partial class WordsViewModel(
+    IWordService wordService,
+    INavigationService navigationService,
+    IDialogService dialogService) : ObservableObject
 {
     private const int PageSize = 100;
     private const int SearchDebounceMs = 300;
@@ -23,6 +26,19 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
     public event EventHandler? ScrollToTopRequested;
 
     public ObservableCollection<WordItemViewModel> Words { get; } = new();
+
+    public ObservableCollection<TagFilterViewModel> TagFilters { get; } = new();
+
+    public IReadOnlyList<WordSortOption> SortOptions => WordSortOption.All;
+
+    [ObservableProperty]
+    private WordSortOption _selectedSort = WordSortOption.All[0];
+
+    [ObservableProperty]
+    private bool _hasTagFilters;
+
+    [ObservableProperty]
+    private bool _hasSelectedTags;
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -62,6 +78,8 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
         ? $"Загружено {Words.Count} из {TotalCount}"
         : $"Слов на странице: {Words.Count}";
 
+    partial void OnSelectedSortChanged(WordSortOption value) => _ = ReloadSafelyAsync();
+
     partial void OnSearchTextChanged(string value)
     {
         _searchDebounceCts?.Cancel();
@@ -85,7 +103,65 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
         if (token.IsCancellationRequested)
             return;
 
+        await ReloadSafelyAsync();
+    }
+
+    /// <summary>
+    /// Обновляет список тегов (сохраняя выбранные) и перезагружает словарь с первой страницы.
+    /// </summary>
+    public async Task RefreshAsync()
+    {
+        await LoadTagFiltersAsync();
         await LoadWordsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ToggleTagAsync(TagFilterViewModel? tag)
+    {
+        if (tag is null)
+            return;
+
+        tag.IsSelected = !tag.IsSelected;
+        HasSelectedTags = TagFilters.Any(t => t.IsSelected);
+        await LoadWordsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ClearTagsAsync()
+    {
+        if (!HasSelectedTags)
+            return;
+
+        foreach (var tag in TagFilters)
+            tag.IsSelected = false;
+
+        HasSelectedTags = false;
+        await LoadWordsAsync();
+    }
+
+    private async Task LoadTagFiltersAsync()
+    {
+        var selectedIds = TagFilters.Where(t => t.IsSelected).Select(t => t.TagId).ToHashSet();
+        var usages = await wordService.GetTagsAsync();
+
+        TagFilters.Clear();
+        foreach (var usage in usages.Where(u => u.WordCount > 0))
+            TagFilters.Add(new TagFilterViewModel(usage) { IsSelected = selectedIds.Contains(usage.Tag.Id) });
+
+        HasTagFilters = TagFilters.Count > 0;
+        HasSelectedTags = TagFilters.Any(t => t.IsSelected);
+    }
+
+    private async Task ReloadSafelyAsync()
+    {
+        try
+        {
+            await LoadWordsAsync();
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowAlertAsync("Ошибка", $"Не удалось загрузить слова: {ex.Message}");
+        }
     }
 
     [RelayCommand]
@@ -116,8 +192,7 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
         IsLoading = true;
         try
         {
-            var search = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText;
-            var (items, totalCount) = await wordService.GetWordsPageAsync(CurrentPage, PageSize, search);
+            var (items, totalCount) = await wordService.GetWordsPageAsync(BuildPageRequest());
 
             if (!append)
                 Words.Clear();
@@ -138,6 +213,13 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
             IsLoading = false;
         }
     }
+
+    private WordsPageRequest BuildPageRequest() => new(
+        CurrentPage,
+        PageSize,
+        string.IsNullOrWhiteSpace(SearchText) ? null : SearchText,
+        TagFilters.Where(t => t.IsSelected).Select(t => t.TagId).ToList(),
+        SelectedSort.Sort);
 
     [RelayCommand]
     private async Task OpenWordDetailAsync(Word word)

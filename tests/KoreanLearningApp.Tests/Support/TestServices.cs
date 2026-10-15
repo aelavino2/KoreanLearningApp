@@ -1,4 +1,4 @@
-﻿using KoreanLearningApp.Infrastructure.Constants;
+using KoreanLearningApp.Infrastructure.Constants;
 using KoreanLearningApp.Infrastructure.Import;
 using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
@@ -26,6 +26,7 @@ public sealed class TestServices
         var langInfos = new BaseRepository<LangInfoEntity>(db);
 
         WordRepository = new WordRepository(db, new GetWordsPageQuery(db), words, krDicts, senses, audios, langInfos);
+        TagRepository = new TagRepository(db);
         ImportService = new WordImportService(
             new WordImportRepository(db, words, krDicts),
             new KrDictJsonSerializer(new ImportJsonOptions()));
@@ -46,6 +47,7 @@ public sealed class TestServices
 
     public TimeProvider TimeProvider { get; }
     public WordRepository WordRepository { get; }
+    public TagRepository TagRepository { get; }
     public WordImportService ImportService { get; }
     public WordExportService ExportService { get; }
     public WordProgressRepository ProgressRepository { get; }

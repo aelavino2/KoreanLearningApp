@@ -1,3 +1,4 @@
+using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Tests.Support;
 
 namespace KoreanLearningApp.Tests.Persistence;
@@ -21,7 +22,7 @@ public sealed class WordSearchTests : IAsyncLifetime
         await _services.WordRepository.SaveWordAsync(TestWords.Create("사과", ru: "яблоко", en: "apple", rank: 1));
         await _services.WordRepository.SaveWordAsync(TestWords.Create("바나나", ru: "банан", en: "banana", rank: 2));
 
-        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(1, 10, search);
+        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(new WordsPageRequest(1, 10, search));
 
         Assert.Equal("사과", Assert.Single(items).Korean);
         Assert.Equal(1, totalCount);
@@ -34,7 +35,7 @@ public sealed class WordSearchTests : IAsyncLifetime
         word.KrDict!.Senses.Add(TestWords.CreateSense("яблоня", null));
         await _services.WordRepository.SaveWordAsync(word);
 
-        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(1, 10, "ябло");
+        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(new WordsPageRequest(1, 10, "ябло"));
 
         Assert.Single(items);
         Assert.Equal(1, totalCount);
@@ -47,7 +48,7 @@ public sealed class WordSearchTests : IAsyncLifetime
         await _services.WordRepository.SaveWordAsync(TestWords.Create("하나", rank: 1));
         await _services.WordRepository.SaveWordAsync(TestWords.Create("둘", rank: 2));
 
-        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(2, 2, null);
+        var (items, totalCount) = await _services.WordRepository.GetWordsPageAsync(new WordsPageRequest(2, 2));
 
         Assert.Equal("셋", Assert.Single(items).Korean);
         Assert.Equal(3, totalCount);

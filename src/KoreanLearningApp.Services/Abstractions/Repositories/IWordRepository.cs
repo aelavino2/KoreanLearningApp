@@ -12,7 +12,7 @@ namespace KoreanLearningApp.Services.Abstractions.Repositories
         Task<List<Word>> GetByIdsAsync(IReadOnlyCollection<int> wordIds);
 
         Task<List<Word>> GetRandomAsync(int count);
-        Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(int page, int pageSize, string? search);
+        Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(WordsPageRequest request);
         Task<int> SaveWordAsync(Word word);
         Task<int> DeleteWordAsync(Word word);
     }

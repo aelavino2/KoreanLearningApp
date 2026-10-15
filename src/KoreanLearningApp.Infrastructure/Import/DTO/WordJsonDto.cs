@@ -34,6 +34,9 @@ public class WordJsonDto
     [JsonPropertyName("krdict")]
     public KrDictJsonDto? KrDict { get; set; }
 
+    [JsonPropertyName("tags")]
+    public List<TagJsonDto> Tags { get; set; } = [];
+
     [JsonPropertyName("_idx")]
     public int Idx { get; set; }
 }

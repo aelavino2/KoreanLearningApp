@@ -34,9 +34,9 @@ public class WordRepository(DbContext dbContext, IGetWordsPageQuery getWordsPage
         return ids.Count == 0 ? new List<Word>() : await BuildWordsAsync(ids);
     }
 
-    public async Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(int page, int pageSize, string? search)
+    public async Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(WordsPageRequest request)
     {
-        var (pageIds, totalCount) = await getWordsPageQuery.ExecuteAsync(page, pageSize, search);
+        var (pageIds, totalCount) = await getWordsPageQuery.ExecuteAsync(request);
 
         if (pageIds.Count == 0)
             return (new List<Word>(), totalCount);
@@ -90,11 +90,37 @@ public class WordRepository(DbContext dbContext, IGetWordsPageQuery getWordsPage
             return k.ToDomain(senses, audio);
         });
         
+        var tagsByWordId = await LoadTagsAsync(wordIds);
+
         var wordsById = wordEntities.ToDictionary(w => w.Id);
         return wordIds
             .Where(id => wordsById.ContainsKey(id))
-            .Select(id => wordsById[id].ToDomain(krDictByWordId.GetValueOrDefault(id)))
+            .Select(id =>
+            {
+                var word = wordsById[id].ToDomain(krDictByWordId.GetValueOrDefault(id));
+                word.Tags = tagsByWordId.GetValueOrDefault(id, []);
+                return word;
+            })
             .ToList();
+    }
+
+    private async Task<Dictionary<int, List<Tag>>> LoadTagsAsync(List<int> wordIds)
+    {
+        var db = await dbContext.GetConnectionAsync();
+        var links = await db.Table<WordTagEntity>().Where(wt => wordIds.Contains(wt.WordId)).ToListAsync();
+        if (links.Count == 0)
+            return [];
+
+        var tagIds = links.Select(l => l.TagId).Distinct().ToList();
+        var tagsById = (await db.Table<TagEntity>().Where(t => tagIds.Contains(t.Id)).ToListAsync())
+            .ToDictionary(t => t.Id, t => t.ToDomain());
+
+        return links
+            .GroupBy(l => l.WordId)
+            .ToDictionary(g => g.Key, g => g
+                .Select(l => tagsById[l.TagId])
+                .OrderBy(t => t.NameRu)
+                .ToList());
     }
 
     public async Task<int> SaveWordAsync(Word word)

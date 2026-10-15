@@ -24,7 +24,7 @@ public partial class WordsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadWordsAsync();
+        await _viewModel.RefreshAsync();
     }
 
     protected override void OnSizeAllocated(double width, double height)

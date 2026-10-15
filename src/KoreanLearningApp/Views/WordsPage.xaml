@@ -30,42 +30,99 @@
                 </Grid>
             </Border>
 
-            <HorizontalStackLayout Spacing="8">
-                <Border Style="{StaticResource ModeChipBorderStyle}">
-                    <Border.Triggers>
-                        <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="False">
-                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
-                        </DataTrigger>
-                    </Border.Triggers>
-                    <Label Text="Страницы" Style="{StaticResource ModeChipLabelStyle}">
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="False">
-                                <Setter Property="TextColor" Value="White" />
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                    <Border Style="{StaticResource ModeChipBorderStyle}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="False">
+                                <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
                             </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding UsePagingCommand}" />
-                    </Border.GestureRecognizers>
-                </Border>
-                <Border Style="{StaticResource ModeChipBorderStyle}">
-                    <Border.Triggers>
-                        <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="True">
-                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
-                        </DataTrigger>
-                    </Border.Triggers>
-                    <Label Text="Лента" Style="{StaticResource ModeChipLabelStyle}">
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="True">
-                                <Setter Property="TextColor" Value="White" />
+                        </Border.Triggers>
+                        <Label Text="Страницы" Style="{StaticResource ModeChipLabelStyle}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="False">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding UsePagingCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource ModeChipBorderStyle}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
                             </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding UseInfiniteScrollCommand}" />
-                    </Border.GestureRecognizers>
-                </Border>
-            </HorizontalStackLayout>
+                        </Border.Triggers>
+                        <Label Text="Лента" Style="{StaticResource ModeChipLabelStyle}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="True">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding UseInfiniteScrollCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </HorizontalStackLayout>
+
+                <Picker Grid.Column="2"
+                        Title="Сортировка"
+                        ItemsSource="{Binding SortOptions}"
+                        ItemDisplayBinding="{Binding Title, x:DataType=vm:WordSortOption}"
+                        SelectedItem="{Binding SelectedSort}"
+                        Style="{StaticResource SortPickerStyle}" />
+            </Grid>
+
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" IsVisible="{Binding HasTagFilters}">
+                <HorizontalStackLayout Spacing="8">
+                    <Border Style="{StaticResource ModeChipBorderStyle}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding HasSelectedTags}" Value="False">
+                                <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="Все темы" Style="{StaticResource ModeChipLabelStyle}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding HasSelectedTags}" Value="False">
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ClearTagsCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding TagFilters}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TagFilterViewModel">
+                                <Border Style="{StaticResource ModeChipBorderStyle}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding Title}" Style="{StaticResource ModeChipLabelStyle}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding ToggleTagCommand, Source={RelativeSource AncestorType={x:Type vm:WordsViewModel}}, x:DataType=vm:WordsViewModel}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </ScrollView>
         </VerticalStackLayout>
 
 
@@ -100,6 +157,15 @@
                                     <Border Style="{StaticResource TopikChipBorderStyle}" IsVisible="{Binding HasTopikLevel}">
                                         <Label Text="{Binding TopikLevel, StringFormat='TOPIK {0}'}" Style="{StaticResource TopikChipLabelStyle}" />
                                     </Border>
+                                    <HorizontalStackLayout Spacing="6" BindableLayout.ItemsSource="{Binding TagTitles}" IsVisible="{Binding HasTags}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="x:String">
+                                                <Border Style="{StaticResource TopikChipBorderStyle}">
+                                                    <Label Text="{Binding .}" Style="{StaticResource TopikChipLabelStyle}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </HorizontalStackLayout>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
 

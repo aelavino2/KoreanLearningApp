@@ -29,6 +29,8 @@ public class DbContext
         await _connection.CreateTableAsync<WordProgressEntity>();
         await _connection.CreateTableAsync<ReviewLogEntity>();
         await _connection.CreateTableAsync<SavedWordEntity>();
+        await _connection.CreateTableAsync<TagEntity>();
+        await _connection.CreateTableAsync<WordTagEntity>();
 
         return _connection;
     }

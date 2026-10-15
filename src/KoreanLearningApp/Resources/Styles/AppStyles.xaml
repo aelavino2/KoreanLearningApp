@@ -189,6 +189,14 @@
         <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
     </Style>
 
+    <Style x:Key="SortPickerStyle" TargetType="Picker">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+        <Setter Property="TitleColor" Value="{StaticResource ColorMuted}" />
+        <Setter Property="MinimumWidthRequest" Value="120" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
     <Style x:Key="SmallIconStyle" TargetType="Image">
         <Setter Property="WidthRequest" Value="16" />
         <Setter Property="HeightRequest" Value="16" />

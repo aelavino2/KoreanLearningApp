@@ -145,6 +145,13 @@ internal static class EntityMappingExtensions
         FirstSeenAt = e.FirstSeenAt,
     };
 
+    public static Tag ToDomain(this TagEntity e) => new()
+    {
+        Id = e.Id,
+        NameKo = e.NameKo,
+        NameRu = e.NameRu,
+    };
+
     public static ReviewLogEntity ToEntity(this ReviewLog l) => new()
     {
         Id = l.Id,

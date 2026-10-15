@@ -73,6 +73,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IWordPracticeService, WordPracticeService>();
 
         builder.Services.AddSingleton<IWordRepository, WordRepository>();
+        builder.Services.AddSingleton<ITagRepository, TagRepository>();
         builder.Services.AddSingleton<IWordService, WordService>();
         builder.Services.AddSingleton<IWordImportService, WordImportService>();
         builder.Services.AddSingleton<IWordImportRepository, WordImportRepository>();

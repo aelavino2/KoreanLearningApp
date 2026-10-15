@@ -24,6 +24,20 @@ public static class TestWords
         }
     };
 
+    public static Word WithTags(this Word word, params Tag[] tags)
+    {
+        word.Tags = [.. tags];
+        return word;
+    }
+
+    public static Tag Tag(string nameKo, string nameRu) => new() { NameKo = nameKo, NameRu = nameRu };
+
+    public static Tag WithId(this Tag tag, int id)
+    {
+        tag.Id = id;
+        return tag;
+    }
+
     public static Sense CreateSense(string? ru, string? en) => new()
     {
         Ru = ru is null ? null : new LangInfo { Word = ru },
