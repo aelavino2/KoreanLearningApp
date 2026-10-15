@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Как писать тесты в KoreanLearningApp — только на важное поведение, без дублирования и без тестов ради покрытия. Использовать, когда нужно написать, добавить, дополнить или проревьюить тесты, создать тестовый проект, решить, что стоит тестировать, или проверить изменение тестами (xUnit, NSubstitute, SQLite, ViewModel'и MAUI).
+description: Как писать тесты в KoreanLearningApp — только на важное поведение, без дублирования и без тестов ради покрытия. Использовать, когда нужно написать, добавить, дополнить или проревьюить тесты, создать тестовый проект, решить, что стоит тестировать, или проверить изменение тестами (xUnit, NSubstitute, SQLite, ViewModel'и в Presentation).
 ---
 
 # Тестирование в KoreanLearningApp
@@ -19,9 +19,11 @@ description: Как писать тесты в KoreanLearningApp — тольк�
    - `WordMappingConfig`: `Korean` берётся из `KrDict.Word`, если он есть; нечисловой `Rank` → 0.
 3. **Поиск и пагинация** — `GetWordsPageQuery`: поиск по корейскому, RU- и EN-переводу; слово с несколькими значениями не дублируется (`DISTINCT`) и считается в `TotalCount` один раз; порядок по `Rank`; корректный `OFFSET` на 2-й странице.
 4. **Конвертация enum ↔ строки** — `PartOfSpeechMapper`, `NiklLevelMapper`, `TopikLevelMapper`: один round-trip тест по **всем** значениям enum (`Enum.GetValues`), плюс неизвестная строка → `Empty`. Не по тесту на каждое значение.
-5. **Логика ViewModel**, у которой есть правила:
-   - `WordsViewModel`: `TotalPages` из `totalCount`, «далее» доступно только после `ScrolledToEnd` и не на последней странице, смена поиска сбрасывает на 1-ю страницу;
-   - `WordDetailViewModel`: `PrimaryTranslation` (EN, иначе RU), `HasAudio` управляет `PlayAudioCommand.CanExecute`.
+5. **Практика** — порядок отбора слов (сохранённые → к повторению → новые, без дублей), фильтр TOPIK, слово после верного ответа не предлагается сегодня, интервалы SM-2, варианты ответа квиза.
+6. **Логика ViewModel** (проект Presentation), у которой есть правила:
+   - `WordsViewModel`: `TotalPages` из `totalCount`, «далее» доступно только после `ScrolledToEnd` и не на последней странице;
+   - `WordDetailViewModel`: `PrimaryTranslation` (EN, иначе RU), `HasAudio` управляет `PlayAudioCommand.CanExecute`;
+   - `PracticeViewModel`: очки и оценка за ответ, истечение таймера = Forgot, завершение сессии после последнего вопроса.
 
 ## 2. Что НЕ тестировать
 
@@ -36,42 +38,31 @@ description: Как писать тесты в KoreanLearningApp — тольк�
 
 **Стек:** xUnit, NSubstitute для моков интерфейсов, обычные `Assert.*` (FluentAssertions v8 платный — не добавлять без согласования).
 
-**Структура проекта тестов** (создать, когда понадобится первый тест):
-
-```
-tests/KoreanLearningApp.Tests/KoreanLearningApp.Tests.csproj   (net9.0)
-  → ProjectReference: Domain, Services, Infrastructure
-```
+**Проект тестов:** `tests/KoreanLearningApp.Tests` (net10.0) → Domain, Services, Infrastructure, Presentation. Папки повторяют области: `Persistence/`, `Import/`, `Practice/`, `ViewModels/`, общие помощники — `Support/`.
 
 ```bash
-dotnet new xunit -o tests/KoreanLearningApp.Tests -f net9.0
-dotnet sln KoreanLearningApp.sln add tests/KoreanLearningApp.Tests/KoreanLearningApp.Tests.csproj
-dotnet add tests/KoreanLearningApp.Tests package NSubstitute
 dotnet test tests/KoreanLearningApp.Tests
 ```
 
-ViewModel'и живут в MAUI-проекте с платформенными TFM (`net10.0-android` и т.д.), обычный тестовый проект на него сослаться не может. Варианты (обсудить с пользователем перед выбором): вынести ViewModel'и в отдельную библиотеку `KoreanLearningApp.Presentation` (net10.0, `UseMaui` не нужен), либо добавить в MAUI-проект TFM `net10.0` с `OutputType=Library` для этого TFM. До этого — сначала убрать из тестируемых ViewModel прямые вызовы `Shell.Current`/`FilePicker` за интерфейсы.
+Помощники в `Support/` — используй их, не пиши свои:
+- `SqliteDatabase` — временный файл БД на тест, `CountAsync(table)` для проверки «сирот»;
+- `TestServices` — реальные репозитории и сервисы поверх тестовой БД (как в `MauiProgram`);
+- `TestWords.Create(...)` — слово с нужными полями;
+- `WaitUntilAsync(condition)` — ожидание по `PropertyChanged` для логики, которая продолжается после таймера.
+
+ViewModel'и лежат в `KoreanLearningApp.Presentation` (без MAUI), поэтому тестируются напрямую: границы (`I*Service`, `INavigationService`, `IDialogService`, `IFileService`) мокаются через NSubstitute, время — `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing`) и `Advance(...)`.
 
 **Правила теста:**
 
 - Имя: `Метод_Условие_ОжидаемыйРезультат` — `ImportFromJsonAsync_SameJsonTwice_ImportsOnlyOnce`.
 - Arrange / Act / Assert, разделённые пустой строкой. Один Act на тест.
 - Проверяй **результат и состояние**, а не вызовы. `Received()` — только когда вызов и есть результат (например, «аудио не запускается, если уже играет»).
-- Мокай только границы: репозитории для сервисов, сервисы для ViewModel. **Не мокай SQLite** — для инфраструктуры используй настоящую БД во временном файле:
-  ```csharp
-  public sealed class SqliteFixture : IDisposable
-  {
-      public string Path { get; } = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"test_{Guid.NewGuid():N}.db");
-      public DbContext Db => _db ??= new DbContext(Path);
-      private DbContext? _db;
-      public void Dispose() { SQLiteAsyncConnection.ResetPool(); File.Delete(Path); }
-  }
-  ```
-  Один файл БД на тест (через `IDisposable` в классе теста), чтобы тесты не зависели друг от друга.
-- Перед тестами Mapster вызывай `WordMappingConfig.Configure()` (идемпотентен).
-- Тестовые данные — через маленький билдер/фабрику (`TestWords.WithSenses("사과", ru: "яблоко", en: "apple")`), а не копипаст графа объектов в каждом тесте. Только поля, важные для этого теста.
+- Мокай только границы: репозитории/сервисы для ViewModel. **Не мокай SQLite** — для Infrastructure и сервисов практики используй `SqliteDatabase` + `TestServices`. Класс теста реализует `IAsyncLifetime` и в `DisposeAsync` вызывает `_database.DisposeAsync()`.
+- **Не вызывай `SQLiteAsyncConnection.ResetPool()`**: он глобальный и рвёт соединения тестов, которые xUnit выполняет параллельно.
+- `TestServices` сам вызывает `WordMappingConfig.Configure()`.
+- Тестовые данные — через `TestWords.Create(...)`, а не копипаст графа объектов. Только поля, важные для этого теста.
 - `[Theory]` + `[InlineData]` — когда это действительно одно правило на разных входах. Не плоди `Theory` с десятью строками, проверяющими одну и ту же ветку.
-- Никаких `Task.Delay`/`Thread.Sleep` в тестах. Для debounce в `WordsViewModel` проверяй публичную команду `LoadWordsAsync`, а не ожидание таймера.
+- Никаких `Task.Delay`/`Thread.Sleep` в тестах. Время двигай через `FakeTimeProvider.Advance`, асинхронное продолжение жди через `TaskCompletionSource` из мока или `WaitUntilAsync`. Для debounce в `WordsViewModel` проверяй команду `LoadWordsAsync`, а не таймер.
 - Тест детерминирован: без `DateTime.Now`, сети, реальных файлов вне временной папки.
 
 ## 4. Порядок работы
@@ -85,25 +76,31 @@ ViewModel'и живут в MAUI-проекте с платформенными T
 ## Пример хорошего теста
 
 ```csharp
-public sealed class WordImportServiceTests : IDisposable
+public sealed class WordImportExportTests : IAsyncLifetime
 {
-    private readonly SqliteFixture _sqlite = new();
+    private readonly SqliteDatabase _database = new();
+    private readonly TestServices _services;
+
+    public WordImportExportTests()
+    {
+        _services = new TestServices(_database.Context);
+    }
 
     [Fact]
     public async Task ImportFromJsonAsync_SameJsonTwice_ImportsOnlyOnce()
     {
-        WordMappingConfig.Configure();
-        var service = TestServices.CreateImportService(_sqlite.Db);
         const string json = """[{ "word": "사과", "krdict": { "word": "사과", "sup_no": 1 } }]""";
 
-        var first = await service.ImportFromJsonAsync(json);
-        var second = await service.ImportFromJsonAsync(json);
+        var first = await _services.ImportService.ImportFromJsonAsync(json);
+        var second = await _services.ImportService.ImportFromJsonAsync(json);
 
         Assert.Equal(1, first);
         Assert.Equal(0, second);
     }
 
-    public void Dispose() => _sqlite.Dispose();
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() => await _database.DisposeAsync();
 }
 ```
 

@@ -10,15 +10,18 @@ description: Правила чистого кода на C# для .NET MAUI (XA
 ## 1. Слои и зависимости
 
 ```
-KoreanLearningApp (UI) → Infrastructure → Services → Domain
+KoreanLearningApp (MAUI) → Presentation → Services → Domain
+                         → Infrastructure ↗
 ```
 
-- **Domain** — только POCO и enum'ы. Никаких атрибутов SQLite, JSON, MAUI.
+- **Domain** — POCO, enum'ы и чистые маппинги кодов (`TopikLevelMapper`). Никаких атрибутов SQLite, JSON, MAUI.
 - **Services** — интерфейсы (`Abstractions/Services`, `Abstractions/Repositories`) и бизнес-логика. Не знает про SQLite, Mapster, Shell, `DisplayAlert`.
 - **Infrastructure** — реализации репозиториев, SQL-запросы, Entities, DTO, маппинг, импорт/экспорт.
-- **UI** — Views, ViewModels, конвертеры, навигация, DI. ViewModel зависит только от интерфейсов из Services и от UI-абстракций (`INavigationService`, диалоги).
+- **Presentation** (net10.0, без MAUI) — ViewModel'и, UI-абстракции (`INavigationService`, `AppRoutes`, `NavigationParameters`, `IDialogService`, `IFileService`), подписи для UI (`Formatting/EnumDisplayExtensions`). Не ссылается на Infrastructure и `Microsoft.Maui.*`.
+- **KoreanLearningApp (MAUI)** — Views (XAML + code-behind), реализации UI-абстракций (`ShellNavigationService`, `ShellDialogService`, `MauiFileService`), конвертеры, стили, DI.
 - Новая зависимость вверх по стрелке (Domain → Services и т.п.) — запрещена.
-- Platform API (`FileSystem`, `FilePicker`, `Share`, `Shell.Current`, `MainThread`) — только за интерфейсом в UI-слое, чтобы ViewModel можно было протестировать.
+- Platform API (`FileSystem`, `FilePicker`, `Share`, `Shell.Current`, `MainThread`, `[QueryProperty]`) — только в MAUI-проекте за интерфейсом из Presentation. Если ViewModel'и нужен новый platform API — сначала интерфейс в Presentation, реализация в MAUI.
+- Время и таймеры во ViewModel/сервисах — через `TimeProvider` (`Task.Delay(delay, timeProvider)`, `new PeriodicTimer(interval, timeProvider)`), чтобы тесты управляли временем.
 
 ## 2. Общий стиль C#
 
@@ -74,10 +77,10 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
 - Действия — `[RelayCommand]` на приватном методе. Доступность — `CanExecute = nameof(...)` + `[NotifyCanExecuteChangedFor]`, а не проверка флага в начале метода и `IsEnabled` в XAML.
 - Флаги загрузки (`IsLoading`, `IsBusy`) — ставь в `try`, снимай в `finally`.
 - ViewModel не знает про View: никаких ссылок на `Page`, контролы, `x:Name`.
-- Не вызывай `Shell.Current.DisplayAlert` из ViewModel в новом коде — используй интерфейс диалогов (например `IDialogService.ShowAlertAsync(title, message)`), реализованный в UI-слое.
+- Сообщения пользователю — только через `IDialogService.ShowAlertAsync(title, message)`, файлы — через `IFileService`; реализации живут в MAUI-проекте.
 - Элементы списков — отдельные лёгкие ViewModel (`WordItemViewModel`, `SenseItemViewModel`), а не доменные модели напрямую, если нужно форматирование для отображения.
 - Коллекции для UI — `ObservableCollection<T>` с `{ get; }` (без сеттера); заменять содержимое через `Clear` + `Add`, а не пересоздавать объект.
-- Параметры навигации — `[QueryProperty]` или `IQueryAttributable`; ключ — константа, а не строка в двух местах.
+- Параметры навигации принимает страница (`[QueryProperty]` на Page) и передаёт во ViewModel; ключ — константа из `NavigationParameters`.
 
 ## 5. Views (XAML)
 
@@ -114,6 +117,7 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
 
 - [ ] Слои не нарушены; ViewModel не трогает `Shell.Current`/platform API напрямую в новом коде.
 - [ ] Все bindings компилируемые (`x:DataType`), нет хардкода цветов.
+- [ ] ViewModel лежит в Presentation и не использует `Microsoft.Maui.*`.
 - [ ] Новые View/ViewModel/сервисы зарегистрированы в `MauiProgram.cs`, роут — в `AppRoutes`.
 - [ ] Нет `async void` (кроме обработчиков), `.Result`, пустых `catch`.
 - [ ] Нет дублирования логики, которую уже делает существующий маппер/репозиторий.
