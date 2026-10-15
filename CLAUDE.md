@@ -34,7 +34,16 @@ dotnet run --project KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-windo
 dotnet test tests/KoreanLearningApp.Tests
 ```
 
-БД: `%LOCALAPPDATA%\koreanApp\KoreanLearning.db`.
+БД: `%LOCALAPPDATA%\koreanApp\KoreanLearning.db`. Пути — `KoreanLearningApp/Diagnostics/AppPaths`.
+
+Android-сборка падает с `APT2265` из-за кириллицы в пути `D:\Проекты`: собирать из копии с ASCII-путём (`robocopy ... /XD bin obj .git .claude`), установка — `dotnet build -f net10.0-android -t:Install` при запущенном эмуляторе `pixel_7_-_api_36`.
+
+## Диагностика
+
+- **Логи** — `%LOCALAPPDATA%\koreanApp\logs\app-yyyyMMdd.log` (Android: `adb shell "run-as com.companyname.koreanlearningapp cat files/koreanApp/logs/app-yyyyMMdd.log"`). Пишет `FileLoggerProvider` (уровень Information и выше).
+- **Клики и навигация** — `UiInteractionLogger` подписывается на все кнопки, тапы, чекбоксы, переключатели, радиокнопки, пикеры и `Shell.Navigated` в окне. Строка лога: действие, элемент, текст, страница, тип BindingContext. Чтобы понять, что произошло после клика, читай лог.
+- **Ошибки** — `GlobalExceptionHandler` (регистрируется в `App`): необработанные исключения UI на Windows/Android пишутся в лог и показываются пользователю сообщением вместо падения.
+- Проверять UI на Windows симуляцией настоящей мыши нельзя (клики могут уйти в чужое окно); на Android — `adb shell input tap` и `adb shell screencap`.
 
 ## Соглашения
 

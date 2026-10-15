@@ -1,16 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using KoreanLearningApp.Diagnostics;
 
 namespace KoreanLearningApp;
 
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
-	}
+    private readonly UiInteractionLogger _interactionLogger;
 
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
+    public App(GlobalExceptionHandler exceptionHandler, UiInteractionLogger interactionLogger)
+    {
+        InitializeComponent();
+        _interactionLogger = interactionLogger;
+        exceptionHandler.Register();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        var window = new Window(new AppShell());
+        _interactionLogger.Attach(window);
+        return window;
+    }
 }
