@@ -17,32 +17,76 @@
             </Border>
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
                 <Label Text="Korean Dictionary" Style="{StaticResource PageTitleStyle}" />
-                <Label Text="{Binding Words.Count, StringFormat='{0} words on this page'}" Style="{StaticResource PageSubtitleStyle}" />
+                <Label Text="{Binding LoadedWordsText}" Style="{StaticResource PageSubtitleStyle}" />
             </VerticalStackLayout>
         </Grid>
 
 
-        <Border Grid.Row="1" Margin="24,14,24,14" Style="{StaticResource SearchBarBorderStyle}">
-            <Grid ColumnDefinitions="Auto,*">
-                <Image Grid.Column="0" Source="search_icon.png" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" VerticalOptions="Center" Margin="0,0,10,0" />
-                <Entry Grid.Column="1" Placeholder="Search for Words" Text="{Binding SearchText}" Style="{StaticResource SearchEntryStyle}" />
-            </Grid>
-        </Border>
+        <VerticalStackLayout Grid.Row="1" Margin="24,14,24,14" Spacing="12">
+            <Border Style="{StaticResource SearchBarBorderStyle}">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Image Grid.Column="0" Source="search_icon.png" WidthRequest="18" HeightRequest="18" Aspect="AspectFit" VerticalOptions="Center" Margin="0,0,10,0" />
+                    <Entry Grid.Column="1" Placeholder="Search for Words" Text="{Binding SearchText}" Style="{StaticResource SearchEntryStyle}" />
+                </Grid>
+            </Border>
+
+            <HorizontalStackLayout Spacing="8">
+                <Border Style="{StaticResource ModeChipBorderStyle}">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="False">
+                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="Страницы" Style="{StaticResource ModeChipLabelStyle}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="False">
+                                <Setter Property="TextColor" Value="White" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UsePagingCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Border Style="{StaticResource ModeChipBorderStyle}">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsInfiniteScroll}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="Лента" Style="{StaticResource ModeChipLabelStyle}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsInfiniteScroll}" Value="True">
+                                <Setter Property="TextColor" Value="White" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UseInfiniteScrollCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
 
 
-        <CollectionView Grid.Row="2" 
+        <CollectionView Grid.Row="2"
                 x:Name="WordsCollectionView"
                 ItemsSource="{Binding Words}"
                 SelectionMode="None"
+                ItemSizingStrategy="MeasureFirstItem"
                 Margin="24,0,24,0"
-                RemainingItemsThreshold="0"
+                RemainingItemsThreshold="{Binding RemainingItemsThreshold}"
                 RemainingItemsThresholdReachedCommand="{Binding ScrolledToEndCommand}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
+            <CollectionView.Footer>
+                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                                   Color="{StaticResource ColorPrimary}" Margin="0,12" />
+            </CollectionView.Footer>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:WordItemViewModel">
-                    <Border Style="{StaticResource CardBorderStyle}">
+                    <Border Style="{StaticResource ListCardBorderStyle}">
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                             <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
                                 <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />

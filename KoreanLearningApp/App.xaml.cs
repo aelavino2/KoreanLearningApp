@@ -9,6 +9,7 @@ public partial class App : Application
     public App(GlobalExceptionHandler exceptionHandler, UiInteractionLogger interactionLogger)
     {
         InitializeComponent();
+        UserAppTheme = AppTheme.Light;
         _interactionLogger = interactionLogger;
         exceptionHandler.Register();
     }

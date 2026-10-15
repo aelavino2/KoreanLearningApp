@@ -43,6 +43,35 @@ public class WordsViewModelTests
         Assert.False(_viewModel.CanGoToNextPage);
     }
 
+    [Fact]
+    public async Task ScrolledToEnd_InfiniteScroll_AppendsNextChunkAndHidesPagination()
+    {
+        ReturnPage(totalCount: 250);
+        await _viewModel.UseInfiniteScrollCommand.ExecuteAsync(null);
+
+        await _viewModel.ScrolledToEndCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, _viewModel.Words.Count);
+        Assert.Equal(2, _viewModel.CurrentPage);
+        Assert.False(_viewModel.IsPaginationVisible);
+    }
+
+    [Fact]
+    public async Task NextPage_PagingMode_ReplacesWordsAndRequestsScrollToTop()
+    {
+        ReturnPage(totalCount: 250);
+        await _viewModel.LoadWordsAsync();
+        await _viewModel.ScrolledToEndCommand.ExecuteAsync(null);
+        var scrollRequests = 0;
+        _viewModel.ScrollToTopRequested += (_, _) => scrollRequests++;
+
+        await _viewModel.NextPageCommand.ExecuteAsync(null);
+
+        Assert.Single(_viewModel.Words);
+        Assert.Equal(2, _viewModel.CurrentPage);
+        Assert.Equal(1, scrollRequests);
+    }
+
     private void ReturnPage(int totalCount) =>
         _wordService.GetWordsPageAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>())
             .Returns((new List<Word> { TestWords.Create("사과") }, totalCount));

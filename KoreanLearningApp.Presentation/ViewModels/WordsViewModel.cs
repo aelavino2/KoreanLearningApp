@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Presentation.Navigation;
@@ -12,9 +12,15 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
 {
     private const int PageSize = 100;
     private const int SearchDebounceMs = 300;
+    private const int InfiniteScrollThreshold = 10;
 
     private CancellationTokenSource? _searchDebounceCts;
     private bool _reachedEndOfCurrentPage;
+
+    /// <summary>
+    /// Список заменён новой страницей — View должна прокрутить его в начало.
+    /// </summary>
+    public event EventHandler? ScrollToTopRequested;
 
     public ObservableCollection<WordItemViewModel> Words { get; } = new();
 
@@ -22,10 +28,16 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
     private string _searchText = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageIndicatorText))]
     private int _currentPage = 1;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageIndicatorText), nameof(IsPaginationVisible))]
     private int _totalPages = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LoadedWordsText))]
+    private int _totalCount;
 
     [ObservableProperty]
     private bool _canGoToNextPage;
@@ -34,15 +46,21 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
     private bool _canGoToPreviousPage;
 
     [ObservableProperty]
-    private bool _isPaginationVisible;
+    [NotifyPropertyChangedFor(nameof(IsPaginationVisible), nameof(RemainingItemsThreshold), nameof(LoadedWordsText))]
+    private bool _isInfiniteScroll;
 
     [ObservableProperty]
     private bool _isLoading;
 
     public string PageIndicatorText => $"{CurrentPage} / {TotalPages}";
 
-    partial void OnCurrentPageChanged(int value) => OnPropertyChanged(nameof(PageIndicatorText));
-    partial void OnTotalPagesChanged(int value) => OnPropertyChanged(nameof(PageIndicatorText));
+    public bool IsPaginationVisible => !IsInfiniteScroll && TotalPages > 1;
+
+    public int RemainingItemsThreshold => IsInfiniteScroll ? InfiniteScrollThreshold : 0;
+
+    public string LoadedWordsText => IsInfiniteScroll
+        ? $"Загружено {Words.Count} из {TotalCount}"
+        : $"Слов на странице: {Words.Count}";
 
     partial void OnSearchTextChanged(string value)
     {
@@ -67,9 +85,7 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
         if (token.IsCancellationRequested)
             return;
 
-        CurrentPage = 1;
-        _reachedEndOfCurrentPage = false;
-        await LoadCurrentPageAsync();
+        await LoadWordsAsync();
     }
 
     [RelayCommand]
@@ -77,10 +93,25 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
     {
         CurrentPage = 1;
         _reachedEndOfCurrentPage = false;
-        await LoadCurrentPageAsync();
+        await LoadCurrentPageAsync(append: false);
     }
 
-    private async Task LoadCurrentPageAsync()
+    [RelayCommand]
+    private Task UsePagingAsync() => SwitchModeAsync(infiniteScroll: false);
+
+    [RelayCommand]
+    private Task UseInfiniteScrollAsync() => SwitchModeAsync(infiniteScroll: true);
+
+    private async Task SwitchModeAsync(bool infiniteScroll)
+    {
+        if (IsInfiniteScroll == infiniteScroll)
+            return;
+
+        IsInfiniteScroll = infiniteScroll;
+        await LoadWordsAsync();
+    }
+
+    private async Task LoadCurrentPageAsync(bool append)
     {
         IsLoading = true;
         try
@@ -88,14 +119,19 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
             var search = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText;
             var (items, totalCount) = await wordService.GetWordsPageAsync(CurrentPage, PageSize, search);
 
-            Words.Clear();
+            if (!append)
+                Words.Clear();
+
             foreach (var word in items)
                 Words.Add(new WordItemViewModel(word));
 
+            TotalCount = totalCount;
             TotalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)PageSize));
-            IsPaginationVisible = TotalPages > 1;
-
+            OnPropertyChanged(nameof(LoadedWordsText));
             UpdatePaginationState();
+
+            if (!append)
+                ScrollToTopRequested?.Invoke(this, EventArgs.Empty);
         }
         finally
         {
@@ -119,13 +155,28 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
     }
 
     [RelayCommand]
-    private void ScrolledToEnd()
+    private async Task ScrolledToEndAsync()
     {
+        if (IsInfiniteScroll)
+        {
+            await LoadNextChunkAsync();
+            return;
+        }
+
         if (_reachedEndOfCurrentPage)
             return;
 
         _reachedEndOfCurrentPage = true;
         UpdatePaginationState();
+    }
+
+    private async Task LoadNextChunkAsync()
+    {
+        if (IsLoading || CurrentPage >= TotalPages)
+            return;
+
+        CurrentPage++;
+        await LoadCurrentPageAsync(append: true);
     }
 
     [RelayCommand]
@@ -136,7 +187,7 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
 
         CurrentPage++;
         _reachedEndOfCurrentPage = false;
-        await LoadCurrentPageAsync();
+        await LoadCurrentPageAsync(append: false);
     }
 
     [RelayCommand]
@@ -147,6 +198,6 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
 
         CurrentPage--;
         _reachedEndOfCurrentPage = true;
-        await LoadCurrentPageAsync();
+        await LoadCurrentPageAsync(append: false);
     }
 }

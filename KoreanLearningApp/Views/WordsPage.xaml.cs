@@ -12,6 +12,13 @@ public partial class WordsPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.ScrollToTopRequested += OnScrollToTopRequested;
+    }
+
+    private void OnScrollToTopRequested(object? sender, EventArgs e)
+    {
+        if (_viewModel.Words.Count > 0)
+            WordsCollectionView.ScrollTo(0, position: ScrollToPosition.Start, animate: false);
     }
 
     protected override async void OnAppearing()

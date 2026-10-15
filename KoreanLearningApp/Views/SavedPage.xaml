@@ -25,13 +25,14 @@
             <CollectionView
                 ItemsSource="{Binding SavedWords}"
                 SelectionMode="None"
+                ItemSizingStrategy="MeasureFirstItem"
                 IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBoolConverter}}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:WordItemViewModel">
-                        <Border Style="{StaticResource CardBorderStyle}">
+                        <Border Style="{StaticResource ListCardBorderStyle}">
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
                                     <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />
