@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KoreanLearningApp.Views.SavedPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:KoreanLearningApp.Presentation.ViewModels;assembly=KoreanLearningApp.Presentation"
+    x:DataType="vm:SavedViewModel"
+    BackgroundColor="{StaticResource ColorBackground}"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="0">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,18,24,4" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource LogoBadgeStyle}">
+                <Image Source="logo_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                <Label Text="Сохранённые" Style="{StaticResource PageTitleStyle}" />
+                <Label Text="{Binding SavedWords.Count, StringFormat='Слов: {0}'}" Style="{StaticResource PageSubtitleStyle}" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="24,10,24,0">
+
+            <CollectionView
+                ItemsSource="{Binding SavedWords}"
+                SelectionMode="None"
+                IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBoolConverter}}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:WordItemViewModel">
+                        <Border Style="{StaticResource CardBorderStyle}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                                    <Label Text="{Binding Korean}" Style="{StaticResource WordKoreanStyle}" />
+                                    <Label Text="{Binding TranslationRu}" Style="{StaticResource PageSubtitleStyle}" />
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Border Style="{StaticResource TagPillBorderStyle}">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Ellipse Style="{StaticResource TagPillDotStyle}" />
+                                                <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                        <Border Style="{StaticResource TopikChipBorderStyle}" IsVisible="{Binding HasTopikLevel}">
+                                            <Label Text="{Binding TopikLevel, StringFormat='TOPIK {0}'}" Style="{StaticResource TopikChipLabelStyle}" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Border Grid.Column="1" Style="{StaticResource RoundIconButtonStyle}" VerticalOptions="Center">
+                                    <Image Source="star_icon_active.png" Style="{StaticResource SmallIconStyle}" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding RemoveFromSavedCommand, Source={RelativeSource AncestorType={x:Type vm:SavedViewModel}}, x:DataType=vm:SavedViewModel}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding OpenWordDetailCommand, Source={RelativeSource AncestorType={x:Type vm:SavedViewModel}}, x:DataType=vm:SavedViewModel}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Пока нет сохранённых слов. Нажмите ☆ на карточке слова, чтобы добавить его сюда."
+                   Style="{StaticResource EmptyStateLabelStyle}"
+                   HorizontalTextAlignment="Center"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding IsEmpty}" />
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                               Color="{StaticResource ColorPrimary}" VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

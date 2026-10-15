@@ -1,4 +1,4 @@
-﻿using KoreanLearningApp.Navigation;
+using KoreanLearningApp.Presentation.Navigation;
 using KoreanLearningApp.Views;
 
 namespace KoreanLearningApp;

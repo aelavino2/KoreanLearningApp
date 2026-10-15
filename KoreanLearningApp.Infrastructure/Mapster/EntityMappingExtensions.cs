@@ -1,4 +1,5 @@
 ﻿using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Domain.Models.Enums;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Mapster;
@@ -11,7 +12,7 @@ internal static class EntityMappingExtensions
         Korean = word.Korean,
         RuleExplanation = word.RuleExplanation,
         Rank = word.Rank,
-        PartOfSpeech = word.PartOfSpeech,
+        PartOfSpeech = word.PartOfSpeech.ToKorean(),
         Hanja = word.Hanja,
         NiklLevel = word.NiklLevel,
         TopikLevel = word.TopikLevel,
@@ -25,7 +26,7 @@ internal static class EntityMappingExtensions
         Korean = e.Korean,
         RuleExplanation = e.RuleExplanation,
         Rank = e.Rank,
-        PartOfSpeech = e.PartOfSpeech,
+        PartOfSpeech = PartOfSpeechMapper.Parse(e.PartOfSpeech),
         Hanja = e.Hanja,
         NiklLevel = e.NiklLevel,
         TopikLevel = e.TopikLevel,
@@ -40,7 +41,7 @@ internal static class EntityMappingExtensions
         TargetCode = k.TargetCode,
         Word = k.Word,
         SupNo = k.SupNo,
-        Pos = k.Pos,
+        Pos = k.Pos.ToKorean(),
         Pronunciation = k.Pronunciation,
         WordGrade = k.WordGrade,
         Link = k.Link,
@@ -54,7 +55,7 @@ internal static class EntityMappingExtensions
         TargetCode = e.TargetCode,
         Word = e.Word,
         SupNo = e.SupNo,
-        Pos = e.Pos,
+        Pos = PartOfSpeechMapper.Parse(e.Pos),
         Pronunciation = e.Pronunciation,
         WordGrade = e.WordGrade,
         Link = e.Link,
@@ -110,5 +111,49 @@ internal static class EntityMappingExtensions
         En = en,
         RuId = e.RuId,
         Ru = ru,
+    };
+
+    public static WordProgressEntity ToEntity(this WordProgress p) => new()
+    {
+        Id = p.Id,
+        WordId = p.WordId,
+        LearningStatus = (int)p.LearningStatus,
+        EasinessFactor = p.EasinessFactor,
+        IntervalDays = p.IntervalDays,
+        RepetitionCount = p.RepetitionCount,
+        NextReviewDate = p.NextReviewDate,
+        LastReviewedDate = p.LastReviewedDate,
+        TotalReviews = p.TotalReviews,
+        TotalCorrect = p.TotalCorrect,
+        LapseCount = p.LapseCount,
+        FirstSeenAt = p.FirstSeenAt,
+    };
+
+    public static WordProgress ToDomain(this WordProgressEntity e) => new()
+    {
+        Id = e.Id,
+        WordId = e.WordId,
+        LearningStatus = (LearningStatusEnum)e.LearningStatus,
+        EasinessFactor = e.EasinessFactor,
+        IntervalDays = e.IntervalDays,
+        RepetitionCount = e.RepetitionCount,
+        NextReviewDate = e.NextReviewDate,
+        LastReviewedDate = e.LastReviewedDate,
+        TotalReviews = e.TotalReviews,
+        TotalCorrect = e.TotalCorrect,
+        LapseCount = e.LapseCount,
+        FirstSeenAt = e.FirstSeenAt,
+    };
+
+    public static ReviewLogEntity ToEntity(this ReviewLog l) => new()
+    {
+        Id = l.Id,
+        WordId = l.WordId,
+        ReviewedAt = l.ReviewedAt,
+        Rating = (int)l.Rating,
+        IntervalBefore = l.IntervalBefore,
+        IntervalAfter = l.IntervalAfter,
+        EasinessBefore = l.EasinessBefore,
+        EasinessAfter = l.EasinessAfter,
     };
 }

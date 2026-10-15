@@ -3,7 +3,7 @@
     x:Class="KoreanLearningApp.Views.WordDetailPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    xmlns:vm="clr-namespace:KoreanLearningApp.Presentation.ViewModels;assembly=KoreanLearningApp.Presentation"
     x:DataType="vm:WordDetailViewModel"
     BackgroundColor="{StaticResource ColorBackground}"
     Shell.NavBarIsVisible="False">
@@ -39,7 +39,7 @@
                             <Label Grid.Column="1" Text="{Binding Word.TopikLevel}" FontSize="11" TextColor="{StaticResource ColorMutedLight}" FontAttributes="Bold" VerticalOptions="Start" />
                         </Grid>
 
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                             <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
                                 <Label Text="{Binding Word.Korean}" Style="{StaticResource WordKoreanHeroStyle}" />
                                 <Label Text="{Binding Word.Hanja}"
@@ -48,7 +48,19 @@
                                        IsVisible="{Binding HasHanja}" />
                             </VerticalStackLayout>
 
-                            <Border Grid.Column="1"
+                            <Border Grid.Column="1" Style="{StaticResource RoundIconButtonStyle}" VerticalOptions="Start">
+                                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="star_icon.png" Style="{StaticResource SmallIconStyle}"
+                                           IsVisible="{Binding IsSaved, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Image Source="star_icon_active.png" Style="{StaticResource SmallIconStyle}"
+                                           IsVisible="{Binding IsSaved}" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleSaveCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Grid.Column="2"
                                     Style="{StaticResource RoundIconButtonStyle}"
                                     VerticalOptions="Start"
                                     IsVisible="{Binding HasAudio}">

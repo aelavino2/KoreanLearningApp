@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KoreanLearningApp.Views.PracticePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:KoreanLearningApp.Presentation.ViewModels;assembly=KoreanLearningApp.Presentation"
+    xmlns:enums="clr-namespace:KoreanLearningApp.Domain.Models.Enums;assembly=KoreanLearningApp.Domain"
+    x:DataType="vm:PracticeViewModel"
+    BackgroundColor="{StaticResource ColorBackground}"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="0">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="24,18,24,4" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource LogoBadgeStyle}">
+                <Image Source="logo_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                <Label Text="Квиз" Style="{StaticResource PageTitleStyle}" />
+                <Label Text="Настройте параметры квиза" Style="{StaticResource PageSubtitleStyle}"
+                       IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Text="{Binding QuestionProgressText}" Style="{StaticResource PageSubtitleStyle}"
+                       IsVisible="{Binding IsSessionActive}" />
+            </VerticalStackLayout>
+            <Border Grid.Column="2" Style="{StaticResource TagPillBorderStyle}" VerticalOptions="Center"
+                    IsVisible="{Binding IsSessionActive}">
+                <Label Text="{Binding Score, StringFormat='⭐ {0}'}" Style="{StaticResource TagPillLabelStyle}" />
+            </Border>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="24,0,24,0"
+                    IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}">
+            <VerticalStackLayout Spacing="22" Padding="0,10,0,20">
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="КОЛИЧЕСТВО СЛОВ" Style="{StaticResource SectionLabelStyle}" />
+                    <Picker ItemsSource="{Binding WordCountOptions}" SelectedItem="{Binding WordCount}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="УРОВЕНЬ TOPIK" Style="{StaticResource SectionLabelStyle}" />
+                    <Label Text="Ничего не выбрано — берём слова всех уровней" Style="{StaticResource HintLabelStyle}" />
+                    <HorizontalStackLayout Spacing="20" BindableLayout.ItemsSource="{Binding TopikLevelOptions}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TopikLevelOptionViewModel">
+                                <HorizontalStackLayout Spacing="6">
+                                    <CheckBox IsChecked="{Binding IsSelected}" Color="{StaticResource ColorPrimary}" />
+                                    <Label Text="{Binding Title}" Style="{StaticResource OptionLabelStyle}" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4"
+                                     RadioButtonGroup.GroupName="QuizDirection"
+                                     RadioButtonGroup.SelectedValue="{Binding QuizDirection}">
+                    <Label Text="НАПРАВЛЕНИЕ ВОПРОСА" Style="{StaticResource SectionLabelStyle}" Margin="0,0,0,4" />
+                    <RadioButton Content="Корейское слово → русский перевод"
+                                 Value="{x:Static enums:QuizDirectionEnum.KoreanToTranslation}" FontSize="13" />
+                    <RadioButton Content="Русский перевод → корейское слово"
+                                 Value="{x:Static enums:QuizDirectionEnum.TranslationToKorean}" FontSize="13" />
+                    <RadioButton Content="Случайно на каждый вопрос"
+                                 Value="{x:Static enums:QuizDirectionEnum.Random}" FontSize="13" />
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Сохранённые слова" Style="{StaticResource OptionLabelStyle}" FontAttributes="Bold" />
+                            <Label Text="Идут первыми, затем слова к повторению и новые" Style="{StaticResource HintLabelStyle}" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding IncludeSavedWords}"
+                                OnColor="{StaticResource ColorPrimary}" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <Button Text="Начать квиз" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding StartPracticeCommand}" />
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="{StaticResource ColorPrimary}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" Padding="24,0,24,0" RowDefinitions="Auto,Auto,*" RowSpacing="14"
+              IsVisible="{Binding IsSessionActive}">
+
+            <Button Grid.Row="0" Text="⚙ Изменить настройки" Style="{StaticResource LinkButtonStyle}"
+                    Command="{Binding BackToSetupCommand}" />
+
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10" IsVisible="{Binding HasActiveQuestion}">
+                <ProgressBar Grid.Column="0" Progress="{Binding CurrentCard.TimeProgress}"
+                             ProgressColor="{StaticResource ColorPrimary}" HeightRequest="8" VerticalOptions="Center">
+                    <ProgressBar.Triggers>
+                        <DataTrigger TargetType="ProgressBar" Binding="{Binding CurrentCard.IsTimeRunningOut}" Value="True">
+                            <Setter Property="ProgressColor" Value="{StaticResource ColorDanger}" />
+                        </DataTrigger>
+                    </ProgressBar.Triggers>
+                </ProgressBar>
+                <Label Grid.Column="1" Text="{Binding CurrentCard.TimeLeft, StringFormat='{0} с'}" Style="{StaticResource QuizTimerLabelStyle}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding CurrentCard.IsTimeRunningOut}" Value="True">
+                            <Setter Property="TextColor" Value="{StaticResource ColorDanger}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+
+            <ScrollView Grid.Row="2" IsVisible="{Binding HasActiveQuestion}">
+                <Grid BindingContext="{Binding CurrentCard}" x:DataType="vm:PracticeCardViewModel"
+                      RowDefinitions="Auto,Auto,Auto" RowSpacing="18" Padding="0,4,0,20">
+
+                    <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" RowSpacing="8">
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource TagPillBorderStyle}" IsVisible="{Binding IsNew}">
+                                <Label Text="новое" Style="{StaticResource TagPillLabelStyle}" />
+                            </Border>
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource TagPillBorderStyle}"
+                                    IsVisible="{Binding IsNew, Converter={StaticResource InverseBoolConverter}}">
+                                <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
+                            </Border>
+
+                            <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource RoundIconButtonStyle}">
+                                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="star_icon.png" Style="{StaticResource SmallIconStyle}"
+                                           IsVisible="{Binding IsSaved, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Image Source="star_icon_active.png" Style="{StaticResource SmallIconStyle}"
+                                           IsVisible="{Binding IsSaved}" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleSaveCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Label Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding QuestionText}"
+                                   Style="{StaticResource QuizQuestionLabelStyle}" Margin="0,6,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Label Grid.Row="1" Text="Выберите правильный ответ" Style="{StaticResource HintLabelStyle}" HorizontalOptions="Center" />
+
+                    <VerticalStackLayout Grid.Row="2" Spacing="10" BindableLayout.ItemsSource="{Binding Options}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AnswerOptionViewModel">
+                                <Border Style="{StaticResource AnswerOptionBorderStyle}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsRevealedCorrect}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorSuccessBg}" />
+                                            <Setter Property="Stroke" Value="{StaticResource ColorSuccess}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsRevealedWrong}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource ColorDangerBg}" />
+                                            <Setter Property="Stroke" Value="{StaticResource ColorDanger}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding Text}" Style="{StaticResource AnswerOptionLabelStyle}" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding SelectAnswerCommand, Source={RelativeSource AncestorType={x:Type vm:PracticeCardViewModel}}, x:DataType=vm:PracticeCardViewModel}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </Grid>
+            </ScrollView>
+
+            <VerticalStackLayout Grid.Row="2" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center"
+                                 IsVisible="{Binding IsSessionComplete}">
+                <Label Text="Квиз завершён!" Style="{StaticResource PageTitleStyle}" HorizontalOptions="Center" />
+                <Label Text="{Binding Score, StringFormat='Очки: {0}'}" Style="{StaticResource OptionLabelStyle}" HorizontalOptions="Center" />
+                <Label Text="{Binding ResultsSummaryText}" Style="{StaticResource EmptyStateLabelStyle}" />
+                <Button Text="Пройти ещё раз" Style="{StaticResource PrimaryButtonStyle}" WidthRequest="220" Margin="0,14,0,0"
+                        Command="{Binding BackToSetupCommand}" />
+            </VerticalStackLayout>
+
+            <Label Grid.Row="2" Text="Пока нечего повторять — импортируйте слова или выберите другой уровень"
+                   Style="{StaticResource EmptyStateLabelStyle}" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                   IsVisible="{Binding IsEmpty}" />
+        </Grid>
+    </Grid>
+</ContentPage>

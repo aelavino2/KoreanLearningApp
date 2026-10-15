@@ -25,23 +25,23 @@ public static class PartOfSpeechMapper
         };
     }
 
-    public static string ToRussian(this PartOfSpeechEnum pos) => pos switch
+    public static string ToKorean(this PartOfSpeechEnum pos) => pos switch
     {
-        PartOfSpeechEnum.Noun => "существительное",
-        PartOfSpeechEnum.Pronoun => "местоимение",
-        PartOfSpeechEnum.Numeral => "числительное",
-        PartOfSpeechEnum.Particle => "частица",
-        PartOfSpeechEnum.Verb => "глагол",
-        PartOfSpeechEnum.Adjective => "прилагательное",
-        PartOfSpeechEnum.Determiner => "определитель",
-        PartOfSpeechEnum.Adverb => "наречие",
-        PartOfSpeechEnum.Interjection => "междометие",
-        PartOfSpeechEnum.Affix => "аффикс",
-        PartOfSpeechEnum.BoundNoun => "зависимое сущ.",
-        PartOfSpeechEnum.AuxiliaryVerb => "вспом. глагол",
-        PartOfSpeechEnum.AuxiliaryAdjective => "вспом. прилаг.",
-        PartOfSpeechEnum.Ending => "окончание",
-        PartOfSpeechEnum.NoPartOfSpeech => "без части речи",
-        _ => "—"
+        PartOfSpeechEnum.Noun => "명사",
+        PartOfSpeechEnum.Pronoun => "대명사",
+        PartOfSpeechEnum.Numeral => "수사",
+        PartOfSpeechEnum.Particle => "조사",
+        PartOfSpeechEnum.Verb => "동사",
+        PartOfSpeechEnum.Adjective => "형용사",
+        PartOfSpeechEnum.Determiner => "관형사",
+        PartOfSpeechEnum.Adverb => "부사",
+        PartOfSpeechEnum.Interjection => "감탄사",
+        PartOfSpeechEnum.Affix => "접사",
+        PartOfSpeechEnum.BoundNoun => "의존 명사",
+        PartOfSpeechEnum.AuxiliaryVerb => "보조 동사",
+        PartOfSpeechEnum.AuxiliaryAdjective => "보조 형용사",
+        PartOfSpeechEnum.Ending => "어미",
+        PartOfSpeechEnum.NoPartOfSpeech => "품사 없음",
+        _ => string.Empty
     };
 }

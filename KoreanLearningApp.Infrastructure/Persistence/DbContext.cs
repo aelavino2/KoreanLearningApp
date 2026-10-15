@@ -26,6 +26,9 @@ public class DbContext
         await _connection.CreateTableAsync<KrDictSenseEntity>();
         await _connection.CreateTableAsync<AudioEntity>();
         await _connection.CreateTableAsync<LangInfoEntity>();
+        await _connection.CreateTableAsync<WordProgressEntity>();
+        await _connection.CreateTableAsync<ReviewLogEntity>();
+        await _connection.CreateTableAsync<SavedWordEntity>();
 
         return _connection;
     }

@@ -7,7 +7,7 @@ using KoreanLearningApp.Services.Abstractions.Repositories;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Repositories;
 
-public class WordRepository(IGetWordsPageQuery getWordsPageQuery,
+public class WordRepository(DbContext dbContext, IGetWordsPageQuery getWordsPageQuery,
     IRepository<WordEntity> wordRepo, IRepository<KrDictEntity> krDictRepo,
     IRepository<KrDictSenseEntity> senseRepo, IRepository<AudioEntity> audioRepo,
     IRepository<LangInfoEntity> langInfoRepo)
@@ -21,7 +21,19 @@ public class WordRepository(IGetWordsPageQuery getWordsPageQuery,
         
         return allIds.Count == 0 ? new List<Word>() : await BuildWordsAsync(allIds);
     }
-    
+
+    public Task<List<Word>> GetByIdsAsync(IReadOnlyCollection<int> wordIds) =>
+        wordIds.Count == 0 ? Task.FromResult(new List<Word>()) : BuildWordsAsync(wordIds.ToList());
+
+    public async Task<List<Word>> GetRandomAsync(int count)
+    {
+        var db = await dbContext.GetConnectionAsync();
+        var rows = await db.QueryAsync<WordEntity>("SELECT Id FROM Words ORDER BY RANDOM() LIMIT ?", count);
+        var ids = rows.Select(r => r.Id).ToList();
+
+        return ids.Count == 0 ? new List<Word>() : await BuildWordsAsync(ids);
+    }
+
     public async Task<(List<Word> Items, int TotalCount)> GetWordsPageAsync(int page, int pageSize, string? search)
     {
         var (pageIds, totalCount) = await getWordsPageQuery.ExecuteAsync(page, pageSize, search);

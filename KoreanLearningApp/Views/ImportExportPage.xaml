@@ -3,7 +3,7 @@
     x:Class="KoreanLearningApp.Views.ImportExportPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    xmlns:vm="clr-namespace:KoreanLearningApp.Presentation.ViewModels;assembly=KoreanLearningApp.Presentation"
     x:DataType="vm:ImportExportViewModel"
     BackgroundColor="{StaticResource ColorBackground}"
     Shell.NavBarIsVisible="False">
@@ -41,42 +41,5 @@
             </Border>
 
         </VerticalStackLayout>
-
-        <Border Grid.Row="2" Style="{StaticResource TabBarBorderStyle}">
-            <Grid ColumnDefinitions="*,*,*,*">
-                <Grid Grid.Column="0" RowDefinitions="Auto,Auto" RowSpacing="4">
-                    <Image Grid.Row="0" Source="words_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                    <Label Grid.Row="1" Text="Words" Style="{StaticResource TabIconLabelStyle}" />
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToWordsCommand}" />
-                    </Grid.GestureRecognizers>
-                </Grid>
-
-                <Grid Grid.Column="1" RowDefinitions="Auto,Auto" RowSpacing="4">
-                    <Image Grid.Row="0" Source="practice_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                    <Label Grid.Row="1" Text="Practice" Style="{StaticResource TabIconLabelStyle}" />
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToPracticeCommand}" />
-                    </Grid.GestureRecognizers>
-                </Grid>
-
-                <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4">
-                    <Image Grid.Row="0" Source="import_export_icon_active.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                    <Label Grid.Row="1" Text="Import" Style="{StaticResource TabIconLabelActiveStyle}" />
-                    <BoxView Grid.Row="0" WidthRequest="4" HeightRequest="4" CornerRadius="2" BackgroundColor="{StaticResource ColorPrimary}" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,-8" />
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToImportExportCommand}" />
-                    </Grid.GestureRecognizers>
-                </Grid>
-
-                <Grid Grid.Column="3" RowDefinitions="Auto,Auto" RowSpacing="4">
-                    <Image Grid.Row="0" Source="star_icon.png" WidthRequest="22" HeightRequest="22" Aspect="AspectFit" HorizontalOptions="Center" />
-                    <Label Grid.Row="1" Text="Saved" Style="{StaticResource TabIconLabelStyle}" Margin="0,4,0,0" />
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToSavedCommand}" />
-                    </Grid.GestureRecognizers>
-                </Grid>
-            </Grid>
-        </Border>
     </Grid>
 </ContentPage>
