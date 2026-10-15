@@ -8,9 +8,9 @@
 
 | Проект | TFM | Назначение | Зависит от |
 |---|---|---|---|
-| `KoreanLearningApp.Domain` | net9.0 | Модели (`Word`, `KrDict`, `Sense`, `WordProgress`, `QuizQuestion`…), enum'ы, `TopikLevelMapper` | — |
-| `KoreanLearningApp.Services` | net9.0 | Интерфейсы сервисов и репозиториев (`Abstractions/`), `WordService`, `SavedWordsService`, практика (`Services/Practice`: SM-2, сборка квиза, очки), `AudioPlayerService` | Domain, Plugin.Maui.Audio |
-| `KoreanLearningApp.Infrastructure` | net9.0 | SQLite (sqlite-net-pcl), Entities, репозитории, запросы, импорт/экспорт JSON, маппинг | Domain, Services, Mapster |
+| `KoreanLearningApp.Domain` | net10.0 | Модели (`Word`, `KrDict`, `Sense`, `WordProgress`, `QuizQuestion`…), enum'ы, `TopikLevelMapper` | — |
+| `KoreanLearningApp.Services` | net10.0 | Интерфейсы сервисов и репозиториев (`Abstractions/`), `WordService`, `SavedWordsService`, практика (`Services/Practice`: SM-2, сборка квиза, очки), `AudioPlayerService` | Domain, Plugin.Maui.Audio |
+| `KoreanLearningApp.Infrastructure` | net10.0 | SQLite (sqlite-net-pcl), Entities, репозитории, запросы, импорт/экспорт JSON, маппинг | Domain, Services, Mapster |
 | `KoreanLearningApp.Presentation` | net10.0 | ViewModel'и (CommunityToolkit.Mvvm) и UI-абстракции: `INavigationService`, `AppRoutes`, `IDialogService`, `IFileService`, форматирование enum'ов (`ToRussian`). **Без MAUI** | Domain, Services |
 | `KoreanLearningApp` | net10.0-android/ios/maccatalyst/windows | MAUI: Views (XAML), реализации `ShellNavigationService`/`ShellDialogService`/`MauiFileService`, конвертеры, стили, DI в `MauiProgram.cs` | Presentation, Infrastructure, Services |
 | `tests/KoreanLearningApp.Tests` | net10.0 | xUnit: репозитории на реальном SQLite, импорт/экспорт, практика, ViewModel'и | Presentation, Infrastructure, Services |
