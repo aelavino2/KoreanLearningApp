@@ -160,6 +160,14 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
+    <Style TargetType="ScrollView" ApplyToDerivedTypes="True">
+        <Setter Property="VerticalScrollBarVisibility" Value="Always" />
+    </Style>
+
+    <Style TargetType="CollectionView" ApplyToDerivedTypes="True">
+        <Setter Property="VerticalScrollBarVisibility" Value="Always" />
+    </Style>
+
     <Style x:Key="SmallIconStyle" TargetType="Image">
         <Setter Property="WidthRequest" Value="16" />
         <Setter Property="HeightRequest" Value="16" />

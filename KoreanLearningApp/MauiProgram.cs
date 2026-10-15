@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using KoreanLearningApp.Diagnostics;
 using KoreanLearningApp.Dialogs;
 using KoreanLearningApp.Files;
 using KoreanLearningApp.Infrastructure.Constants;
@@ -28,6 +29,8 @@ namespace KoreanLearningApp;
 
 public static class MauiProgram
 {
+    private const string DatabaseFileName = "KoreanLearning.db";
+
     public static MauiApp CreateMauiApp()
     {
         WordMappingConfig.Configure();
@@ -44,9 +47,11 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+        builder.Logging.AddProvider(new FileLoggerProvider(AppPaths.LogsDirectory, TimeProvider.System));
+        builder.Services.AddSingleton<GlobalExceptionHandler>();
+        builder.Services.AddSingleton<UiInteractionLogger>();
 
-        var dbPath = GetDatabasePath("KoreanLearning.db");
-        builder.Services.AddSingleton(new DbContext(dbPath));
+        builder.Services.AddSingleton(new DbContext(AppPaths.GetDataFilePath(DatabaseFileName)));
 
         builder.Services.AddSingleton<IRepository<WordEntity>, BaseRepository<WordEntity>>();
         builder.Services.AddSingleton<IRepository<KrDictEntity>, BaseRepository<KrDictEntity>>();
@@ -104,15 +109,4 @@ public static class MauiProgram
         return app;
     }
 
-    static string GetDatabasePath(string fileName)
-    {
-        var baseDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "koreanApp");
-
-        if (!Directory.Exists(baseDir))
-            Directory.CreateDirectory(baseDir);
-
-        return Path.Combine(baseDir, fileName);
-    }
 }
