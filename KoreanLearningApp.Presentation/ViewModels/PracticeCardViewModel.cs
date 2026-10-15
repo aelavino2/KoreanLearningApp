@@ -1,12 +1,11 @@
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Dialogs;
 using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Domain.Models.Enums;
+using KoreanLearningApp.Presentation.Dialogs;
+using KoreanLearningApp.Presentation.Formatting;
 using KoreanLearningApp.Services.Abstractions.Services;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public sealed partial class PracticeCardViewModel : ObservableObject, IDisposable
 {
@@ -17,14 +16,16 @@ public sealed partial class PracticeCardViewModel : ObservableObject, IDisposabl
 
     private readonly ISavedWordsService _savedWordsService;
     private readonly IDialogService _dialogService;
+    private readonly TimeProvider _timeProvider;
     private readonly Action<PracticeCardViewModel, bool> _onAnswered;
     private PeriodicTimer? _timer;
 
     public PracticeCardViewModel(QuizQuestion question, bool isSaved, ISavedWordsService savedWordsService,
-        IDialogService dialogService, Action<PracticeCardViewModel, bool> onAnswered)
+        IDialogService dialogService, TimeProvider timeProvider, Action<PracticeCardViewModel, bool> onAnswered)
     {
         _savedWordsService = savedWordsService;
         _dialogService = dialogService;
+        _timeProvider = timeProvider;
         _onAnswered = onAnswered;
 
         WordId = question.Card.Word.Id;
@@ -66,8 +67,8 @@ public sealed partial class PracticeCardViewModel : ObservableObject, IDisposabl
         TimeLeft = QuestionSeconds;
         TimeProgress = 1.0;
 
-        _timer = new PeriodicTimer(TickInterval);
-        _ = RunTimerAsync(_timer, Stopwatch.GetTimestamp());
+        _timer = new PeriodicTimer(TickInterval, _timeProvider);
+        _ = RunTimerAsync(_timer, _timeProvider.GetTimestamp());
     }
 
     public void Dispose() => StopTimer();
@@ -76,7 +77,7 @@ public sealed partial class PracticeCardViewModel : ObservableObject, IDisposabl
     {
         while (await timer.WaitForNextTickAsync())
         {
-            var remainingSeconds = Math.Max(0, QuestionSeconds - Stopwatch.GetElapsedTime(startedAt).TotalSeconds);
+            var remainingSeconds = Math.Max(0, QuestionSeconds - _timeProvider.GetElapsedTime(startedAt).TotalSeconds);
             TimeProgress = remainingSeconds / QuestionSeconds;
             TimeLeft = (int)Math.Ceiling(remainingSeconds);
 

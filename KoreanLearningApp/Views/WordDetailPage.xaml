@@ -3,7 +3,7 @@
     x:Class="KoreanLearningApp.Views.WordDetailPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:KoreanLearningApp.ViewModels"
+    xmlns:vm="clr-namespace:KoreanLearningApp.Presentation.ViewModels;assembly=KoreanLearningApp.Presentation"
     x:DataType="vm:WordDetailViewModel"
     BackgroundColor="{StaticResource ColorBackground}"
     Shell.NavBarIsVisible="False">

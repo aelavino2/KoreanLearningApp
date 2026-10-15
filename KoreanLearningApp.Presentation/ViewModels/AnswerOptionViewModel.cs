@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class AnswerOptionViewModel(string text, bool isCorrect) : ObservableObject
 {

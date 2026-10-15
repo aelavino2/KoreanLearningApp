@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Dialogs;
+using KoreanLearningApp.Presentation.Dialogs;
 using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Domain.Models.Enums;
-using KoreanLearningApp.Navigation;
+using KoreanLearningApp.Presentation.Formatting;
+using KoreanLearningApp.Presentation.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
-[QueryProperty(nameof(Word), "Word")]
 public partial class WordDetailViewModel(
     INavigationService navigationService,
     IAudioPlayerService audioPlayerService,

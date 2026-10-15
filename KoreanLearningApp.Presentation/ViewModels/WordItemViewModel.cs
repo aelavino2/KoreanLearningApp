@@ -1,8 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Domain.Models.Enums;
+using KoreanLearningApp.Presentation.Formatting;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class WordItemViewModel(Word word) : ObservableObject
 {

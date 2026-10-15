@@ -44,24 +44,4 @@ public static class PartOfSpeechMapper
         PartOfSpeechEnum.NoPartOfSpeech => "품사 없음",
         _ => string.Empty
     };
-
-    public static string ToRussian(this PartOfSpeechEnum pos) => pos switch
-    {
-        PartOfSpeechEnum.Noun => "существительное",
-        PartOfSpeechEnum.Pronoun => "местоимение",
-        PartOfSpeechEnum.Numeral => "числительное",
-        PartOfSpeechEnum.Particle => "частица",
-        PartOfSpeechEnum.Verb => "глагол",
-        PartOfSpeechEnum.Adjective => "прилагательное",
-        PartOfSpeechEnum.Determiner => "определитель",
-        PartOfSpeechEnum.Adverb => "наречие",
-        PartOfSpeechEnum.Interjection => "междометие",
-        PartOfSpeechEnum.Affix => "аффикс",
-        PartOfSpeechEnum.BoundNoun => "зависимое сущ.",
-        PartOfSpeechEnum.AuxiliaryVerb => "вспом. глагол",
-        PartOfSpeechEnum.AuxiliaryAdjective => "вспом. прилаг.",
-        PartOfSpeechEnum.Ending => "окончание",
-        PartOfSpeechEnum.NoPartOfSpeech => "без части речи",
-        _ => "—"
-    };
 }

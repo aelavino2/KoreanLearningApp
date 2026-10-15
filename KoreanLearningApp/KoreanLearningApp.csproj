@@ -74,6 +74,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\KoreanLearningApp.Infrastructure\KoreanLearningApp.Infrastructure.csproj" />
+	  <ProjectReference Include="..\KoreanLearningApp.Presentation\KoreanLearningApp.Presentation.csproj" />
 	  <ProjectReference Include="..\KoreanLearningApp.Services\KoreanLearningApp.Services.csproj" />
 	</ItemGroup>
 

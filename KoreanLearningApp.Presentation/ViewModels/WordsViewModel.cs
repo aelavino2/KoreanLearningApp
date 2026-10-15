@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
-using KoreanLearningApp.Navigation;
+using KoreanLearningApp.Presentation.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 using System.Collections.ObjectModel;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class WordsViewModel(IWordService wordService, INavigationService navigationService)
     : ObservableObject

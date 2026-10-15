@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using KoreanLearningApp.Dialogs;
+using KoreanLearningApp.Files;
 using KoreanLearningApp.Infrastructure.Constants;
 using KoreanLearningApp.Infrastructure.Import;
 using KoreanLearningApp.Infrastructure.Import.Abstraction;
@@ -13,7 +14,10 @@ using KoreanLearningApp.Services.Abstractions.Repositories;
 using KoreanLearningApp.Services.Abstractions.Services;
 using KoreanLearningApp.Services.Services;
 using KoreanLearningApp.Services.Services.Practice;
-using KoreanLearningApp.ViewModels;
+using KoreanLearningApp.Presentation.Dialogs;
+using KoreanLearningApp.Presentation.Files;
+using KoreanLearningApp.Presentation.Navigation;
+using KoreanLearningApp.Presentation.ViewModels;
 using KoreanLearningApp.Views;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
@@ -81,6 +85,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ImportExportPage>();
         builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
         builder.Services.AddSingleton<IDialogService, ShellDialogService>();
+        builder.Services.AddSingleton<IFileService, MauiFileService>();
         builder.Services.AddTransient<WordDetailViewModel>();
         builder.Services.AddTransient<WordDetailPage>();
         builder.Services.AddTransient<PracticeViewModel>();

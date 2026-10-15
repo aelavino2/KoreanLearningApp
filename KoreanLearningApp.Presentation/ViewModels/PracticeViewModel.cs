@@ -1,18 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Dialogs;
 using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Domain.Models.Enums;
-using KoreanLearningApp.Infrastructure.Mapster;
+using KoreanLearningApp.Presentation.Dialogs;
 using KoreanLearningApp.Services.Abstractions.Services;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class PracticeViewModel(
     IWordPracticeService practiceService,
     ISavedWordsService savedWordsService,
     IQuizScoringService scoringService,
-    IDialogService dialogService) : ObservableObject
+    IDialogService dialogService,
+    TimeProvider timeProvider) : ObservableObject
 {
     private static readonly TimeSpan AnswerRevealDelay = TimeSpan.FromMilliseconds(1100);
 
@@ -103,7 +103,7 @@ public partial class PracticeViewModel(
 
             _sessionCards = questions
                 .Select(q => new PracticeCardViewModel(q, savedIds.Contains(q.Card.Word.Id),
-                    savedWordsService, dialogService, OnCardAnswered))
+                    savedWordsService, dialogService, timeProvider, OnCardAnswered))
                 .ToList();
 
             Score = 0;
@@ -163,7 +163,7 @@ public partial class PracticeViewModel(
             await dialogService.ShowAlertAsync("Ошибка", $"Не удалось сохранить результат: {ex.Message}");
         }
 
-        await Task.Delay(AnswerRevealDelay);
+        await Task.Delay(AnswerRevealDelay, timeProvider);
 
         if (sessionVersion == _sessionVersion)
             ShowCard(_cardIndex + 1);

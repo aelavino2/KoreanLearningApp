@@ -1,6 +1,5 @@
-﻿using KoreanLearningApp.Domain.Models.Enums;
 
-namespace KoreanLearningApp.Infrastructure.Mapster;
+namespace KoreanLearningApp.Domain.Models.Enums;
 
 public static class TopikLevelMapper
 {

@@ -1,4 +1,4 @@
-namespace KoreanLearningApp.Dialogs;
+namespace KoreanLearningApp.Presentation.Dialogs;
 
 public interface IDialogService
 {

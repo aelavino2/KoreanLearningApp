@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class SenseItemViewModel(Sense sense) : ObservableObject
 {

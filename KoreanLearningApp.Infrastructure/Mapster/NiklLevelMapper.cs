@@ -22,12 +22,4 @@ public static class NiklLevelMapper
         NiklLevelEnum.Advanced => "고급",
         _ => string.Empty
     };
-
-    public static string ToRussian(this NiklLevelEnum level) => level switch
-    {
-        NiklLevelEnum.Beginner => "начальный",
-        NiklLevelEnum.Intermediate => "средний",
-        NiklLevelEnum.Advanced => "продвинутый",
-        _ => "—"
-    };
 }

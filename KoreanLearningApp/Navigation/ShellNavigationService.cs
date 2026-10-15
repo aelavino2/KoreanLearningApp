@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Controls;
+﻿using KoreanLearningApp.Presentation.Navigation;
 
 namespace KoreanLearningApp.Navigation
 {
@@ -28,7 +28,7 @@ namespace KoreanLearningApp.Navigation
         {
             await Shell.Current.GoToAsync(route, new Dictionary<string, object>
             {
-                ["Word"] = parameter
+                [NavigationParameters.Word] = parameter
             });
         }
     }

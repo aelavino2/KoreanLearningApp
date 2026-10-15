@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Dialogs;
-using KoreanLearningApp.Navigation;
+using KoreanLearningApp.Presentation.Dialogs;
+using KoreanLearningApp.Presentation.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 
-namespace KoreanLearningApp.ViewModels;
+namespace KoreanLearningApp.Presentation.ViewModels;
 
 public partial class SavedViewModel(
     ISavedWordsService savedWordsService,

@@ -1,4 +1,4 @@
-using KoreanLearningApp.ViewModels;
+using KoreanLearningApp.Presentation.ViewModels;
 
 namespace KoreanLearningApp.Views;
 
