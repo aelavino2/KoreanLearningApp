@@ -1,4 +1,5 @@
 ﻿using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Domain.Models.Enums;
 
 public class KrDict
 {
@@ -6,7 +7,7 @@ public class KrDict
     public string TargetCode { get; set; } = string.Empty;
     public string Word { get; set; } = string.Empty;
     public int SupNo { get; set; }
-    public string Pos { get; set; } = string.Empty;
+    public PartOfSpeechEnum Pos { get; set; }
     public string Pronunciation { get; set; } = string.Empty;
     public string WordGrade { get; set; } = string.Empty;
     public string Link { get; set; } = string.Empty;

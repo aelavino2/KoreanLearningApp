@@ -1,4 +1,6 @@
-﻿namespace KoreanLearningApp.Domain.Models;
+﻿using KoreanLearningApp.Domain.Models.Enums;
+
+namespace KoreanLearningApp.Domain.Models;
 
 public class Word
 {
@@ -7,7 +9,7 @@ public class Word
     public string RuleExplanation { get; set; } = string.Empty;
 
     public int Rank { get; set; }
-    public string PartOfSpeech { get; set; } = string.Empty;
+    public PartOfSpeechEnum PartOfSpeech { get; set; }
     public string Hanja { get; set; } = string.Empty;
     public string NiklLevel { get; set; } = string.Empty;
     public string TopikLevel { get; set; } = string.Empty;

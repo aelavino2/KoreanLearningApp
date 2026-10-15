@@ -30,7 +30,7 @@
         </Border>
 
 
-        <CollectionView Grid.Row="2"
+        <CollectionView Grid.Row="2" 
                 x:Name="WordsCollectionView"
                 ItemsSource="{Binding Words}"
                 SelectionMode="None"
@@ -82,10 +82,7 @@
 
         <Grid Grid.Row="3" RowDefinitions="Auto,Auto" Padding="24,10,24,10" IsVisible="{Binding IsPaginationVisible}">
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                <Button Grid.Column="0"
-                        Text="&#8592;"
-                        Command="{Binding PreviousPageCommand}"
-                        IsEnabled="{Binding CanGoToPreviousPage}"
+                <Button Grid.Column="0" Text="&#8592;" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoToPreviousPage}"
                         WidthRequest="44" HeightRequest="44" Padding="0"
                         FontSize="16" CornerRadius="13"
                         BackgroundColor="{StaticResource ColorChipBg}"

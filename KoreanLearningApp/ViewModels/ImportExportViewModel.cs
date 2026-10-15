@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 
 namespace KoreanLearningApp.ViewModels;
 
 public partial class ImportExportViewModel(IWordService wordService,
-    IWordImportService wordImportService, IWordExportService wordExportService, INavigationService navigationService)
+    IWordImportService wordImportService, IWordExportService wordExportService)
     : ObservableObject
 {
     private static readonly FilePickerFileType JsonFileType = new(
@@ -75,16 +74,4 @@ public partial class ImportExportViewModel(IWordService wordService,
             await Shell.Current.DisplayAlert("Ошибка", $"Не удалось импортировать: {ex.Message}", "OK");
         }
     }
-
-    [RelayCommand]
-    private Task GoToWordsAsync() => navigationService.GoToRootAsync(AppRoutes.Words);
-
-    [RelayCommand]
-    private Task GoToPracticeAsync() => navigationService.GoToRootAsync(AppRoutes.Practice);
-
-    [RelayCommand]
-    private Task GoToImportExportAsync() => navigationService.GoToRootAsync(AppRoutes.ImportExport);
-
-    [RelayCommand]
-    private Task GoToSavedAsync() => navigationService.GoToRootAsync(AppRoutes.Saved);
 }

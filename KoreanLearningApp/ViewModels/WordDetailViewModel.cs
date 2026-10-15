@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Domain.Models.Enums;
 using KoreanLearningApp.Navigation;
 using KoreanLearningApp.Services.Abstractions.Services;
 
@@ -40,7 +41,7 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
             ? FirstSense!.En!.Word
             : FirstSense?.Ru?.Word ?? string.Empty;
 
-    public string PartOfSpeechDisplay => Word.PartOfSpeech;
+    public string PartOfSpeechDisplay => Word.PartOfSpeech.ToRussian();
 
     public bool HasHanja => !string.IsNullOrWhiteSpace(Word.Hanja);
 

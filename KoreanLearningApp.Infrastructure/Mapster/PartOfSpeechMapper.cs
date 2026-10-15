@@ -25,6 +25,26 @@ public static class PartOfSpeechMapper
         };
     }
 
+    public static string ToKorean(this PartOfSpeechEnum pos) => pos switch
+    {
+        PartOfSpeechEnum.Noun => "명사",
+        PartOfSpeechEnum.Pronoun => "대명사",
+        PartOfSpeechEnum.Numeral => "수사",
+        PartOfSpeechEnum.Particle => "조사",
+        PartOfSpeechEnum.Verb => "동사",
+        PartOfSpeechEnum.Adjective => "형용사",
+        PartOfSpeechEnum.Determiner => "관형사",
+        PartOfSpeechEnum.Adverb => "부사",
+        PartOfSpeechEnum.Interjection => "감탄사",
+        PartOfSpeechEnum.Affix => "접사",
+        PartOfSpeechEnum.BoundNoun => "의존 명사",
+        PartOfSpeechEnum.AuxiliaryVerb => "보조 동사",
+        PartOfSpeechEnum.AuxiliaryAdjective => "보조 형용사",
+        PartOfSpeechEnum.Ending => "어미",
+        PartOfSpeechEnum.NoPartOfSpeech => "품사 없음",
+        _ => string.Empty
+    };
+
     public static string ToRussian(this PartOfSpeechEnum pos) => pos switch
     {
         PartOfSpeechEnum.Noun => "существительное",

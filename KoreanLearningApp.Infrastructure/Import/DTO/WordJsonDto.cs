@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using KoreanLearningApp.Domain.Models.Enums;
+using KoreanLearningApp.Infrastructure.Mapster;
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO;
 
@@ -11,7 +13,8 @@ public class WordJsonDto
     public string Word { get; set; } = string.Empty;
 
     [JsonPropertyName("part_of_speech")]
-    public string PartOfSpeech { get; set; } = string.Empty;
+    [JsonConverter(typeof(PartOfSpeechJsonConverter))]
+    public PartOfSpeechEnum PartOfSpeech { get; set; }
 
     [JsonPropertyName("hanja")]
     public string Hanja { get; set; } = string.Empty;

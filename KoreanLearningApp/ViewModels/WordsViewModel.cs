@@ -149,16 +149,4 @@ public partial class WordsViewModel(IWordService wordService, INavigationService
         _reachedEndOfCurrentPage = true;
         await LoadCurrentPageAsync();
     }
-
-    [RelayCommand]
-    private Task GoToWordsAsync() => navigationService.GoToRootAsync(AppRoutes.Words);
-
-    [RelayCommand]
-    private Task GoToPracticeAsync() => navigationService.GoToRootAsync(AppRoutes.Practice);
-
-    [RelayCommand]
-    private Task GoToImportExportAsync() => navigationService.GoToRootAsync(AppRoutes.ImportExport);
-
-    [RelayCommand]
-    private Task GoToSavedAsync() => navigationService.GoToRootAsync(AppRoutes.Saved);
 }

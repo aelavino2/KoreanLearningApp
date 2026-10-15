@@ -18,7 +18,7 @@ public partial class WordItemViewModel(Word word) : ObservableObject
     private string _translationRu = word.KrDict?.Senses.FirstOrDefault()?.Ru?.Word ?? string.Empty;
 
     [ObservableProperty]
-    private PartOfSpeechEnum _partOfSpeech = PartOfSpeechMapper.Parse(word.PartOfSpeech);
+    private PartOfSpeechEnum _partOfSpeech = word.PartOfSpeech;
 
     public string PartOfSpeechDisplay => PartOfSpeech.ToRussian();
 
