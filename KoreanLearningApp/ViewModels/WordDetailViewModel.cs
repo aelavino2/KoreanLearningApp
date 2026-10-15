@@ -1,6 +1,6 @@
-﻿using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KoreanLearningApp.Dialogs;
 using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Domain.Models.Enums;
 using KoreanLearningApp.Navigation;
@@ -9,8 +9,11 @@ using KoreanLearningApp.Services.Abstractions.Services;
 namespace KoreanLearningApp.ViewModels;
 
 [QueryProperty(nameof(Word), "Word")]
-public partial class WordDetailViewModel(INavigationService navigationService, IAudioPlayerService audioPlayerService)
-    : ObservableObject
+public partial class WordDetailViewModel(
+    INavigationService navigationService,
+    IAudioPlayerService audioPlayerService,
+    ISavedWordsService savedWordsService,
+    IDialogService dialogService) : ObservableObject
 {
     [ObservableProperty]
     private Word _word = new();
@@ -29,10 +32,16 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
         OnPropertyChanged(nameof(HasAudio));
 
         PlayAudioCommand.NotifyCanExecuteChanged();
+        ToggleSaveCommand.NotifyCanExecuteChanged();
+
+        _ = LoadSavedStateAsync(value.Id);
     }
 
     [ObservableProperty]
     private List<SenseItemViewModel> _senses = new();
+
+    [ObservableProperty]
+    private bool _isSaved;
 
     private Sense? FirstSense => Word.KrDict?.Senses.FirstOrDefault();
 
@@ -53,11 +62,26 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
         !string.IsNullOrWhiteSpace(Word.KrDict?.Audio?.Url) ||
         !string.IsNullOrWhiteSpace(Word.KrDict?.Audio?.File);
 
+    private bool IsPersisted => Word.Id != 0;
+
     [ObservableProperty]
     private bool _isAudioBusy;
 
     [RelayCommand]
     private Task GoBackAsync() => navigationService.GoBackAsync();
+
+    [RelayCommand(CanExecute = nameof(IsPersisted))]
+    private async Task ToggleSaveAsync()
+    {
+        try
+        {
+            IsSaved = await savedWordsService.ToggleAsync(Word.Id);
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowAlertAsync("Ошибка", $"Не удалось сохранить слово: {ex.Message}");
+        }
+    }
 
     [RelayCommand(CanExecute = nameof(HasAudio))]
     private async Task PlayAudioAsync()
@@ -76,11 +100,23 @@ public partial class WordDetailViewModel(INavigationService navigationService, I
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Ошибка", $"Не удалось воспроизвести аудио: {ex.Message}", "OK");
+            await dialogService.ShowAlertAsync("Ошибка", $"Не удалось воспроизвести аудио: {ex.Message}");
         }
         finally
         {
             IsAudioBusy = false;
+        }
+    }
+
+    private async Task LoadSavedStateAsync(int wordId)
+    {
+        try
+        {
+            IsSaved = wordId != 0 && await savedWordsService.IsSavedAsync(wordId);
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowAlertAsync("Ошибка", $"Не удалось проверить сохранение слова: {ex.Message}");
         }
     }
 }

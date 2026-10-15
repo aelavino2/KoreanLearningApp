@@ -63,9 +63,17 @@
         <Tab Title="Words" Route="WordsPage" Style="{StaticResource WordsTabStyle}">
             <ShellContent ContentTemplate="{DataTemplate views:WordsPage}" />
         </Tab>
-        
+
+        <Tab Title="Practice" Route="PracticePage" Style="{StaticResource PracticeTabStyle}">
+            <ShellContent ContentTemplate="{DataTemplate views:PracticePage}" />
+        </Tab>
+
         <Tab Title="Import" Route="ImportExportPage" Style="{StaticResource ImportExportTabStyle}">
             <ShellContent ContentTemplate="{DataTemplate views:ImportExportPage}" />
+        </Tab>
+
+        <Tab Title="Saved" Route="SavedPage" Style="{StaticResource SavedTabStyle}">
+            <ShellContent ContentTemplate="{DataTemplate views:SavedPage}" />
         </Tab>
     </TabBar>
 </Shell>

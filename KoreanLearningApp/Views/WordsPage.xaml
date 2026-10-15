@@ -53,14 +53,8 @@
                                             <Label Text="{Binding PartOfSpeechDisplay}" Style="{StaticResource TagPillLabelStyle}" />
                                         </HorizontalStackLayout>
                                     </Border>
-                                    <Border BackgroundColor="{StaticResource ColorChipBg}"
-                                            StrokeShape="RoundRectangle 10"
-                                            Padding="8,3"
-                                            IsVisible="{Binding HasTopikLevel}">
-                                        <Label Text="{Binding TopikLevel, StringFormat='TOPIK {0}'}"
-                                               FontSize="10"
-                                               FontAttributes="Bold"
-                                               TextColor="{StaticResource ColorPrimaryDark}" />
+                                    <Border Style="{StaticResource TopikChipBorderStyle}" IsVisible="{Binding HasTopikLevel}">
+                                        <Label Text="{Binding TopikLevel, StringFormat='TOPIK {0}'}" Style="{StaticResource TopikChipLabelStyle}" />
                                     </Border>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>

@@ -13,6 +13,11 @@
     <Color x:Key="ColorChipBg">#F0F4F1</Color>
     <Color x:Key="ColorDivider">#E5E5E5</Color>
 
+    <Color x:Key="ColorSuccess">#2D8040</Color>
+    <Color x:Key="ColorSuccessBg">#EDF7EE</Color>
+    <Color x:Key="ColorDanger">#D64545</Color>
+    <Color x:Key="ColorDangerBg">#FDECEC</Color>
+
     <!--  Пилюли (уровни вежливости / часть речи)  -->
     <Color x:Key="ColorPoliteBg">#EDF7EE</Color>
     <Color x:Key="ColorPoliteText">#2D8040</Color>
