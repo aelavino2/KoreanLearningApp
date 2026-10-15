@@ -49,6 +49,4 @@ dotnet test tests/KoreanLearningApp.Tests
 
 - Namespace не совпадает с папкой: `PartOfSpeechMapper` (в `Domain.Models.Enums`, лежит в Infrastructure), `EntityMappingExtensions` (`Infrastructure.Persistence.Mapster`), `DatabaseConstants` (`Infrastructure.Persistence`); `KrDict` вообще без namespace.
 - `AudioPlayerService` в Services использует MAUI Essentials (`FileSystem`) и `DevPaths` (dev-хак для Windows Debug).
-- `KrDictJsonDto.Pos` использует `JsonStringEnumConverter` (ждёт `"Noun"`), а `WordJsonDto.PartOfSpeech` — `PartOfSpeechJsonConverter` (корейская строка `"명사"`). Проверить формат исходного JSON.
-- Множественные INSERT при импорте/сохранении идут без транзакции.
 - В `KoreanLearningApp.csproj` остались ссылки на удалённый `Views/Control/NavigationBarView.xaml`.
