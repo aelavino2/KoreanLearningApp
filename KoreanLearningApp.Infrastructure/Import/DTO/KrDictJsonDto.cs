@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using KoreanLearningApp.Domain.Models.Enums;
+using KoreanLearningApp.Infrastructure.Mapster;
 
 namespace KoreanLearningApp.Infrastructure.Import.DTO
 {
@@ -15,7 +16,7 @@ namespace KoreanLearningApp.Infrastructure.Import.DTO
         public int SupNo { get; set; }
 
         [JsonPropertyName("pos")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonConverter(typeof(PartOfSpeechJsonConverter))]
         public PartOfSpeechEnum Pos { get; set; }
 
         [JsonPropertyName("pronunciation")]

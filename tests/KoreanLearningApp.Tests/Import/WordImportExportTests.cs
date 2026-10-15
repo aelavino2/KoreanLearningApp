@@ -1,11 +1,13 @@
+﻿using KoreanLearningApp.Domain.Models.Enums;
 using KoreanLearningApp.Tests.Support;
+using SQLite;
 
 namespace KoreanLearningApp.Tests.Import;
 
 public sealed class WordImportExportTests : IAsyncLifetime
 {
     private const string AppleJson = """
-        [{ "word": "사과", "rank": "1", "krdict": { "word": "사과", "sup_no": 1,
+        [{ "word": "사과", "rank": "1", "krdict": { "word": "사과", "sup_no": 1, "pos": "명사",
            "senses": [{ "ru": { "word": "яблоко" }, "en": { "word": "apple" } }] } }]
         """;
 
@@ -65,6 +67,33 @@ public sealed class WordImportExportTests : IAsyncLifetime
         Assert.Equal(0, word.Rank);
     }
 
+    [Theory]
+    [InlineData("명사")]
+    [InlineData("Noun")]
+    public async Task ImportFromJsonAsync_KrDictPosInKoreanOrEnglish_MapsToEnum(string pos)
+    {
+        var json = $$"""[{ "word": "사과", "krdict": { "word": "사과", "sup_no": 1, "pos": "{{pos}}" } }]""";
+
+        await _services.ImportService.ImportFromJsonAsync(json);
+
+        var word = Assert.Single(await _services.WordRepository.GetWordsAsync());
+        Assert.Equal(PartOfSpeechEnum.Noun, word.KrDict!.Pos);
+    }
+
+    [Fact]
+    public async Task ImportFromJsonAsync_FailureMidImport_LeavesNoPartialRows()
+    {
+        var db = await _database.Context.GetConnectionAsync();
+        await db.ExecuteAsync("DROP TABLE KrDictSenses");
+
+        await Assert.ThrowsAsync<SQLiteException>(() => _services.ImportService.ImportFromJsonAsync(AppleJson));
+
+        Assert.Equal((0, 0, 0), (
+            await _database.CountAsync("Words"),
+            await _database.CountAsync("KrDicts"),
+            await _database.CountAsync("LangInfos")));
+    }
+
     [Fact]
     public async Task ExportToJsonAsync_ImportIntoEmptyDatabase_PreservesWord()
     {
@@ -77,7 +106,7 @@ public sealed class WordImportExportTests : IAsyncLifetime
 
         var word = Assert.Single(await target.WordRepository.GetWordsAsync());
         var sense = Assert.Single(word.KrDict!.Senses);
-        Assert.Equal(("사과", 1, 1), (word.Korean, word.Rank, word.KrDict.SupNo));
+        Assert.Equal(("사과", 1, 1, PartOfSpeechEnum.Noun), (word.Korean, word.Rank, word.KrDict.SupNo, word.KrDict.Pos));
         Assert.Equal(("яблоко", "apple"), (sense.Ru!.Word, sense.En!.Word));
     }
 

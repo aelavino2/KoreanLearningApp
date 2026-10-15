@@ -1,4 +1,4 @@
-using KoreanLearningApp.Infrastructure.Constants;
+﻿using KoreanLearningApp.Infrastructure.Constants;
 using KoreanLearningApp.Infrastructure.Import;
 using KoreanLearningApp.Infrastructure.Persistence;
 using KoreanLearningApp.Infrastructure.Persistence.Entities;
@@ -27,7 +27,7 @@ public sealed class TestServices
 
         WordRepository = new WordRepository(db, new GetWordsPageQuery(db), words, krDicts, senses, audios, langInfos);
         ImportService = new WordImportService(
-            new WordImportRepository(words, krDicts, senses, audios, langInfos),
+            new WordImportRepository(db, words, krDicts),
             new KrDictJsonSerializer(new ImportJsonOptions()));
         ExportService = new WordExportService(new ExportJsonOptions());
 
