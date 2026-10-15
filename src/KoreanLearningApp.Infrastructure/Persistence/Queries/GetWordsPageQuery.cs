@@ -1,65 +1,66 @@
-﻿using KoreanLearningApp.Domain.Models;
-using SQLite;
+using KoreanLearningApp.Domain.Models;
+using KoreanLearningApp.Domain.Models.Enums;
+using KoreanLearningApp.Infrastructure.Persistence.Entities;
 
 namespace KoreanLearningApp.Infrastructure.Persistence.Queries;
 
 public class GetWordsPageQuery(DbContext dbContext) : IGetWordsPageQuery
 {
-    public async Task<(List<int> Ids, int TotalCount)> ExecuteAsync(int page, int pageSize, string? search)
+    private const string SearchCondition = """
+        (w.Korean LIKE ? OR EXISTS (
+            SELECT 1
+            FROM KrDicts k
+            JOIN KrDictSenses s ON s.KrDictId = k.Id
+            LEFT JOIN LangInfos liRu ON liRu.Id = s.RuId
+            LEFT JOIN LangInfos liEn ON liEn.Id = s.EnId
+            WHERE k.WordId = w.Id AND (liRu.Word LIKE ? OR liEn.Word LIKE ?)))
+        """;
+
+    private const string FirstTagName = """
+        (SELECT MIN(t.NameRu) FROM WordTags wt JOIN Tags t ON t.Id = wt.TagId WHERE wt.WordId = w.Id)
+        """;
+
+    public async Task<(List<int> Ids, int TotalCount)> ExecuteAsync(WordsPageRequest request)
     {
         var db = await dbContext.GetConnectionAsync();
+        var (where, args) = BuildFilter(request);
 
-        var hasSearch = !string.IsNullOrWhiteSpace(search);
-        var likePattern = hasSearch ? $"%{search}%" : null;
+        var totalCount = await db.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM Words w {where}", args.ToArray());
 
-        var totalCount = await GetTotalCountAsync(db, hasSearch, likePattern);
-        var pageIds = await GetPageIdsAsync(db, hasSearch, likePattern, page, pageSize);
+        var pageSql = $"SELECT w.Id FROM Words w {where} ORDER BY {BuildOrder(request.Sort)} LIMIT ? OFFSET ?";
+        object[] pageArgs = [.. args, request.PageSize, (request.Page - 1) * request.PageSize];
+        var rows = await db.QueryAsync<WordEntity>(pageSql, pageArgs);
 
-        return (pageIds, totalCount);
+        return (rows.Select(r => r.Id).ToList(), totalCount);
     }
 
-    private static async Task<int> GetTotalCountAsync(SQLiteAsyncConnection db, bool hasSearch, string? likePattern)
+    private static (string Sql, List<object> Args) BuildFilter(WordsPageRequest request)
     {
-        if (!hasSearch)
-            return await db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Words");
+        var conditions = new List<string>();
+        var args = new List<object>();
 
-        const string countSql = @"
-        SELECT COUNT(DISTINCT w.Id)
-        FROM Words w
-        LEFT JOIN KrDicts k ON k.WordId = w.Id
-        LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
-        LEFT JOIN LangInfos liRu ON liRu.Id = s.RuId
-        LEFT JOIN LangInfos liEn ON liEn.Id = s.EnId
-        WHERE w.Korean LIKE ? OR liRu.Word LIKE ? OR liEn.Word LIKE ?";
-
-        return await db.ExecuteScalarAsync<int>(countSql, likePattern, likePattern, likePattern);
-    }
-
-    private static async Task<List<int>> GetPageIdsAsync(
-        SQLiteAsyncConnection db, bool hasSearch, string? likePattern, int page, int pageSize)
-    {
-        var offset = (page - 1) * pageSize;
-
-        if (!hasSearch)
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            const string plainSql = "SELECT Id FROM Words ORDER BY Rank LIMIT ? OFFSET ?";
-            var plainRows = await db.QueryAsync<Word>(plainSql, pageSize, offset);
-            return plainRows.Select(r => r.Id).ToList();
+            var likePattern = $"%{request.Search.Trim()}%";
+            conditions.Add(SearchCondition);
+            args.AddRange([likePattern, likePattern, likePattern]);
         }
 
-        const string searchSql = @"
-        SELECT DISTINCT w.Id
-        FROM Words w
-        LEFT JOIN KrDicts k ON k.WordId = w.Id
-        LEFT JOIN KrDictSenses s ON s.KrDictId = k.Id
-        LEFT JOIN LangInfos liRu ON liRu.Id = s.RuId
-        LEFT JOIN LangInfos liEn ON liEn.Id = s.EnId
-        WHERE w.Korean LIKE ? OR liRu.Word LIKE ? OR liEn.Word LIKE ?
-        ORDER BY w.Rank
-        LIMIT ? OFFSET ?";
+        if (request.TagIds is { Count: > 0 } tagIds)
+        {
+            var placeholders = string.Join(",", tagIds.Select(_ => "?"));
+            conditions.Add($"EXISTS (SELECT 1 FROM WordTags wt WHERE wt.WordId = w.Id AND wt.TagId IN ({placeholders}))");
+            args.AddRange(tagIds.Cast<object>());
+        }
 
-        var searchRows = await db.QueryAsync<Word>(
-            searchSql, likePattern, likePattern, likePattern, pageSize, offset);
-        return searchRows.Select(r => r.Id).ToList();
+        var sql = conditions.Count == 0 ? string.Empty : "WHERE " + string.Join(" AND ", conditions);
+        return (sql, args);
     }
+
+    private static string BuildOrder(WordSortEnum sort) => sort switch
+    {
+        WordSortEnum.Korean => "w.Korean, w.Rank, w.Id",
+        WordSortEnum.Tag => $"{FirstTagName} IS NULL, {FirstTagName}, w.Rank, w.Id",
+        _ => "w.Rank, w.Id"
+    };
 }

@@ -17,4 +17,6 @@ public class Word
     public int SourceIndex { get; set; }
 
     public KrDict? KrDict { get; set; }
+
+    public List<Tag> Tags { get; set; } = [];
 }

@@ -16,6 +16,7 @@ internal static class WordGraphWriter
         var wordEntity = word.ToEntity();
         db.Insert(wordEntity);
         InsertKrDict(db, word.KrDict, wordEntity.Id);
+        AddTags(db, wordEntity.Id, word.Tags);
         return wordEntity.Id;
     }
 
@@ -26,13 +27,58 @@ internal static class WordGraphWriter
         db.Update(wordEntity);
         DeleteKrDicts(db, word.Id);
         InsertKrDict(db, word.KrDict, word.Id);
+        db.Table<WordTagEntity>().Delete(wt => wt.WordId == word.Id);
+        AddTags(db, word.Id, word.Tags);
         return word.Id;
     }
 
     public static int Delete(SQLiteConnection db, int wordId)
     {
         DeleteKrDicts(db, wordId);
+        db.Table<WordTagEntity>().Delete(wt => wt.WordId == wordId);
         return db.Delete<WordEntity>(wordId);
+    }
+
+    /// <summary>
+    /// Привязывает теги к слову, создавая недостающие теги по <see cref="Tag.NameKo"/>; уже привязанные пропускает.
+    /// </summary>
+    /// <returns><c>true</c>, если у слова появился хотя бы один новый тег.</returns>
+    public static bool AddTags(SQLiteConnection db, int wordId, IEnumerable<Tag> tags)
+    {
+        var added = false;
+
+        foreach (var tag in tags.Where(t => !string.IsNullOrWhiteSpace(t.NameKo)).DistinctBy(t => t.NameKo.Trim()))
+        {
+            var tagId = GetOrCreateTagId(db, tag);
+            if (db.Table<WordTagEntity>().Any(wt => wt.WordId == wordId && wt.TagId == tagId))
+                continue;
+
+            db.Insert(new WordTagEntity { WordId = wordId, TagId = tagId });
+            added = true;
+        }
+
+        return added;
+    }
+
+    private static int GetOrCreateTagId(SQLiteConnection db, Tag tag)
+    {
+        var nameKo = tag.NameKo.Trim();
+        var existing = db.Table<TagEntity>().FirstOrDefault(t => t.NameKo == nameKo);
+
+        if (existing is null)
+        {
+            var created = new TagEntity { NameKo = nameKo, NameRu = tag.NameRu.Trim() };
+            db.Insert(created);
+            return created.Id;
+        }
+
+        if (string.IsNullOrWhiteSpace(existing.NameRu) && !string.IsNullOrWhiteSpace(tag.NameRu))
+        {
+            existing.NameRu = tag.NameRu.Trim();
+            db.Update(existing);
+        }
+
+        return existing.Id;
     }
 
     private static void InsertKrDict(SQLiteConnection db, KrDict? krDict, int wordId)

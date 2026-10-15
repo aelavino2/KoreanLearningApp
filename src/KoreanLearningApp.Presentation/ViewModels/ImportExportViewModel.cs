@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KoreanLearningApp.Domain.Models;
 using KoreanLearningApp.Presentation.Dialogs;
 using KoreanLearningApp.Presentation.Files;
 using KoreanLearningApp.Services.Abstractions.Services;
@@ -41,17 +42,26 @@ public partial class ImportExportViewModel(
             if (json is null)
                 return;
 
-            var importedCount = await wordImportService.ImportFromJsonAsync(json);
-
-            var message = importedCount > 0
-                ? $"Успешно импортировано слов: {importedCount}"
-                : "Новых слов для импорта не найдено (возможно, все уже есть в словаре)";
-
-            await dialogService.ShowAlertAsync("Импорт", message);
+            var result = await wordImportService.ImportFromJsonAsync(json);
+            await dialogService.ShowAlertAsync("Импорт", BuildImportMessage(result));
         }
         catch (Exception ex)
         {
             await dialogService.ShowAlertAsync("Ошибка", $"Не удалось импортировать: {ex.Message}");
         }
+    }
+
+    private static string BuildImportMessage(WordImportResult result)
+    {
+        if (result is { AddedWords: 0, TaggedExistingWords: 0 })
+            return "Новых слов и тегов не найдено (возможно, всё уже есть в словаре)";
+
+        var parts = new List<string>();
+        if (result.AddedWords > 0)
+            parts.Add($"Добавлено слов: {result.AddedWords}");
+        if (result.TaggedExistingWords > 0)
+            parts.Add($"Обновлены теги у слов: {result.TaggedExistingWords}");
+
+        return string.Join(Environment.NewLine, parts);
     }
 }
