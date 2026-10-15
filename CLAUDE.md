@@ -6,13 +6,20 @@
 
 ## Структура решения
 
+```
+.claude/skills/   скиллы Claude Code
+.github/          CI (dotnet test)
+src/              проекты приложения
+tests/            xUnit-тесты
+```
+
 | Проект | TFM | Назначение | Зависит от |
 |---|---|---|---|
-| `KoreanLearningApp.Domain` | net10.0 | Модели (`Word`, `KrDict`, `Sense`, `WordProgress`, `QuizQuestion`…), enum'ы, `TopikLevelMapper` | — |
-| `KoreanLearningApp.Services` | net10.0 | Интерфейсы сервисов и репозиториев (`Abstractions/`), `WordService`, `SavedWordsService`, практика (`Services/Practice`: SM-2, сборка квиза, очки), `AudioPlayerService` | Domain, Plugin.Maui.Audio |
-| `KoreanLearningApp.Infrastructure` | net10.0 | SQLite (sqlite-net-pcl), Entities, репозитории, запросы, импорт/экспорт JSON, маппинг | Domain, Services, Mapster |
-| `KoreanLearningApp.Presentation` | net10.0 | ViewModel'и (CommunityToolkit.Mvvm) и UI-абстракции: `INavigationService`, `AppRoutes`, `IDialogService`, `IFileService`, форматирование enum'ов (`ToRussian`). **Без MAUI** | Domain, Services |
-| `KoreanLearningApp` | net10.0-android/ios/maccatalyst/windows | MAUI: Views (XAML), реализации `ShellNavigationService`/`ShellDialogService`/`MauiFileService`, конвертеры, стили, DI в `MauiProgram.cs` | Presentation, Infrastructure, Services |
+| `src/KoreanLearningApp.Domain` | net10.0 | Модели (`Word`, `KrDict`, `Sense`, `WordProgress`, `QuizQuestion`…), enum'ы, `TopikLevelMapper` | — |
+| `src/KoreanLearningApp.Services` | net10.0 | Интерфейсы сервисов и репозиториев (`Abstractions/`), `WordService`, `SavedWordsService`, практика (`Services/Practice`: SM-2, сборка квиза, очки), `AudioPlayerService` | Domain, Plugin.Maui.Audio |
+| `src/KoreanLearningApp.Infrastructure` | net10.0 | SQLite (sqlite-net-pcl), Entities, репозитории, запросы, импорт/экспорт JSON, маппинг | Domain, Services, Mapster |
+| `src/KoreanLearningApp.Presentation` | net10.0 | ViewModel'и (CommunityToolkit.Mvvm) и UI-абстракции: `INavigationService`, `AppRoutes`, `IDialogService`, `IFileService`, форматирование enum'ов (`ToRussian`). **Без MAUI** | Domain, Services |
+| `src/KoreanLearningApp` | net10.0-android/ios/maccatalyst/windows | MAUI: Views (XAML), реализации `ShellNavigationService`/`ShellDialogService`/`MauiFileService`, конвертеры, стили, DI в `MauiProgram.cs` | Presentation, Infrastructure, Services |
 | `tests/KoreanLearningApp.Tests` | net10.0 | xUnit: репозитории на реальном SQLite, импорт/экспорт, практика, ViewModel'и | Presentation, Infrastructure, Services |
 
 Направление зависимостей: UI → Presentation / Infrastructure → Services → Domain. Интерфейсы репозиториев лежат в **Services** (`Services/Abstractions/Repositories`), реализации — в Infrastructure. Platform API (Shell, FilePicker, Share, FileSystem) — только в MAUI-проекте за интерфейсами из Presentation.
@@ -29,14 +36,14 @@
 ## Сборка, запуск, тесты
 
 ```bash
-dotnet build KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-windows10.0.19041.0
-dotnet run --project KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-windows10.0.19041.0
+dotnet build src/KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-windows10.0.19041.0
+dotnet run --project src/KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-windows10.0.19041.0
 dotnet test tests/KoreanLearningApp.Tests
 ```
 
-БД: `%LOCALAPPDATA%\koreanApp\KoreanLearning.db`. Пути — `KoreanLearningApp/Diagnostics/AppPaths`.
+БД: `%LOCALAPPDATA%\koreanApp\KoreanLearning.db`. Пути — `src/KoreanLearningApp/Diagnostics/AppPaths`.
 
-Android-сборка падает с `APT2265` из-за кириллицы в пути `D:\Проекты`: собирать из копии с ASCII-путём (`robocopy ... /XD bin obj .git .claude`), установка — `dotnet build -f net10.0-android -t:Install` при запущенном эмуляторе `pixel_7_-_api_36`.
+Android-сборка падает с `APT2265` из-за кириллицы в пути `D:\Проекты`: собирать из копии с ASCII-путём (`robocopy ... /XD bin obj .git .claude .idea`), установка — `dotnet build src/KoreanLearningApp/KoreanLearningApp.csproj -f net10.0-android -t:Install` на эмулятор `pixel_7_-_api_36` или телефон (`-p:AdbTarget="-s <serial>"`), только по просьбе пользователя.
 
 ## Диагностика
 
