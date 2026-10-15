@@ -21,10 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\KoreanLearningApp.Domain\KoreanLearningApp.Domain.csproj" />
-    <ProjectReference Include="..\..\KoreanLearningApp.Services\KoreanLearningApp.Services.csproj" />
-    <ProjectReference Include="..\..\KoreanLearningApp.Infrastructure\KoreanLearningApp.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\KoreanLearningApp.Presentation\KoreanLearningApp.Presentation.csproj" />
+    <ProjectReference Include="..\..\src\KoreanLearningApp.Domain\KoreanLearningApp.Domain.csproj" />
+    <ProjectReference Include="..\..\src\KoreanLearningApp.Services\KoreanLearningApp.Services.csproj" />
+    <ProjectReference Include="..\..\src\KoreanLearningApp.Infrastructure\KoreanLearningApp.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\KoreanLearningApp.Presentation\KoreanLearningApp.Presentation.csproj" />
   </ItemGroup>
 
 </Project>
